@@ -16,7 +16,7 @@ import org.lwjgl.input.Mouse;
 import java.util.*;
 import static dev.zyon.Setting.*;
 import static dev.zyon.Feature.Category.*;
-@Mod(modid="zyon",name="Zyon Client",version="1.2.0",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
+@Mod(modid="zyon",name="Zyon Client",version="1.2.1",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
 public final class Zyon {
  public static Zyon instance;public final List<Feature> features=new ArrayList<Feature>();public Engine engine;public Profiles profiles;public Keystrokes keystrokes;public boolean requestMenu;
  public final KeyBinding menuKey=new KeyBinding("Zyon: abrir menu",Keyboard.KEY_RSHIFT,"Zyon"),panicKey=new KeyBinding("Zyon: desligar tudo",Keyboard.KEY_END,"Zyon");

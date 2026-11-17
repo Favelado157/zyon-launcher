@@ -56,7 +56,7 @@ jobs:
           .\gradlew.bat "-Porg.gradle.java.installations.paths=$env:ZYON_JAVA8" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Pop-Location
-          Copy-Item client-src/build/libs/zyon-1.8.9-1.2.0.jar payload/zyon-1.8.9-1.2.0.jar -Force
+          Copy-Item client-src/build/libs/zyon-1.8.9-1.2.1.jar payload/zyon-1.8.9-1.2.1.jar -Force
           node build/prepare-release.cjs
       - name: Testar o launcher
         shell: pwsh
@@ -83,9 +83,10 @@ jobs:
         run: |
           $v = $env:ZYON_RELEASE_VERSION
           @"
-          Zyon Launcher $v — keystrokes e OptiFine.
+          Zyon Launcher $v — novo fundo do menu Minecraft.
 
           Instalação para Windows x64. Mundos e configurações são preservados.
+          Novo menu noturno com cerejeiras, lago, ponte iluminada e título ZYON, baseado na imagem enviada pelo publicador. Botões funcionais centralizados, sem imagens de botões duplicadas.
           Keystrokes arrastáveis: Shift direito > Editar HUD, ou Ctrl direito. Tamanho, cores, transparência e CPS em Interface > Keystrokes.
           OptiFine opcional: na aba Instalação, baixe o JAR oficial 1.8.9 HD U M5 e use Importar. O zoom usa C; a capa exige uma capa OptiFine ativa. O JAR OptiFine não acompanha o instalador.
           Client ID público do Zyon incluído. O login direto ainda depende da aprovação do aplicativo pela Microsoft para as APIs do Minecraft; a autenticação real não foi validada nesta publicação.

@@ -143,7 +143,7 @@ async function ensureArtifacts({ root, instanceDir, minecraftRoot, signal, emit 
   }
   const clientJar = path.join(minecraftRoot, 'versions', GAME_VERSION, GAME_VERSION + '.jar');
   const ready = {
-    schema: 1, version: GAME_VERSION, clientVersion: '1.2.0', minecraftRoot, instanceDir, mainClass: forge.version.mainClass,
+    schema: 1, version: GAME_VERSION, clientVersion: '1.2.1', minecraftRoot, instanceDir, mainClass: forge.version.mainClass,
     arguments: forge.version.minecraftArguments || vanilla.minecraftArguments, classpath: libraries.filter(value => !value.native).map(value => value.file).concat(clientJar),
     natives, assetsRoot, assetsIndex: index.id, logging,
     resources: objects.map(value => path.join(assetsRoot, 'objects', value.hash.slice(0, 2), value.hash)), prepared: new Date().toISOString()
@@ -154,7 +154,7 @@ async function ensureArtifacts({ root, instanceDir, minecraftRoot, signal, emit 
 }
 async function readReady(root, instanceDir, minecraftRoot) {
   const ready = await core.readJson(path.join(root, 'game-ready.json'), null).catch(() => null);
-  if (!ready || ready.schema !== 1 || ready.clientVersion !== '1.2.0' || ready.instanceDir !== instanceDir || ready.minecraftRoot !== minecraftRoot) return null;
+  if (!ready || ready.schema !== 1 || ready.clientVersion !== '1.2.1' || ready.instanceDir !== instanceDir || ready.minecraftRoot !== minecraftRoot) return null;
   if (!core.inside(root, ready.natives) || !core.inside(minecraftRoot, ready.assetsRoot)) return null;
   const files = [...ready.classpath, ...(ready.resources || []), ...(ready.logging ? [ready.logging.file] : [])];
   if (files.some(file => !core.inside(minecraftRoot, file))) return null;
@@ -176,7 +176,7 @@ function launchArguments(ready, session, memoryGB) {
     auth_uuid: session.uuid, auth_access_token: session.accessToken, auth_session: 'token:' + session.accessToken + ':' + session.uuid,
     user_properties: '{}', user_type: 'mojang', version_type: 'release'
   };
-  const args = [`-Xmx${memoryGB}G`, '-XX:+UseG1GC', '-Djava.library.path=' + ready.natives, '-Dminecraft.launcher.brand=Zyon', '-Dminecraft.launcher.version=1.2.0'];
+  const args = [`-Xmx${memoryGB}G`, '-XX:+UseG1GC', '-Djava.library.path=' + ready.natives, '-Dminecraft.launcher.brand=Zyon', '-Dminecraft.launcher.version=1.2.1'];
   if (ready.logging) args.push(ready.logging.argument.replace('${path}', ready.logging.file));
   args.push('-cp', ready.classpath.join(';'), ready.mainClass);
   for (const token of splitArguments(ready.arguments)) {

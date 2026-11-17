@@ -1,6 +1,6 @@
 # Zyon Launcher
 
-Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria, menu Zyon, keystrokes arrastáveis, importação opcional do OptiFine e atualizações pelo GitHub.
+Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria, menu Zyon com cenário noturno de cerejeiras, keystrokes arrastáveis, importação opcional do OptiFine e atualizações pelo GitHub.
 
 [Baixar a versão mais recente](https://github.com/Favelado157/zyon-launcher/releases/latest) · [Acompanhar compilações](https://github.com/Favelado157/zyon-launcher/actions) · [Guia de configuração](CONFIGURAR-PUBLICACAO.md)
 

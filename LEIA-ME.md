@@ -1,12 +1,12 @@
 # Zyon Launcher 1.2 — Windows 10/11 x64
 
-Esta atualização adiciona keystrokes configuráveis com posição arrastável e importação opcional do OptiFine 1.8.9 HD U M5 para zoom e capas.
+Esta atualização troca o fundo do menu inicial do jogo pelo cenário noturno com cerejeiras, lago, ponte iluminada e título ZYON enviado pelo publicador. Os botões são controles reais centralizados sobre o fundo, sem botões desenhados na imagem. A imagem do aplicativo launcher permanece a mesma. Keystrokes arrastáveis e importação opcional do OptiFine continuam disponíveis.
 
 ## Atualizar
 
 1. Feche o Minecraft e aceite a atualização na aba **Atualizações** do Zyon, ou baixe o instalador mais recente em https://github.com/Favelado157/zyon-launcher/releases/latest.
 2. Abra o launcher e clique em **Preparar Minecraft / Verificar arquivos** para instalar o cliente novo.
-3. Mundos e perfis são mantidos. Os JARs anteriores do Zyon 1.0 e 1.1 são movidos para `zyon-backups`, evitando duas versões do mod.
+3. Mundos e perfis são mantidos. Os JARs anteriores do Zyon 1.0, 1.1 e 1.2.0 são movidos para `zyon-backups`, evitando duas versões do mod.
 
 O Client ID público do Zyon está incluído. O pedido de aprovação das APIs do Minecraft foi enviado pelo publicador; o resultado ainda não foi confirmado. O login direto continua dependendo dessa aprovação e de uma conta com acesso ao Minecraft Java.
 

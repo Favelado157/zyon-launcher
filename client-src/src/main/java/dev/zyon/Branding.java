@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 
 public final class Branding {
     public static final ResourceLocation LOGO = new ResourceLocation("zyon", "textures/brand.png");
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("zyon", "textures/menu.jpg");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("zyon", "textures/menu.png");
     @SubscribeEvent public void open(GuiOpenEvent event) {
         if (event.gui instanceof GuiMainMenu && Zyon.instance.feature("theme").flag("menu")) event.gui = new MainMenu();
     }
@@ -45,26 +45,24 @@ public final class Branding {
     }
     private static final class MainMenu extends GuiScreen {
         @Override public void initGui() {
-            int left = Math.max(18, width / 12), top = Math.max(95, height / 2 - 15), w = Math.min(210, width - left - 20);
+            int w = Math.max(150, Math.min(240, (int)(width * .28))), left = (width - w) / 2;
+            int titleBottom = (int)Math.ceil(215 * Math.max(width / 1672.0, height / 941.0)) + 8;
+            int top = Math.max(64, Math.min(height - 116, Math.max(titleBottom, height / 3))), third = (w - 8) / 3;
             buttonList.clear();
-            buttonList.add(new MenuButton(1, left, top, w, "Um jogador"));
-            buttonList.add(new MenuButton(2, left, top + 29, w, "Multijogador"));
-            buttonList.add(new MenuButton(3, left, top + 58, w / 2 - 3, "Opcoes"));
-            buttonList.add(new MenuButton(4, left + w / 2 + 3, top + 58, w / 2 - 3, "Menu Zyon"));
-            buttonList.add(new MenuButton(6, left, top + 87, w / 2 - 3, "Mods"));
-            buttonList.add(new MenuButton(5, left + w / 2 + 3, top + 87, w / 2 - 3, "Sair"));
+            buttonList.add(new GuiButton(1, left, top, w, 20, "Um jogador"));
+            buttonList.add(new GuiButton(2, left, top + 24, w, 20, "Multijogador"));
+            buttonList.add(new GuiButton(4, left, top + 48, w, 20, "Menu Zyon"));
+            buttonList.add(new GuiButton(3, left, top + 84, third, 20, "Opcoes"));
+            buttonList.add(new GuiButton(6, left + third + 4, top + 84, third, 20, "Mods"));
+            buttonList.add(new GuiButton(5, left + 2 * (third + 4), top + 84, w - 2 * (third + 4), 20, "Sair"));
         }
         @Override public void drawScreen(int mouseX, int mouseY, float partial) {
-            image(BACKGROUND, 0, 0, width, height);
-            drawRect(0, 0, width, height, 0x55100B23);
-            int left = Math.max(18, width / 12), logoY = Math.max(15, Math.max(95, height / 2 - 15) - 77);
-            image(LOGO, left, logoY, 43, 43);
-            GlStateManager.pushMatrix(); GlStateManager.translate(left + 52, logoY + 8, 0); GlStateManager.scale(2, 2, 1);
-            fontRendererObj.drawStringWithShadow("ZYON", 0, 0, 0xFFE3D6FF); GlStateManager.popMatrix();
-            fontRendererObj.drawStringWithShadow("MINECRAFT JAVA 1.8.9", left + 53, logoY + 31, 0xFFC5B7E0);
-            fontRendererObj.drawStringWithShadow("Seu mundo. Seu cliente.", left, logoY + 57, 0xFFD0C5E5);
+            // Cover the viewport without stretching. Anchor the crop to the top to preserve the ZYON title on ultrawide displays.
+            double cover = Math.max(width / 1672.0, height / 941.0);
+            int backgroundWidth = (int)Math.ceil(1672 * cover), backgroundHeight = (int)Math.ceil(941 * cover);
+            image(BACKGROUND, (width - backgroundWidth) / 2, 0, backgroundWidth, backgroundHeight);
             super.drawScreen(mouseX, mouseY, partial);
-            fontRendererObj.drawStringWithShadow("Zyon Client 1.2.0  /  Forge", 14, height - 16, 0xFFCEBFDE);
+            fontRendererObj.drawStringWithShadow("Minecraft 1.8.9 / Zyon 1.2.1", 4, height - 12, 0xFFE0DCEB);
         }
         @Override protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));
@@ -76,15 +74,5 @@ public final class Branding {
         }
         @Override protected void keyTyped(char typed, int key) { }
         @Override public boolean doesGuiPauseGame() { return false; }
-    }
-    private static final class MenuButton extends GuiButton {
-        MenuButton(int id, int x, int y, int width, String name) { super(id, x, y, width, 23, name); }
-        @Override public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-            if (!visible) return;
-            hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
-            drawRect(xPosition, yPosition, xPosition + width, yPosition + height, hovered ? 0xED5C477D : 0xD0241B37);
-            drawRect(xPosition, yPosition, xPosition + 2, yPosition + height, hovered ? Zyon.instance.accent() : 0xFF77608E);
-            drawCenteredString(mc.fontRendererObj, displayString, xPosition + width / 2, yPosition + 8, enabled ? 0xFFF3EBFF : 0xFF81758D);
-        }
     }
 }
