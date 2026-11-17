@@ -6,6 +6,7 @@ const os = require('node:os');
 const core = require('./core.cjs');
 const game = require('./game.cjs');
 const updates = require('./updates.cjs');
+const optifine = require('./optifine.cjs');
 const { MicrosoftAccount, validClientId } = require('./auth.cjs');
 const publisher = require('./release-config.json');
 app.setName('Zyon Launcher');
@@ -48,7 +49,7 @@ async function state() {
   return { ...config, installed, busy, busyType, running: !!gameChild, version: app.getVersion(),
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
     account: await account.profile(), authConfigured: account.configured(), update: lastUpdate, updateMessage,
-    updatesConfigured: !!config.githubRepository, profile: 'Zyon 1.8.9', root };
+    updatesConfigured: !!config.githubRepository, optifine: await optifine.status(config.instanceDir), profile: 'Zyon 1.8.9', root };
 }
 function register(channel, handler) {
   ipcMain.handle('zyon:' + channel, async (event, ...args) => {
@@ -99,6 +100,19 @@ register('prepare', async () => {
   return state();
 });
 register('cancel', async () => { controller?.abort(); return true; });
+register('import-optifine', async () => {
+  noOperation(true);busy = true;busyType = 'optifine';
+  try {
+    const picked = await dialog.showOpenDialog(window, { title: 'Importar OptiFine 1.8.9 HD U M5', properties: ['openFile'], filters: [{ name: 'OptiFine Java', extensions: ['jar'] }] });
+    if (!picked.canceled && picked.filePaths[0]) await optifine.install(picked.filePaths[0], config.instanceDir);
+  } finally { busy = false;busyType = ''; }
+  return state();
+});
+register('remove-optifine', async () => {
+  noOperation(true);busy = true;busyType = 'optifine';
+  try { await optifine.remove(config.instanceDir); } finally { busy = false;busyType = ''; }
+  return state();
+});
 register('login', async () => {
   noOperation(true); busy = true; busyType = 'login'; controller = new AbortController();
   try {
@@ -174,7 +188,7 @@ register('folder', async kind => {
   const error = await shell.openPath(folder); if (error) throw new Error(error); return true;
 });
 register('external', async kind => {
-  const urls = { launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid' };
+  const urls = { launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid', optifine: 'https://optifine.net/adloadx?f=OptiFine_1.8.9_HD_U_M5.jar', cape: 'https://optifine.net/cape' };
   if (!urls[kind]) throw new Error('Link inválido.'); await shell.openExternal(urls[kind]); return true;
 });
 if (lock) app.whenReady().then(async () => {

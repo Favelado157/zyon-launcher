@@ -21,6 +21,8 @@ function applyBusy() {
   $('mainAction').disabled = busy || running; $('launchAction').disabled = busy || running || !current?.installed;
   $('loginAction').disabled = busy || running; $('logoutAction').disabled = busy || running;
   $('installUpdateAction').disabled = busy || running || !updateAvailable?.available;
+  $('importOptifineAction').disabled = busy || running;
+  $('removeOptifineAction').disabled = busy || running;
   $('cancelAction').classList.toggle('hidden', operation !== 'prepare' && operation !== 'launch');
   $('updateCancel').classList.toggle('hidden', operation !== 'update');
   if (busy) {
@@ -44,6 +46,8 @@ function render(state) {
   $('heroStatus').textContent = state.running ? 'Seu mundo está aberto' : state.installed ? 'Sua instância está preparada' : 'Uma nova experiência está chegando';
   $('heroHint').textContent = state.running ? 'O Minecraft foi iniciado diretamente pelo Zyon.' : state.account ? 'Conectado como ' + state.account.name + '. Pronto para Play.' : 'Faça o login em Minha conta para usar o Play direto.';
   $('prepareAction').textContent = state.installed ? 'Verificar arquivos ↻' : 'Preparar Minecraft ↓';
+  $('optifineStatus').textContent = state.optifine?.problem || (state.optifine?.installed ? 'Instalado · OptiFine ' + state.optifine.version + ' · disponível na próxima abertura do jogo.' : 'Opcional · importe o JAR oficial HD U M5 para esta instância.');
+  $('removeOptifineAction').classList.toggle('hidden', !state.optifine?.managed);
   $('accountName').textContent = state.account ? state.account.name : 'Entre com a Microsoft';
   $('accountDescription').textContent = state.account ? 'Conta conectada. A senha e a sessão permanecem protegidas.' : 'Use sua conta com acesso ao Minecraft Java. A senha fica na página da Microsoft.';
   $('loginAction').textContent = !state.authConfigured ? 'Configurar login' : state.account ? 'Entrar novamente' : 'Entrar com Microsoft';
@@ -121,6 +125,10 @@ document.addEventListener('click', async event => {
       case 'azure': await call('external', 'azure'); break;
       case 'github': await call('external', 'github'); break;
       case 'official': await call('external', 'launcher'); break;
+      case 'optifine-site': await call('external', 'optifine'); break;
+      case 'cape': await call('external', 'cape'); break;
+      case 'import-optifine': await run('optifine', async () => { render(await call('importOptifine')); if(current.optifine?.installed)toast('OptiFine instalado. O zoom e a capa ficam disponíveis na próxima abertura do jogo.'); }); break;
+      case 'remove-optifine': await run('optifine', async () => { render(await call('removeOptifine')); toast('OptiFine movido para o backup da instância.'); }); break;
       case 'check-updates': {
         $('checkUpdatesAction').disabled = true; $('updateDescription').textContent = 'Verificando publicações…';
         try { const result = await call('checkUpdates'); renderUpdate(result.update, result.message); }

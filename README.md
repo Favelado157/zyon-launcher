@@ -1,8 +1,14 @@
 # Zyon Launcher
 
-Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria, novo menu do jogo, ícones Zyon e um canal de atualizações.
+Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria, menu Zyon, keystrokes arrastáveis, importação opcional do OptiFine e atualizações pelo GitHub.
 
 [Baixar a versão mais recente](https://github.com/Favelado157/zyon-launcher/releases/latest) · [Acompanhar compilações](https://github.com/Favelado157/zyon-launcher/actions) · [Guia de configuração](CONFIGURAR-PUBLICACAO.md)
+
+## Keystrokes e OptiFine
+
+- **Shift direito → Editar HUD**, ou **Ctrl direito**: arraste os keystrokes. Em Interface → Keystrokes, configure tamanho, cores, transparência, CPS, mouse e pulo. Posição e estilo ficam nos perfis.
+- No launcher, **Instalação → OptiFine**: baixe o JAR oficial **1.8.9 HD U M5** e use **Importar OptiFine .jar**. O JAR não é redistribuído pelo Zyon. Zoom usa **C** por padrão; a capa depende de uma capa OptiFine ativa na conta.
+- Veja [LEIA-ME.md](LEIA-ME.md) para instalação e controles.
 
 ## Estado do projeto
 

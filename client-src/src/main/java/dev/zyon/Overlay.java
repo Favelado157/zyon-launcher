@@ -11,11 +11,12 @@ public final class Overlay {
  public Overlay(Zyon client,Engine engine){this.client=client;this.engine=engine;}private Feature f(String id){return client.feature(id);}
  private void text(String value,int x,int y,int color){mc.fontRendererObj.drawStringWithShadow(value,x,y,color);}
  public void hud(){
-  if(mc.thePlayer==null||mc.gameSettings.showDebugInfo||mc.gameSettings.hideGUI||mc.currentScreen instanceof ClickGui)return;
+  if(mc.thePlayer==null||mc.gameSettings.showDebugInfo||mc.gameSettings.hideGUI||mc.currentScreen instanceof ClickGui||mc.currentScreen instanceof HudEditor)return;
   ScaledResolution res=new ScaledResolution(mc);int width=res.getScaledWidth(),height=res.getScaledHeight(),accent=client.accent();
+  client.keystrokes.draw(width,height,false);
   if(f("crosshair").enabled()&&mc.gameSettings.thirdPersonView==0){int cx=width/2,cy=height/2,s=f("crosshair").setting("size").integer(),g=f("crosshair").setting("gap").integer();Gui.drawRect(cx-g-s,cy,cx-g,cy+1,accent);Gui.drawRect(cx+g+1,cy,cx+g+s+1,cy+1,accent);Gui.drawRect(cx,cy-g-s,cx+1,cy-g,accent);Gui.drawRect(cx,cy+g+1,cx+1,cy+g+s+1,accent);if(f("crosshair").flag("dot"))Gui.drawRect(cx,cy,cx+1,cy+1,accent);}
   Feature hud=f("hud");if(!hud.enabled())return;int x=Math.min(hud.setting("x").integer(),Math.max(0,width-150)),y=Math.min(hud.setting("y").integer(),Math.max(0,height-80));
-  Gui.drawRect(x,y,x+144,y+34,0xD0161925);Gui.drawRect(x,y,x+2,y+34,accent);if(hud.flag("logo"))Branding.image(Branding.LOGO,x+6,y+4,26,26);text("ZYON",x+(hud.flag("logo")?39:10),y+7,accent);text("1.8.9 / 1.1",x+(hud.flag("logo")?39:10),y+20,0xFFABB2C8);int row=y+42;
+  Gui.drawRect(x,y,x+144,y+34,0xD0161925);Gui.drawRect(x,y,x+2,y+34,accent);if(hud.flag("logo"))Branding.image(Branding.LOGO,x+6,y+4,26,26);text("ZYON",x+(hud.flag("logo")?39:10),y+7,accent);text("1.8.9 / 1.2",x+(hud.flag("logo")?39:10),y+20,0xFFABB2C8);int row=y+42;
   if(hud.flag("fps")){text(Minecraft.getDebugFPS()+" FPS",x,row,0xFFE1E4EE);row+=12;}
   if(hud.flag("coords")){text(String.format(Locale.ROOT,"XYZ  %.1f  %.1f  %.1f",mc.thePlayer.posX,mc.thePlayer.posY,mc.thePlayer.posZ),x,row,0xFFABB2C8);row+=12;}
   if(hud.flag("target")&&engine.target!=null&&!engine.target.isDead){EntityLivingBase t=engine.target;int top=Math.min(row+10,height-39);Gui.drawRect(x,top,x+150,top+38,0xD0161925);text(mc.fontRendererObj.trimStringToWidth(t.getName(),132),x+8,top+6,0xFFF1F2F8);text(String.format(Locale.ROOT,"%.1f HP  |  %.1f m",t.getHealth(),mc.thePlayer.getDistanceToEntity(t)),x+8,top+18,0xFFABB2C8);Gui.drawRect(x+8,top+31,x+142,top+33,0xFF34394D);float ratio=Math.max(0,Math.min(1,t.getHealth()/Math.max(1,t.getMaxHealth())));Gui.drawRect(x+8,top+31,x+8+(int)(134*ratio),top+33,accent);}

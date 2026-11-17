@@ -64,7 +64,7 @@ public final class Branding {
             fontRendererObj.drawStringWithShadow("MINECRAFT JAVA 1.8.9", left + 53, logoY + 31, 0xFFC5B7E0);
             fontRendererObj.drawStringWithShadow("Seu mundo. Seu cliente.", left, logoY + 57, 0xFFD0C5E5);
             super.drawScreen(mouseX, mouseY, partial);
-            fontRendererObj.drawStringWithShadow("Zyon Client 1.1.0  /  Forge", 14, height - 16, 0xFFCEBFDE);
+            fontRendererObj.drawStringWithShadow("Zyon Client 1.2.0  /  Forge", 14, height - 16, 0xFFCEBFDE);
         }
         @Override protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));

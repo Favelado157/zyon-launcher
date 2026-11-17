@@ -15,6 +15,12 @@ public class ProfilesTest {
  @Test public void pathTraversalCannotEscapeFolder()throws IOException{for(String n:new String[]{"../escape","/tmp/escape","a/b","a\\b","","a.b"})try{profiles.save(n);fail(n);}catch(IllegalArgumentException expected){assertTrue(expected.getMessage().contains("nome"));}assertEquals(0,folder.listFiles().length);}
  @Test public void brokenJsonAndUnknownSchemaAreRejected()throws IOException{write("broken","{not json");invalid("broken");write("future","{\"schema\":99,\"modules\":{}}");invalid("future");assertEquals(3,aura.number("range"),0);}
  @Test public void missingProfilePreservesState(){aura.key=19;invalid("missing");assertEquals(19,aura.key);}
+ @Test public void draggedPositionAndStyleSurviveProfileReload()throws IOException{
+  Zyon client=new Zyon();Feature keys=new Feature("keystrokes","Keystrokes","",Feature.Category.CLIENT,Setting.number("x","X",2,0,100,.1),Setting.number("y","Y",35,0,100,.1),Setting.number("scale","Tamanho",1,.5,2,.1),Setting.choice("color","Cor",0,"Tema","Branco"));client.features.add(keys);
+  Profiles layouts=new Profiles(client,folder);keys.setting("x").set(HudLayout.percent(124,320,72));keys.setting("y").set(100);keys.setting("scale").set(1.8);keys.setting("color").set(1);layouts.save("layout");
+  keys.setting("x").set(0);keys.setting("y").set(0);keys.setting("scale").set(.5);keys.setting("color").set(0);layouts.load("layout");
+  assertEquals(50,keys.number("x"),0);assertEquals(100,keys.number("y"),0);assertEquals(1.8,keys.number("scale"),.00001);assertEquals(1,keys.setting("color").integer());
+ }
  private void write(String name,String json)throws IOException{Files.write(new File(folder,name+".json").toPath(),json.getBytes(StandardCharsets.UTF_8));}
  private void invalid(String name){try{profiles.load(name);fail(name);}catch(IOException expected){assertNotNull(expected.getMessage());}}
 }

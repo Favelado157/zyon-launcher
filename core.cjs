@@ -9,7 +9,7 @@ const extractZip = require('extract-zip');
 const FORGE_URL = 'https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar';
 const FORGE_SHA256 = 'f9fdf4945ca02d73ec6cc46300942f4e199e4add068877d517157b3677563656';
 const VERSION = 'zyon-1.8.9-forge';
-const MOD = 'zyon-1.8.9-1.1.0.jar';
+const MOD = 'zyon-1.8.9-1.2.0.jar';
 const digest = (data, algorithm = 'sha256') => crypto.createHash(algorithm).update(data).digest('hex');
 const exists = async file => { try { await fs.access(file); return true; } catch { return false; } };
 function checkAbort(signal) { if (signal?.aborted) throw new Error('Operação cancelada. Você pode retomar a instalação.'); }
@@ -200,7 +200,7 @@ async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2
     lastProgress = Date.now();
     emit({ step: 'java', percent: 50 + Math.min(27, Math.floor(27 * received / total)), message: `Baixando Java 8: ${(received / 1024 / 1024).toFixed(1)} de ${(total / 1024 / 1024).toFixed(1)} MB…` });
   } });
-  stage('client', 82, 'Instalando os 18 módulos e criando o perfil separado…');
+  stage('client', 82, 'Instalando os 19 módulos e criando o perfil separado…');
   await installMod(payload, instanceDir);
   checkAbort(signal);
   if (registerProfiles) { await beforeProfiles(); checkAbort(signal); await updateProfiles(minecraftRoot, instanceDir, javaExe, memoryGB); }

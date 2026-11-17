@@ -41,13 +41,15 @@ test('upgrading moves the old Zyon jar to backup even when the new jar was alrea
   const root = await folder(t), mods = path.join(root, 'mods'); await fs.mkdir(mods);
   const old = new AdmZip(); old.addFile('mcmod.info', Buffer.from('[{"modid":"zyon","version":"1.0.0"}]')); old.addFile('custom.dat', Buffer.from('preserved'));
   const oldData = old.toBuffer(); await fs.writeFile(path.join(mods, 'zyon-1.8.9-1.0.0.jar'), oldData);
+  await fs.writeFile(path.join(mods, 'zyon-1.8.9-1.1.0.jar'), oldData);
   await fs.copyFile(path.join(__dirname, '../payload', core.MOD), path.join(mods, core.MOD));
   await core.installMod(path.join(__dirname, '../payload'), root);
   assert.equal(await core.exists(path.join(mods, 'zyon-1.8.9-1.0.0.jar')), false);
-  const names = await fs.readdir(path.join(root, 'zyon-backups')); assert.equal(names.length, 1);
-  assert.deepEqual(await fs.readFile(path.join(root, 'zyon-backups', names[0])), oldData);
+  assert.equal(await core.exists(path.join(mods, 'zyon-1.8.9-1.1.0.jar')), false);
+  const names = await fs.readdir(path.join(root, 'zyon-backups')); assert.equal(names.length, 2);
+  for (const name of names) assert.deepEqual(await fs.readFile(path.join(root, 'zyon-backups', name)), oldData);
   await core.installMod(path.join(__dirname, '../payload'), root);
-  assert.equal((await fs.readdir(path.join(root, 'zyon-backups'))).length, 1);
+  assert.equal((await fs.readdir(path.join(root, 'zyon-backups'))).length, 2);
 });
 test('profile update preserves existing profiles, settings, and account fields', async t => {
   const root = await folder(t), original = { profiles: { vanilla: { name: 'Vanilla', gameDir: 'original' } }, settings: { locale: 'pt-br' }, authenticationDatabase: { fixture: 'preserved' }, version: 3 };

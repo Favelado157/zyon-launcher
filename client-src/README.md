@@ -1,4 +1,4 @@
-# Zyon Client 1.1.0
+# Zyon Client 1.2.0
 
 Mod cliente para **Minecraft Java 1.8.9 / Forge 11.15.1.2318**. Menu escuro em português, seis cores, cor animada, busca, atalhos e perfis locais.
 
@@ -6,7 +6,7 @@ Mod cliente para **Minecraft Java 1.8.9 / Forge 11.15.1.2318**. Menu escuro em p
 
 1. Extraia este ZIP em uma pasta do computador.
 2. Feche o Minecraft. Na instalação 1.8.9 do LabyMod 4, habilite o suporte a Forge / Forge Loader, se disponível nessa instalação.
-3. Pelo launcher, abra a pasta de jogo **da instalação**. Copie `zyon-1.8.9-1.1.0.jar` para a subpasta `mods`; crie essa subpasta se não existir.
+3. Pelo launcher, abra a pasta de jogo **da instalação**. Copie `zyon-1.8.9-1.2.0.jar` para a subpasta `mods`; crie essa subpasta se não existir.
 4. Inicie o jogo e entre em um mundo. **Shift direito** abre o menu. **End** desliga todos os módulos.
 
 O JAR precisa que o Forge esteja carregado. Não é um addon nativo do LabyMod. Se sua instalação não oferecer suporte a Forge, colocar o JAR entre os addons nativos não o carregará. Uma instalação Forge 1.8.9 é o alvo direto do projeto. A compatibilidade específica com LabyMod 4 ainda não foi executada neste ambiente.
@@ -24,7 +24,13 @@ Se o menu não abrir, confira se Zyon Client aparece na lista de mods do Forge e
 
 As alterações são salvas em `config/zyon/auto.json`, dentro da pasta de jogo, e restauradas ao reiniciar. Na primeira abertura, somente o HUD vem ativo. A tecla End também funciona dentro do menu do Zyon. As teclas de menu e desligamento podem ser alteradas nos controles do Minecraft.
 
-## Os 18 módulos
+## Keystrokes arrastáveis
+
+Abra **Shift direito → Editar HUD**, ou use **Ctrl direito**. Arraste com o mouse e solte para salvar. Em **Interface → Keystrokes**, configure tamanho, cor ao pressionar, opacidade, mouse, CPS e pulo. As teclas acompanham os controles do Minecraft; posição e estilo ficam nos perfis e se adaptam à resolução.
+
+Para zoom e capas, instale separadamente o **OptiFine 1.8.9 HD U M5** na mesma instalação Forge 2318. No Zyon Launcher, use Instalação → OptiFine → Importar. O zoom é C por padrão e a capa depende do serviço OptiFine.
+
+## Os 19 módulos
 
 | Categoria | Módulos e ajustes |
 | --- | --- |
@@ -70,7 +76,7 @@ Se o Gradle não detectar o JDK 8, informe o caminho dele:
 ./gradlew -Porg.gradle.java.installations.paths=/caminho/para/jdk8 build
 ```
 
-A primeira compilação baixa as dependências. O JAR instalável é `build/libs/zyon-1.8.9-1.1.0.jar`. JARs com sufixo `-dev` são de desenvolvimento; `-sources` contêm fontes. Instale somente o JAR sem esses sufixos.
+A primeira compilação baixa as dependências. O JAR instalável é `build/libs/zyon-1.8.9-1.2.0.jar`. JARs com sufixo `-dev` são de desenvolvimento; `-sources` contêm fontes. Instale somente o JAR sem esses sufixos.
 
 ## Limites e validação
 

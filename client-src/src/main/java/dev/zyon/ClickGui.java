@@ -27,7 +27,7 @@ public final class ClickGui extends GuiScreen {
    int opacity=client.feature("theme").setting("opacity").integer();card(0,0,W,H,(opacity<<24)|0x111520);card(0,0,154,H,(opacity<<24)|0x171B29);drawRect(153,10,154,H-10,0xFF2B3146);
    label("Z Y O N",24,25,client.accent());label("CLIENT / 1.8.9",24,44,MUTED);label("CATEGORIAS",24,76,0xFF606B86);
    for(Feature.Category c:Feature.Category.values()){int row=97+c.ordinal()*36;boolean active=!profilesPage&&c==category;if(active){card(14,row-8,126,30,0xFF2A2D43);drawRect(14,row-2,16,row+13,client.accent());}label(c.label,27,row+2,active?client.accent():MUTED);}
-   drawRect(24,282,130,283,0xFF2B3146);button("Perfis",18,300,118,28,x,y,profilesPage);button("Desligar tudo",18,367,118,28,x,y,false);label("END: desligar",24,405,0xFF68748F);
+   drawRect(24,282,130,283,0xFF2B3146);button("Perfis",18,300,118,28,x,y,profilesPage);button("Editar HUD",18,333,118,28,x,y,false);button("Desligar tudo",18,367,118,28,x,y,false);label("END: desligar",24,405,0xFF68748F);
    label(profilesPage?"Seus perfis":category.label,174,21,TEXT);label(profilesPage?"Configuracoes salvas neste computador":"Seu cliente, do seu jeito.",174,40,MUTED);
    if(profilesPage)drawProfiles(x,y);else{card(480,17,240,32,0xFF222838);if(search.getText().isEmpty()&&!search.isFocused())label("Buscar modulos...",495,28,MUTED);search.drawTextBox();drawModules(x,y);drawInspector(x,y);}
    drawRect(174,390,720,391,0xFF2B3146);int count=0;for(Feature f:client.features)if(f.enabled())count++;
@@ -61,6 +61,7 @@ public final class ClickGui extends GuiScreen {
  protected void mouseClicked(int mouseX,int mouseY,int button)throws IOException{
   if(button!=0)return;int x=mx(mouseX),y=my(mouseY);binding=false;
   if(hit(x,y,18,367,118,28)){client.panic();status="Todos os modulos desligados.";return;}
+  if(hit(x,y,18,333,118,28)){mc.displayGuiScreen(new HudEditor(client,this));return;}
   if(hit(x,y,18,300,118,28)){profilesPage=true;search.setFocused(false);return;}
   for(Feature.Category c:Feature.Category.values())if(hit(x,y,14,89+c.ordinal()*36,126,30)){category=c;profilesPage=false;search.setText("");search.setFocused(false);profile.setFocused(false);listScroll=settingsScroll=0;for(Feature f:client.features)if(f.category==c){selected=f;break;}return;}
   if(profilesPage){profileClick(x,y);return;}search.mouseClicked(x,y,button);
@@ -79,7 +80,7 @@ public final class ClickGui extends GuiScreen {
  public void handleMouseInput()throws IOException{super.handleMouseInput();int wheel=Mouse.getEventDWheel();if(wheel==0)return;int x=mx(Mouse.getEventX()*width/mc.displayWidth),y=my(height-Mouse.getEventY()*height/mc.displayHeight-1),delta=wheel>0?-28:28;if(profilesPage&&hit(x,y,184,171,522,190))profileScroll+=delta;else if(hit(x,y,174,70,218,306))listScroll+=delta;else if(hit(x,y,408,170,312,206))settingsScroll+=delta;}
  protected void keyTyped(char typed,int key)throws IOException{
   if(!binding&&key==client.panicKey.getKeyCode()){client.panic();status="Todos os modulos desligados.";return;}
-  if(binding){if(key==Keyboard.KEY_ESCAPE){binding=false;status="Atalho mantido.";return;}if(key==client.menuKey.getKeyCode()||key==client.panicKey.getKeyCode()){status="Tecla reservada.";return;}selected.key=key==Keyboard.KEY_DELETE||key==Keyboard.KEY_BACK?0:key;binding=false;status="Atalho atualizado: "+selected.name;client.profiles.saveAutomatic();return;}
+  if(binding){if(key==Keyboard.KEY_ESCAPE){binding=false;status="Atalho mantido.";return;}if(key==client.menuKey.getKeyCode()||key==client.panicKey.getKeyCode()||key==client.editorKey.getKeyCode()){status="Tecla reservada.";return;}selected.key=key==Keyboard.KEY_DELETE||key==Keyboard.KEY_BACK?0:key;binding=false;status="Atalho atualizado: "+selected.name;client.profiles.saveAutomatic();return;}
   if(key==Keyboard.KEY_ESCAPE||key==client.menuKey.getKeyCode()){mc.displayGuiScreen(null);return;}if(profilesPage)profile.textboxKeyTyped(typed,key);else if(search.textboxKeyTyped(typed,key))listScroll=0;
  }
  public void updateScreen(){search.updateCursorCounter();profile.updateCursorCounter();}public void onGuiClosed(){Keyboard.enableRepeatEvents(false);client.profiles.saveAutomatic();}public boolean doesGuiPauseGame(){return false;}
