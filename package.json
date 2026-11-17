@@ -1,0 +1,88 @@
+{
+  "name": "zyon-launcher",
+  "version": "1.1.0",
+  "description": "Launcher Zyon para Minecraft Java 1.8.9 com inicializacao direta e atualizacoes",
+  "author": "Zyon",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.cjs",
+    "dist:win": "electron-builder --win nsis --x64 --publish never",
+    "configure:publisher": "node build/configure-publisher.cjs",
+    "prepare:release": "node build/prepare-release.cjs"
+  },
+  "dependencies": {
+    "@azure/msal-node": "7.2.2",
+    "adm-zip": "0.5.17",
+    "extract-zip": "2.0.1"
+  },
+  "devDependencies": {
+    "electron": "45.3.3",
+    "electron-builder": "26.18.0",
+    "resedit": "3.1.1"
+  },
+  "build": {
+    "appId": "dev.zyon.launcher",
+    "productName": "Zyon Launcher",
+    "asar": true,
+    "publish": [],
+    "afterPack": "build/after-pack.cjs",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "core.cjs",
+      "renderer/**",
+      "assets/**",
+      "package.json",
+      "game.cjs",
+      "auth.cjs",
+      "updates.cjs",
+      "release-config.json"
+    ],
+    "extraResources": [
+      {
+        "from": "payload",
+        "to": "payload"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false,
+      "artifactName": "Zyon-Launcher-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "script": "build/installer.nsi",
+      "differentialPackage": false,
+      "warningsAsErrors": false,
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "installerLanguages": [
+        "pt_BR"
+      ],
+      "displayLanguageSelector": false
+    },
+    "electronLanguages": [
+      "pt-BR",
+      "en-US"
+    ]
+  }
+}

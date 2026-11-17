@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Zyon Launcher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><img class="brand-icon" src="../assets/icon.png" alt="Ícone Zyon"><div><strong>ZYON</strong><small>LAUNCHER</small></div></div>
+    <div class="nav-label">SEU ESPAÇO</div>
+    <nav aria-label="Navegação principal">
+      <button data-page="home" class="nav active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></span>Visão geral</button>
+      <button data-page="install" class="nav"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg></span>Instalação<span id="installDot" class="dot"></span></button>
+      <button data-page="settings" class="nav"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-1 3-3 1-2 4 2 2v4l4 3 3-1 3 1 4-3v-4l2-2-2-4-3-1-1-3z"/><circle cx="12" cy="12" r="3"/></svg></span>Configurações</button>
+      <button data-page="account" class="nav"><span class="nav-icon">◎</span>Minha conta</button><button data-page="updates" class="nav"><span class="nav-icon">↻</span>Atualizações<span id="updateDot" class="dot hidden"></span></button><button data-page="guide" class="nav"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></svg></span>Como jogar</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="edition"><span class="cube-small">◇</span><div><strong>Minecraft Java</strong><small>1.8.9 · Forge</small></div></div><div class="build"><span class="status-light"></span> Windows x64 <span id="appVersion">v1.0.0</span></div></div>
+  </aside>
+  <main>
+    <header><div class="breadcrumb">Biblioteca <span>/</span> Minecraft Java</div><div id="statusBadge" class="badge">Configuração pendente</div></header>
+    <section id="page-home" class="page">
+      <div class="heading"><div><span class="eyebrow">BEM-VINDO AO ZYON</span><h1>Seu próximo mundo.</h1></div><button class="icon-button" data-action="folder" title="Abrir pasta da instância" aria-label="Abrir pasta da instância">→</button></div>
+      <div class="hero">
+        <img class="world-art" src="../assets/hero.jpg" alt="Portal de ametista, ilhas suspensas e cachoeiras ao pôr do sol">
+        <div class="hero-content"><div class="hero-tag"><span></span> MINECRAFT JAVA 1.8.9</div><h2>Sua instância.<br>Seu Zyon.</h2><p>18 módulos. Seus perfis.<br>Um espaço separado para jogar.</p><div class="hero-specs"><span>FORGE 2318</span><span>JAVA 8</span><span>CLIENT 1.1</span></div></div>
+        <div class="hero-footer"><div><span class="ready-light"></span><strong id="heroStatus">Vamos preparar sua instalação</strong><small id="heroHint">Seus mundos e mods do LabyMod ficam separados.</small></div><button id="mainAction" class="primary" data-action="primary">Preparar instalação <span>→</span></button></div>
+      </div>
+      <div class="feature-grid"><article><div class="feature-icon purple">⌘</div><h3>18 módulos, um cliente</h3><p>Combate, movimento, visual e utilitários. Ajuste tudo dentro do jogo.</p><button class="text-button" data-page="guide">Conhecer os controles →</button></article><article><div class="feature-icon blue">▱</div><h3>Uma instância sua</h3><p>Mods, configurações e mundos em uma pasta própria, separada do LabyMod.</p><button class="text-button" data-action="folder">Abrir minha pasta →</button></article><article><div class="feature-icon mint">◈</div><h3>Sua conta, aqui mesmo</h3><p>Entre pela Microsoft e inicie o Minecraft diretamente pelo Zyon.</p><button class="text-button" data-page="account">Gerenciar minha conta →</button></article></div>
+      <div class="home-note"><span>i</span><p>O Zyon prepara e inicia o jogo. Faça o login Microsoft em <strong>Minha conta</strong> e use <strong>Play</strong>. O acesso online depende da ativação do aplicativo pelo publicador.</p></div>
+    </section>
+    <section id="page-install" class="page hidden">
+      <div class="heading"><div><span class="eyebrow">PRIMEIRO ACESSO</span><h1>Prepare sua instância.</h1></div><span class="pill">1.8.9 / Forge</span></div>
+      <div class="panel install-panel"><div class="panel-heading"><div><h2>Tudo no seu lugar.</h2><p>Feche o Minecraft antes de preparar ou atualizar os arquivos.</p></div><span class="number-badge">01 — 04</span></div>
+        <div class="step" data-step="minecraft"><span class="step-number">01</span><div><strong>Minecraft 1.8.9</strong><p>Arquivos oficiais da Mojang.</p></div><span class="step-status">Aguardando</span></div>
+        <div class="step" data-step="forge"><span class="step-number">02</span><div><strong>Forge 11.15.1.2318</strong><p>Carregador de mods desta instância.</p></div><span class="step-status">Aguardando</span></div>
+        <div class="step" data-step="java"><span class="step-number">03</span><div><strong>Java 8 próprio</strong><p>Baixado e verificado, sem alterar o Java do sistema.</p></div><span class="step-status">Aguardando</span></div>
+        <div class="step" data-step="client"><span class="step-number">04</span><div><strong>Zyon Client + perfil</strong><p>18 módulos, identidade visual e arquivos da sua instância.</p></div><span class="step-status">Aguardando</span></div>
+        <div class="progress-wrap"><div class="progress-label"><span id="progressMessage">Pronto para começar.</span><strong id="progressPercent">0%</strong></div><div class="progress-track"><div id="progressFill"></div></div><small>Internet necessária na primeira instalação. O Zyon baixa bibliotecas, recursos e componentes nativos verificados.</small></div>
+        <div class="panel-actions"><button id="prepareAction" class="primary" data-action="prepare">Preparar instalação <span>↓</span></button><button id="cancelAction" class="secondary hidden" data-action="cancel">Cancelar</button><button id="launchAction" class="secondary" data-action="launch" disabled>Play →</button></div>
+      </div>
+      <div class="log-panel"><div><strong>ATIVIDADE</strong><button class="text-button" data-action="logs">Abrir registros →</button></div><pre id="activity" role="log" aria-live="polite">O Zyon está pronto.</pre></div>
+    </section>
+    <section id="page-settings" class="page hidden">
+      <div class="heading"><div><span class="eyebrow">DO SEU JEITO</span><h1>Configurações.</h1></div></div>
+      <div class="panel settings-panel"><h2>Pastas e aplicativos</h2><p class="muted">A pasta da instância guarda seus mundos, mods e configurações.</p>
+        <div class="setting-row"><label for="instancePath">Instância separada Zyon</label><div class="path-row"><input id="instancePath" readonly><button class="secondary" data-pick="instance">Alterar</button></div></div>
+        <div class="setting-row"><label for="minecraftPath">Cache próprio do Minecraft</label><small>Bibliotecas e recursos ficam nesta pasta, sem depender do launcher oficial.</small><div class="path-row"><input id="minecraftPath" readonly></div></div>
+        <details id="publisherSetup" class="publisher-setup"><summary>Configuração do publicador</summary>
+          <p>IDs públicos para testar nesta instalação. Para disponibilizar a todos, use o guia de publicação e compile a versão com o canal definido.</p>
+          <div class="setting-row"><label for="clientId">Microsoft Application (client) ID</label><input id="clientId" type="text" autocomplete="off" placeholder="ID público do aplicativo aprovado"><small>Não coloque senhas, tokens ou client secrets.</small></div>
+          <div class="setting-row"><label for="repository">Repositório público de atualizações</label><input id="repository" type="text" autocomplete="off" placeholder="usuario/zyon-launcher"></div>
+          <div class="inline-actions"><button class="text-button" data-action="azure">Registrar aplicativo Microsoft →</button><button class="text-button" data-action="github">Criar repositório GitHub →</button></div>
+        </details>
+        <details class="publisher-setup"><summary>Compatibilidade com a instalação anterior</summary><p>Opção temporária enquanto o login próprio é configurado. O Play principal usa o Java diretamente.</p><div class="path-row"><input id="launcherPath" readonly placeholder="MinecraftLauncher.exe"><button class="secondary" data-pick="launcher">Escolher</button></div><button class="secondary" data-action="legacy">Abrir instalação pelo oficial</button></details>
+      </div>
+      <div class="panel memory-panel"><div><h2>Memória do jogo</h2><p class="muted">Usada na próxima inicialização do jogo.</p></div><div class="memory-value"><span id="memoryValue">2</span><small>GB</small></div><label class="sr-only" for="memory">Memória em GB</label><input type="range" id="memory" min="1" max="8" value="2"><div class="range-labels"><span>1 GB</span><span id="maxMemory">8 GB</span></div><button class="primary compact" data-action="save">Salvar configurações</button></div>
+    </section>
+    <section id="page-account" class="page hidden">
+      <div class="heading"><div><span class="eyebrow">SEU PERFIL NO ZYON</span><h1>Minha conta.</h1></div></div>
+      <div class="panel account-panel"><img src="../assets/icon.png" alt="Zyon" class="account-logo"><div><h2 id="accountName">Entre com a Microsoft</h2><p id="accountDescription" class="muted">Use sua conta com acesso ao Minecraft Java. A senha fica na página da Microsoft.</p></div><div class="inline-actions"><button id="loginAction" class="primary" data-action="login">Entrar com Microsoft</button><button id="logoutAction" class="secondary hidden" data-action="logout">Sair da conta</button></div></div>
+      <div id="authSetupNotice" class="panel setup-notice"><h2>Login próprio aguardando ativação</h2><p>O publicador precisa registrar um aplicativo Microsoft e obter a aprovação para o Minecraft. Sem essa configuração, o login online direto ainda não está disponível.</p><button class="secondary" data-action="setup">Ver configuração do publicador</button></div>
+      <div id="deviceCodePanel" class="panel hidden"><span class="eyebrow">CONEXÃO MICROSOFT</span><h2>Confirme o código na página da Microsoft</h2><p class="muted">O navegador será aberto. Use este código somente para conectar sua conta ao Zyon:</p><strong id="deviceCode" class="device-code"></strong><p id="deviceUrl" class="muted"></p><button class="secondary" data-action="cancel">Cancelar login</button></div>
+    </section>
+    <section id="page-updates" class="page hidden">
+      <div class="heading"><div><span class="eyebrow">SEMPRE NO SEU RITMO</span><h1>Atualizações.</h1></div><span class="pill" id="currentVersion">1.1.0</span></div>
+      <div class="panel"><h2 id="updateTitle">Verificar nova versão</h2><p id="updateDescription" class="muted">Novas versões publicadas no canal do Zyon aparecem aqui.</p><pre id="releaseNotes" class="release-notes"></pre><div id="updateProgress" class="muted hidden"></div><div class="inline-actions"><button id="checkUpdatesAction" class="secondary" data-action="check-updates">Verificar agora</button><button id="installUpdateAction" class="primary hidden" data-action="install-update">Atualizar agora</button><button id="updateCancel" class="secondary hidden" data-action="cancel">Cancelar download</button></div></div>
+      <div class="home-note"><span>i</span><p>A instalação mantém seus mundos e configurações. A atualização é oferecida depois que o publicador libera uma nova versão. Quem usa a 1.0 precisa instalar esta versão uma vez para receber os próximos avisos.</p></div>
+    </section>
+    <section id="page-guide" class="page hidden">
+      <div class="heading"><div><span class="eyebrow">VAMOS JOGAR</span><h1>Da instalação ao mundo.</h1></div></div>
+      <div class="guide-grid"><div class="panel"><span class="guide-number">01</span><h2>Prepare sua instância</h2><p>Na aba Instalação, clique em Preparar Minecraft. O Zyon baixa os arquivos necessários e verifica os downloads.</p><span class="guide-number">02</span><h2>Conecte sua conta</h2><p>Na aba Minha conta, entre com Microsoft usando o código exibido. A senha é informada na página oficial da Microsoft. O aplicativo do publicador precisa estar aprovado para Minecraft.</p><span class="guide-number">03</span><h2>Pressione Play</h2><p>O Zyon inicia o Java e abre o Minecraft diretamente. Não abre o launcher oficial. Na primeira vez, a preparação dos recursos pode levar alguns minutos.</p><span class="guide-number">04</span><h2>Receba novidades</h2><p>Quando houver uma versão publicada no canal configurado, o Zyon avisa e oferece a atualização. Mudanças locais do publicador precisam ser publicadas para chegar aos outros PCs.</p></div><div class="panel controls"><h2>Dentro do Minecraft</h2><div><kbd>Shift direito</kbd><span>Abrir o menu Zyon</span></div><div><kbd>End</kbd><span>Desligar todos os módulos</span></div><div><kbd>Esc</kbd><span>Fechar o menu</span></div><hr><p>O novo menu inicial e o ícone do HUD acompanham o tema do Zyon. Em Interface → Tema, você pode desativar o menu personalizado.</p><p>O KillAura exige uma espada ou machado por padrão. As ações aceitas continuam dependendo do servidor.</p><p class="muted">Seus mundos e configurações da 1.0 são mantidos. A atualização move o JAR antigo do Zyon para uma pasta de backup.</p></div></div>
+    </section>
+    <footer><span>ZYON LAUNCHER <span class="footer-dot">·</span> MINECRAFT JAVA 1.8.9</span><button class="text-button" data-page="guide">Precisa de ajuda? →</button></footer>
+  </main>
+  <div id="toast" class="toast hidden" role="status"><span id="toastText"></span><button id="dismissToast" aria-label="Fechar mensagem">×</button></div>
+  <script src="app.js"></script>
+</body>
+</html>
