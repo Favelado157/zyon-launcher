@@ -1,7 +1,7 @@
 ; NSIS installer built on Linux; uninstaller is generated on the destination Windows PC.
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
-!include "${PROJECT_DIR}/build/installer-files.nsh"
+!include "${BUILD_RESOURCES_DIR}\installer-files.nsh"
 Name "Zyon Launcher"
 RequestExecutionLevel user
 InstallDir "$LOCALAPPDATA\Programs\Zyon Launcher"
@@ -46,7 +46,7 @@ FunctionEnd
 Section "Zyon Launcher" main
   SetShellVarContext current
   SetOutPath "$INSTDIR"
-  File /r "${PROJECT_DIR}/dist/win-unpacked/*"
+  File /r "${PROJECT_DIR}\dist\win-unpacked\*"
   FileOpen $0 "$INSTDIR\zyon-install.marker" w
   FileWrite $0 "dev.zyon.launcher"
   FileClose $0

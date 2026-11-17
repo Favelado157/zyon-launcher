@@ -36,5 +36,7 @@ module.exports = async context => {
   for (const file of files) lines.push(`  Delete "$INSTDIR\\${escape(file)}"`);
   for (const dir of dirs.sort((a, b) => b.length - a.length)) lines.push(`  RMDir "$INSTDIR\\${escape(dir)}"`);
   lines.push('!macroend');
-  await fs.writeFile(path.join(context.packager.projectDir, 'build', 'installer-files.nsh'), lines.join('\n'));
+  const manifest = path.join(context.packager.projectDir, 'build', 'installer-files.nsh');
+  await fs.writeFile(manifest, lines.join('\n'));
+  console.log(`Zyon: generated uninstall manifest at ${manifest} (${files.length} files).`);
 };
