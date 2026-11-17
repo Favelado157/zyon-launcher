@@ -8,7 +8,7 @@ Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria,
 
 - Identidade visual, cliente Java e instalador Windows implementados.
 - Canal definido: `Favelado157/zyon-launcher`. Novas alterações enviadas à `main` disparam o workflow de publicação.
-- O login online próprio ainda depende do **Client ID Microsoft aprovado para Minecraft**. O canal de atualizações funciona independentemente desse cadastro.
+- Client ID Microsoft do Zyon incluído. O login online próprio ainda depende da **aprovação do aplicativo para as APIs do Minecraft**; a autenticação real ainda não foi validada. O canal de atualizações funciona independentemente dessa aprovação.
 - A versão 1.0 precisa ser atualizada manualmente uma vez para receber o verificador. Na 1.1 já instalada, o canal pode ser definido em Configurações como `Favelado157/zyon-launcher`.
 
 ## Instalação
@@ -21,7 +21,7 @@ Consulte [LEIA-ME.md](LEIA-ME.md) para controles, pastas, limitações e verific
 
 O workflow gera uma versão crescente, compila o cliente Java, executa os testes, cria o instalador Windows e publica o `.exe` com `SHA256SUMS.txt`. Não distribui tokens de acesso aos jogadores.
 
-A variável de repositório `MICROSOFT_CLIENT_ID` é opcional para publicar atualizações visuais. Sem um ID aprovado, o aplicativo deixa explícito que o login online próprio ainda não está ativado.
+A variável de repositório `MICROSOFT_CLIENT_ID` pode substituir o ID público incluído em `release-config.json`. Sem a variável, a compilação usa o ID do projeto. Incluir esse ID não substitui a aprovação Microsoft/Minecraft.
 
 ## Desenvolvimento
 

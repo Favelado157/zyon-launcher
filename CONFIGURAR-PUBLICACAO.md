@@ -1,6 +1,6 @@
 # Ativar Play online e atualizações para todos
 
-São dois cadastros independentes: o repositório hospeda as versões do instalador; o aplicativo Microsoft permite autenticar os jogadores. O canal já foi definido nas fontes como `Favelado157/zyon-launcher`. É possível publicar atualizações visuais antes de concluir o login próprio.
+São dois cadastros independentes: o repositório hospeda as versões do instalador; o aplicativo Microsoft permite autenticar os jogadores. O canal já foi definido nas fontes como `Favelado157/zyon-launcher`, e o Client ID público do Zyon já está incluído em `release-config.json`. A aprovação Microsoft/Minecraft e o teste real de login continuam pendentes. É possível publicar atualizações visuais antes de concluir o login próprio.
 
 ## 1. Repositório GitHub
 
@@ -52,9 +52,9 @@ Esses valores afetam **somente esse PC**. Para outras pessoas, publique uma comp
 4. Confira se `package.json` e `.github` estão na **raiz**, sem uma pasta extra envolvendo o projeto.
 5. Envie à branch **main**. O workflow em **Actions** compila o mod, testa, gera o instalador e cria uma **Release** com `.exe` e `SHA256SUMS.txt`.
 
-O workflow insere o repositório atual e a variável Microsoft no `release-config.json` da compilação. A versão aumenta com o número da execução; a branch não é alterada apenas para gerar a versão.
+O workflow insere o repositório atual e a variável Microsoft no `release-config.json` da compilação. Quando a variável está vazia, mantém o Client ID público já incluído nas fontes. A versão aumenta com o número da execução; a branch não é alterada apenas para gerar a versão.
 
-Se a variável Microsoft estiver vazia, o workflow publica o instalador com o canal de atualizações configurado e o login próprio ainda pendente. Quando a variável for preenchida, teste o login real: o workflow não concede nem simula a aprovação Microsoft.
+Se tanto a variável Microsoft quanto o ID das fontes estiverem vazios, o workflow publica o instalador com o canal de atualizações configurado e o login próprio ainda pendente. Com o ID incluído, teste o login real após a aprovação: o workflow não concede nem simula a aprovação Microsoft.
 
 ## 5. Publicar as próximas mudanças
 
