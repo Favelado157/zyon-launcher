@@ -1,6 +1,8 @@
-# Ativar Play online e atualizações para todos
+# Configurar login Microsoft opcional e atualizações
 
 São dois cadastros independentes: o repositório hospeda as versões do instalador; o aplicativo Microsoft permite autenticar os jogadores. O canal já foi definido nas fontes como `Favelado157/zyon-launcher`, e o Client ID público do Zyon já está incluído em `release-config.json`. A aprovação Microsoft/Minecraft e o teste real de login continuam pendentes. É possível publicar atualizações visuais antes de concluir o login próprio.
+
+O modo offline por nick não depende destes cadastros. Eles se aplicam ao login Microsoft opcional e à publicação. O formulário de revisão Minecraft exige autenticação e verificação de propriedade antes de liberar o jogo; esta edição com modo offline não atende a essa exigência e não deve ser descrita como aprovada por esse processo.
 
 ## 1. Repositório GitHub
 

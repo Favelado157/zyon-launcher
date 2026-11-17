@@ -7,6 +7,7 @@ const core = require('./core.cjs');
 const game = require('./game.cjs');
 const updates = require('./updates.cjs');
 const optifine = require('./optifine.cjs');
+const sessions = require('./sessions.cjs');
 const { MicrosoftAccount, validClientId } = require('./auth.cjs');
 const publisher = require('./release-config.json');
 app.setName('Zyon Launcher');
@@ -20,7 +21,8 @@ if (!lock) app.quit();
 app.on('second-instance', () => { if (window) { if (window.isMinimized()) window.restore(); window.focus(); } });
 const defaults = () => ({
   instanceDir: path.join(root, 'instances', '1.8.9'), minecraftRoot: path.join(root, 'minecraft'),
-  memoryGB: 2, microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || '', legacyLauncherPath: ''
+  memoryGB: 2, microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || '', legacyLauncherPath: '',
+  loginMode: 'offline', offlineNickname: ''
 });
 async function log(message) {
   const line = `${new Date().toISOString()}  ${String(message).replaceAll(/[\r\n]/g, ' ')}\n`;
@@ -31,7 +33,7 @@ async function log(message) {
   }).catch(() => {});
 }
 function notify(channel, value) { if (window && !window.isDestroyed()) window.webContents.send('zyon:' + channel, value); }
-async function saveConfig() { await core.atomicWrite(path.join(root, 'config.json'), JSON.stringify(config, null, 2)); }
+async function saveConfig(next = config) { await core.atomicWrite(path.join(root, 'config.json'), JSON.stringify(next, null, 2)); }
 function noOperation(requireGameClosed = false) {
   if (busy) throw new Error('Aguarde a operação atual terminar ou cancele.');
   if (requireGameClosed && gameChild) throw new Error('Feche o Minecraft antes desta operação.');
@@ -48,7 +50,8 @@ async function state() {
   } catch { installed = false; }
   return { ...config, installed, busy, busyType, running: !!gameChild, version: app.getVersion(),
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
-    account: await account.profile(), authConfigured: account.configured(), update: lastUpdate, updateMessage,
+    account: await account.profile(), offlineProfile: sessions.validNickname(config.offlineNickname) ? { name: config.offlineNickname, uuid: sessions.offlineSession(config.offlineNickname).uuid } : null,
+    authConfigured: account.configured(), update: lastUpdate, updateMessage,
     updatesConfigured: !!config.githubRepository, optifine: await optifine.status(config.instanceDir), profile: 'Zyon 1.8.9', root };
 }
 function register(channel, handler) {
@@ -100,6 +103,22 @@ register('prepare', async () => {
   return state();
 });
 register('cancel', async () => { controller?.abort(); return true; });
+register('offline-login', async name => {
+  noOperation(true);busy = true;busyType = 'profile';
+  try {
+    const session = sessions.offlineSession(name);
+    const next = { ...config, offlineNickname: session.name, loginMode: 'offline' };
+    await saveConfig(next);config = next;
+  } finally { busy = false;busyType = ''; }
+  return state();
+});
+register('session-mode', async mode => {
+  noOperation(true);
+  if (mode !== 'microsoft') throw new Error('Para usar o modo offline, salve um nick válido.');
+  busy = true;busyType = 'profile';
+  try { const next = { ...config, loginMode: mode };await saveConfig(next);config = next; } finally { busy = false;busyType = ''; }
+  return state();
+});
 register('import-optifine', async () => {
   noOperation(true);busy = true;busyType = 'optifine';
   try {
@@ -120,6 +139,7 @@ register('login', async () => {
       notify('auth-code', value);
       shell.openExternal(value.url).catch(() => notify('auth-code', { ...value, openManually: true }));
     });
+    const next = { ...config, loginMode: 'microsoft' };await saveConfig(next);config = next;
     await log('Login Microsoft concluído.');
   } finally { busy = false; busyType = ''; controller = null; notify('auth-code', { finished: true }); }
   return state();
@@ -129,19 +149,20 @@ register('launch', async () => {
   noOperation(true); if (process.platform !== 'win32') throw new Error('A inicialização desta versão é para Windows x64.');
   busy = true; busyType = 'launch'; controller = new AbortController();
   try {
-    const session = await account.getSession(controller.signal);
+    const session = await sessions.resolveSession({ mode: config.loginMode, name: config.offlineNickname, microsoftAccount: account, signal: controller.signal });
     if (!(await state()).installed) await prepareInstallation();
     const ready = await game.readReady(root, config.instanceDir, config.minecraftRoot);
     if (!ready) throw new Error('A instalação está incompleta. Prepare-a novamente.');
     const java = await core.readJson(path.join(root, 'java.json'));
     const gameLog = path.join(root, 'game.log');
     if (await core.exists(gameLog) && (await fs.stat(gameLog)).size > 5 * 1024 * 1024) await fs.rename(gameLog, gameLog + '.previous').catch(() => {});
+    if (controller.signal.aborted) throw new Error('Inicialização cancelada.');
     const child = await game.launch({ javaExe: java.executable, ready, session, memoryGB: config.memoryGB,
       onOutput: text => { gameLogChain = gameLogChain.then(() => fs.appendFile(gameLog, text)).catch(() => {}); },
       onExit: result => { gameChild = null; notify('game-state', { running: false, code: result.code }); log('Minecraft encerrado com código ' + result.code); if (window && !window.isDestroyed() && !window.isVisible()) app.quit(); }
     });
     gameChild = child.exitCode === null ? child : null;
-    await log('Minecraft iniciado diretamente pelo Java.'); notify('game-state', { running: !!gameChild });
+    await log('Minecraft iniciado diretamente pelo Java no modo ' + config.loginMode + '.'); notify('game-state', { running: !!gameChild });
   } finally { busy = false; busyType = ''; controller = null; notify('progress', { finished: true }); }
   return state();
 });
@@ -195,6 +216,7 @@ if (lock) app.whenReady().then(async () => {
   await fs.mkdir(root, { recursive: true }); config = defaults();
   try {
     const previous = await core.readJson(path.join(root, 'config.json'), {});
+    Object.assign(config, sessions.loginSettings(previous));
     if (typeof previous.instanceDir === 'string' && path.isAbsolute(previous.instanceDir)) config.instanceDir = previous.instanceDir;
     // 1.0 shared the official folder; 1.1 has its own cache and preserves the existing instance directory.
     if (typeof previous.minecraftRoot === 'string' && core.inside(root, previous.minecraftRoot)) config.minecraftRoot = previous.minecraftRoot;

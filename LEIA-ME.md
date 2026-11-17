@@ -1,6 +1,6 @@
 # Zyon Launcher 1.2 — Windows 10/11 x64
 
-Esta atualização troca o fundo do menu inicial do jogo pelo cenário noturno com cerejeiras, lago, ponte iluminada e título ZYON enviado pelo publicador. Os botões são controles reais centralizados sobre o fundo, sem botões desenhados na imagem. A imagem do aplicativo launcher permanece a mesma. Keystrokes arrastáveis e importação opcional do OptiFine continuam disponíveis.
+Esta atualização adiciona **modo offline por nick**, sem exigir conta Microsoft. O menu noturno, os keystrokes arrastáveis e a importação opcional do OptiFine continuam disponíveis.
 
 ## Atualizar
 
@@ -8,7 +8,17 @@ Esta atualização troca o fundo do menu inicial do jogo pelo cenário noturno c
 2. Abra o launcher e clique em **Preparar Minecraft / Verificar arquivos** para instalar o cliente novo.
 3. Mundos e perfis são mantidos. Os JARs anteriores do Zyon 1.0, 1.1 e 1.2.0 são movidos para `zyon-backups`, evitando duas versões do mod.
 
-O Client ID público do Zyon está incluído. O pedido de aprovação das APIs do Minecraft foi enviado pelo publicador; o resultado ainda não foi confirmado. O login direto continua dependendo dessa aprovação e de uma conta com acesso ao Minecraft Java.
+## Jogar sem login Microsoft
+
+1. Abra **Minha conta** e digite seu nick: de 3 a 16 letras, números ou `_`.
+2. Clique em **Usar este nick**. O modo offline fica selecionado e é salvo para as próximas aberturas.
+3. Prepare a instalação se necessário e use **Play offline**.
+
+O modo offline não chama os serviços Microsoft/Xbox e não exige Client ID nem aprovação. A primeira preparação dos arquivos precisa de internet. Depois, com todos os arquivos prontos, mundos locais podem ser abertos sem autenticação.
+
+Servidores com autenticação continuam exigindo uma conta original. O nick é a identidade offline, diferenciando maiúsculas/minúsculas; mudar o nome pode mudar seu inventário/progresso em servidores. Skins e capas dependem dos serviços externos e não são garantidas pelo modo offline.
+
+Para usar a conta original, selecione **Usar modo Microsoft** em Minha conta e conecte a conta. O Client ID público do Zyon está incluído, mas esse modo ainda depende da aprovação das APIs Minecraft e de uma conta com acesso ao Java. Se o login Microsoft falhar, o launcher não inicia automaticamente com uma identidade offline.
 
 ## Keystrokes
 
@@ -44,7 +54,7 @@ O canal `Favelado157/zyon-launcher` verifica releases ao abrir e periodicamente.
 
 O projeto inclui testes de instalação, preservação de arquivos, autenticação simulada, atualizações, importação OptiFine, limites do editor, resolução e persistência dos perfis. A importação também foi conferida localmente com o JAR oficial M5, sem incluí-lo nas fontes ou no instalador. O mod compila para Java 8 / Forge 1.8.9.
 
-O login Microsoft real, o instalador no Windows e o zoom/capa dentro do jogo precisam ser confirmados no PC do jogador. O código não cria uma capa OptiFine nem concede aprovação Microsoft. O executável não possui assinatura digital de editor.
+O login Microsoft real, o instalador no Windows, o início do jogo offline e o zoom/capa dentro do jogo precisam ser confirmados no PC do jogador. O modo offline foi conferido por testes de sessão, argumentos Java e fluxo desktop com processo de jogo simulado. O código não cria uma capa OptiFine nem concede aprovação Microsoft. O executável não possui assinatura digital de editor.
 
 As fontes do cliente estão em `client-src`; leia `CONFIGURAR-PUBLICACAO.md` para publicar. O GitHub Actions compila o mod, atualiza o manifesto, testa e gera o instalador Windows automaticamente.
 

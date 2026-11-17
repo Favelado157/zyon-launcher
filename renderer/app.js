@@ -15,11 +15,13 @@ function showPage(next) {
   for (const element of document.querySelectorAll('.nav')) element.classList.toggle('active', element.dataset.page === next);
 }
 function setup() { showPage('settings'); $('publisherSetup').open = true; $('publisherSetup').scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+function offlineMode() { return current?.loginMode === 'offline'; }
 function applyBusy() {
   const busy = !!operation || !!current?.busy, running = !!current?.running;
   for (const element of document.querySelectorAll('[data-pick], [data-action="save"], [data-action="legacy"], #memory, #clientId, #repository, #prepareAction')) element.disabled = busy || running;
   $('mainAction').disabled = busy || running; $('launchAction').disabled = busy || running || !current?.installed;
   $('loginAction').disabled = busy || running; $('logoutAction').disabled = busy || running;
+  $('offlineNickname').disabled = busy || running; $('offlineLoginAction').disabled = busy || running; $('microsoftModeAction').disabled = busy || running;
   $('installUpdateAction').disabled = busy || running || !updateAvailable?.available;
   $('importOptifineAction').disabled = busy || running;
   $('removeOptifineAction').disabled = busy || running;
@@ -29,12 +31,13 @@ function applyBusy() {
     $('statusBadge').textContent = { login: 'Conectando sua conta', launch: 'Iniciando Minecraft', update: 'Baixando atualização', prepare: 'Preparando Minecraft' }[operation || current.busyType] || 'Aguarde…';
     $('mainAction').textContent = 'Aguarde…';
   } else if (current) {
-    $('mainAction').textContent = running ? 'Minecraft aberto' : !current.installed ? 'Preparar Minecraft →' : !current.authConfigured ? 'Configurar login →' : !current.account ? 'Entrar com Microsoft →' : 'Play →';
+    $('mainAction').textContent = running ? 'Minecraft aberto' : !current.installed ? 'Preparar Minecraft →' : offlineMode() ? current.offlineProfile ? 'Play offline →' : 'Escolher nick →' : !current.authConfigured ? 'Configurar login →' : !current.account ? 'Entrar com Microsoft →' : 'Play →';
   }
+  $('launchAction').textContent = offlineMode() ? 'Play offline →' : 'Play →';
 }
 function render(state) {
   current = state;
-  $('statusBadge').textContent = state.running ? 'Minecraft em execução' : state.installed ? 'Pronto para jogar' : 'Preparação pendente';
+  $('statusBadge').textContent = state.running ? 'Minecraft em execução' : state.installed ? offlineMode() && !state.offlineProfile ? 'Escolha seu nick' : 'Pronto para jogar' : 'Preparação pendente';
   $('statusBadge').classList.toggle('ready', state.installed || state.running); $('installDot').classList.toggle('hidden', state.installed);
   $('appVersion').textContent = 'v' + state.version; $('currentVersion').textContent = 'v' + state.version;
   $('instancePath').value = state.instanceDir; $('minecraftPath').value = state.minecraftRoot; $('launcherPath').value = state.legacyLauncherPath || '';
@@ -44,14 +47,19 @@ function render(state) {
   if (document.activeElement !== $('memory')) { $('memory').value = state.memoryGB; $('memoryValue').textContent = state.memoryGB; }
   $('maxMemory').textContent = state.maxMemoryGB + ' GB';
   $('heroStatus').textContent = state.running ? 'Seu mundo está aberto' : state.installed ? 'Sua instância está preparada' : 'Uma nova experiência está chegando';
-  $('heroHint').textContent = state.running ? 'O Minecraft foi iniciado diretamente pelo Zyon.' : state.account ? 'Conectado como ' + state.account.name + '. Pronto para Play.' : 'Faça o login em Minha conta para usar o Play direto.';
+  $('heroHint').textContent = state.running ? 'O Minecraft foi iniciado diretamente pelo Zyon.' : offlineMode() ? state.offlineProfile ? 'Modo offline · ' + state.offlineProfile.name + ' · sem login Microsoft.' : 'Escolha seu nick em Minha conta para jogar offline.' : state.account ? 'Conectado como ' + state.account.name + '. Pronto para Play.' : 'Faça o login Microsoft em Minha conta.';
+  if (document.activeElement !== $('offlineNickname')) $('offlineNickname').value = state.offlineNickname || '';
+  $('activeLoginMode').textContent = offlineMode() ? 'Ativo: nick offline' : 'Ativo: Microsoft';
+  $('offlinePanel').classList.toggle('active-profile', offlineMode());
+  $('offlineStatus').textContent = state.offlineProfile ? (offlineMode() ? 'Nick ativo: ' : 'Nick salvo: ') + state.offlineProfile.name : 'Escolha um nick e clique em Usar este nick.';
+  $('microsoftModeAction').classList.toggle('hidden', !offlineMode());
   $('prepareAction').textContent = state.installed ? 'Verificar arquivos ↻' : 'Preparar Minecraft ↓';
   $('optifineStatus').textContent = state.optifine?.problem || (state.optifine?.installed ? 'Instalado · OptiFine ' + state.optifine.version + ' · disponível na próxima abertura do jogo.' : 'Opcional · importe o JAR oficial HD U M5 para esta instância.');
   $('removeOptifineAction').classList.toggle('hidden', !state.optifine?.managed);
-  $('accountName').textContent = state.account ? state.account.name : 'Entre com a Microsoft';
-  $('accountDescription').textContent = state.account ? 'Conta conectada. A senha e a sessão permanecem protegidas.' : 'Use sua conta com acesso ao Minecraft Java. A senha fica na página da Microsoft.';
+  $('accountName').textContent = state.account ? state.account.name : 'Conta Microsoft';
+  $('accountDescription').textContent = state.account ? 'Conta conectada. Use o modo Microsoft para jogar com essa identidade.' : 'Opcional para jogar offline. Para servidores que exigem conta original, entre com uma conta com acesso ao Java.';
   $('loginAction').textContent = !state.authConfigured ? 'Configurar login' : state.account ? 'Entrar novamente' : 'Entrar com Microsoft';
-  $('logoutAction').classList.toggle('hidden', !state.account); $('authSetupNotice').classList.toggle('hidden', state.authConfigured);
+  $('logoutAction').classList.toggle('hidden', !state.account); $('authSetupNotice').classList.toggle('hidden', state.authConfigured || offlineMode());
   if (state.installed && !operation) progress({ step: 'done', percent: 100, message: 'Minecraft preparado. O Play inicia o jogo diretamente.' }, false);
   if (!state.installed && !operation && currentStep === 4) { currentStep = -1; progress({ percent: 0, message: 'Prepare os arquivos desta versão.' }, false); }
   renderUpdate(state.update || updateAvailable, state.updateMessage);
@@ -94,7 +102,7 @@ async function run(kind, task) {
 }
 async function prepare() {
   showPage('install'); currentStep = -1; progress({ step: 'minecraft', percent: 0, message: 'Preparando sua instância…' });
-  await run('prepare', async () => { await call('prepare'); toast('Arquivos preparados. Entre com Microsoft e use Play.'); });
+  await run('prepare', async () => { await call('prepare'); toast('Arquivos preparados. Escolha seu nick ou conecte a Microsoft em Minha conta.'); });
 }
 async function login() {
   if (!current.authConfigured) { setup(); toast('Veja o guia do publicador para registrar e aprovar o aplicativo Microsoft.'); return; }
@@ -102,6 +110,11 @@ async function login() {
   await run('login', async () => { await call('login'); toast('Conta Microsoft conectada. Seu Play está pronto.'); });
 }
 async function play() {
+  if (offlineMode()) {
+    if (!current.offlineProfile) { showPage('account'); $('offlineNickname').focus(); toast('Escolha seu nick e clique em Usar este nick.'); return; }
+    await run('launch', async () => { await call('launch'); toast('Minecraft iniciado no modo offline como ' + current.offlineProfile.name + '.'); });
+    return;
+  }
   if (!current.authConfigured) { setup(); toast('O login próprio ainda precisa da configuração do publicador.'); return; }
   if (!current.account) { await login(); return; }
   await run('launch', async () => { await call('launch'); toast('Minecraft iniciado diretamente pelo Zyon.'); });
@@ -116,6 +129,8 @@ document.addEventListener('click', async event => {
       case 'prepare': await prepare(); break;
       case 'launch': await play(); break;
       case 'login': await login(); break;
+      case 'offline-login': await run('profile', async () => { render(await call('offlineLogin', $('offlineNickname').value)); $('offlineNickname').value = current.offlineNickname; toast('Nick salvo. Use Play offline para jogar como ' + current.offlineNickname + '.'); }); break;
+      case 'select-microsoft': await run('profile', async () => { render(await call('selectMicrosoft')); toast('Modo Microsoft selecionado.'); }); break;
       case 'logout': await call('logout'); await refresh(); break;
       case 'cancel': await call('cancel'); toast('Cancelando a operação…'); break;
       case 'folder': await call('folder', 'instance'); break;
@@ -145,6 +160,7 @@ document.addEventListener('click', async event => {
   } catch (error) { toast(error.message, true); }
 });
 $('memory').addEventListener('input', () => { $('memoryValue').textContent = $('memory').value; });
+$('offlineNickname').addEventListener('keydown', event => { if (event.key === 'Enter' && !$('offlineLoginAction').disabled) { event.preventDefault(); $('offlineLoginAction').click(); } });
 $('dismissToast').addEventListener('click', () => $('toast').classList.add('hidden'));
 window.zyon?.onProgress(progress);
 window.zyon?.onEvent('auth-code', value => {

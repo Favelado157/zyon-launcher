@@ -168,13 +168,13 @@ function splitArguments(text) {
   for (const match of matches) result.push(match[1] ?? match[2] ?? match[3]); return result;
 }
 function launchArguments(ready, session, memoryGB) {
-  if (!session?.accessToken || !/^[a-f0-9]{32}$/i.test(session.uuid || '') || !/^[A-Za-z0-9_]{1,16}$/.test(session.name || '')) throw new Error('Sessão Minecraft inválida. Entre na conta novamente.');
+  const userType = require('./sessions.cjs').validateSession(session);
   if (!Number.isInteger(memoryGB) || memoryGB < 1 || memoryGB > 16) throw new Error('Memória inválida.');
   const variables = {
     auth_player_name: session.name, version_name: core.VERSION, game_directory: ready.instanceDir, assets_root: ready.assetsRoot,
     game_assets: path.join(ready.assetsRoot, 'virtual', ready.assetsIndex), assets_index_name: ready.assetsIndex,
     auth_uuid: session.uuid, auth_access_token: session.accessToken, auth_session: 'token:' + session.accessToken + ':' + session.uuid,
-    user_properties: '{}', user_type: 'mojang', version_type: 'release'
+    user_properties: '{}', user_type: userType, version_type: 'release'
   };
   const args = [`-Xmx${memoryGB}G`, '-XX:+UseG1GC', '-Djava.library.path=' + ready.natives, '-Dminecraft.launcher.brand=Zyon', '-Dminecraft.launcher.version=1.2.1'];
   if (ready.logging) args.push(ready.logging.argument.replace('${path}', ready.logging.file));
@@ -188,7 +188,7 @@ function launchArguments(ready, session, memoryGB) {
 }
 function redactGameLog(value, session) {
   let text = String(value);
-  if (session?.accessToken) text = text.split(session.accessToken).join('[sessão omitida]');
+  if (session?.accessToken && session.mode !== 'offline') text = text.split(session.accessToken).join('[sessão omitida]');
   return text.replace(/(access[_-]?token[=: ]+)[^\s,;}]+/gi, '$1[omitido]');
 }
 function launch({ javaExe, ready, session, memoryGB, onOutput = () => {}, onExit = () => {}, spawnProcess = spawn }) {

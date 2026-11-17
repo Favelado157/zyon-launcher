@@ -1,8 +1,16 @@
 # Zyon Launcher
 
-Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria, menu Zyon com cenário noturno de cerejeiras, keystrokes arrastáveis, importação opcional do OptiFine e atualizações pelo GitHub.
+Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com modo offline por nick, login Microsoft opcional, instância própria e menu Zyon com cenário noturno de cerejeiras, keystrokes arrastáveis, importação opcional do OptiFine e atualizações pelo GitHub.
 
 [Baixar a versão mais recente](https://github.com/Favelado157/zyon-launcher/releases/latest) · [Acompanhar compilações](https://github.com/Favelado157/zyon-launcher/actions) · [Guia de configuração](CONFIGURAR-PUBLICACAO.md)
+
+## Jogar com nick offline
+
+1. Abra **Minha conta**, digite um nick de 3 a 16 letras, números ou `_` e clique em **Usar este nick**.
+2. Prepare os arquivos na aba Instalação, caso ainda não estejam prontos.
+3. Use **Play offline**. Não precisa de conta Microsoft, Client ID nem aprovação para esse modo. A primeira preparação precisa de internet.
+
+O modo offline funciona em mundos locais e servidores que aceitam jogadores sem autenticação. Servidores com autenticação exigem uma conta original e o modo Microsoft. O nick, incluindo maiúsculas/minúsculas, determina sua identidade offline; mudar o nome pode mudar inventário/progresso em servidores.
 
 ## Keystrokes e OptiFine
 
@@ -14,7 +22,8 @@ Launcher desktop para **Minecraft Java 1.8.9 + Forge**, com instância própria,
 
 - Identidade visual, cliente Java e instalador Windows implementados.
 - Canal definido: `Favelado157/zyon-launcher`. Novas alterações enviadas à `main` disparam o workflow de publicação.
-- Client ID Microsoft do Zyon incluído. O login online próprio ainda depende da **aprovação do aplicativo para as APIs do Minecraft**; a autenticação real ainda não foi validada. O canal de atualizações funciona independentemente dessa aprovação.
+- Modo offline por nick disponível e selecionado inicialmente. A escolha e o nick são salvos neste PC.
+- Client ID Microsoft do Zyon incluído para o modo Microsoft opcional. O login online próprio ainda depende da **aprovação do aplicativo para as APIs do Minecraft**; a autenticação real ainda não foi validada. O canal de atualizações funciona independentemente dessa aprovação.
 - A versão 1.0 precisa ser atualizada manualmente uma vez para receber o verificador. Na 1.1 já instalada, o canal pode ser definido em Configurações como `Favelado157/zyon-launcher`.
 
 ## Instalação
