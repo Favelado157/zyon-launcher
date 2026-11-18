@@ -1,0 +1,75 @@
+BOT DE MÚSICA PARA DISCORD — WINDOWS 10/11 (64 BITS)
+
+Este programa roda no seu PC e toca músicas em canais de voz do Discord.
+A janela do terminal permanece aberta para manter o bot conectado. Fechar a janela ou desligar o PC desconecta o bot.
+
+1. EXTRAIR O ZIP
+Clique com o botão direito no ZIP > Extrair tudo. Abra a pasta extraída.
+Não execute diretamente de dentro do ZIP.
+
+2. INSTALAR PYTHON (se ainda não estiver instalado)
+Baixe Python 3.12, Windows installer (64-bit):
+https://www.python.org/downloads/windows/
+Na instalação, marque "Add python.exe to PATH".
+O código precisa de Python 3.11 ou mais recente; recomendamos 3.12.
+
+3. CRIAR O BOT NO DISCORD
+Acesse https://discord.com/developers/applications
+- Clique em New Application e escolha o nome do seu bot.
+- Abra Bot e crie o bot se essa opção aparecer.
+- Em Bot, use Reset Token / Copy para obter o token DO BOT.
+- Não use o token da sua conta pessoal do Discord.
+- Em OAuth2 > URL Generator, marque os scopes "bot" e "applications.commands".
+- Marque as permissões View Channels, Send Messages, Embed Links,
+  Connect e Speak. Permissões adicionais não são necessárias.
+- Abra o link gerado e adicione o bot a um servidor que você administra.
+- Este código usa comandos / e não precisa ativar Message Content Intent,
+  Server Members Intent nem Presence Intent.
+
+4. INICIAR
+Dê dois cliques em INICIAR.bat.
+Na primeira vez ele instala as dependências, FFmpeg e Deno em um ambiente local.
+Precisa de internet; pode demorar alguns minutos.
+Quando ele pedir o token, cole-o NO TERMINAL DO SEU PC e pressione Enter.
+Nada aparece enquanto você digita/cola: isso é normal.
+O token é salvo em .env. Não envie esse arquivo, o token nem a pasta
+configurada para outras pessoas. Para trocar o token, abra CONFIGURAR_TOKEN.bat.
+
+5. TOCAR NO DISCORD
+Espere aparecer "Bot conectado" e a confirmação de sincronização.
+No servidor, entre em um canal de voz e use:
+/play musica: nome ou link
+/pause
+/resume
+/skip
+/stop
+/queue
+/volume nivel: 50
+/leave
+
+Os comandos globais podem levar alguns minutos para aparecer no Discord.
+Reabra o Discord se necessário. Confira se o convite incluiu
+applications.commands e se seu cargo pode usar comandos de aplicativos.
+Para encerrar o bot, pressione Ctrl+C na janela.
+
+PROBLEMAS COMUNS
+- "Python não encontrado": instale Python e marque a opção de PATH.
+- "Token recusado": abra CONFIGURAR_TOKEN.bat e cole um novo token de bot.
+- Bot sem voz: confira Connect e Speak no canal e se não está silenciado.
+- Erro de música: certos sites/vídeos exigem login, impõem limites ou
+  ficam indisponíveis. Teste outro link. O programa não contorna esses bloqueios.
+- Dependências: confirme a conexão e tente novamente. O terminal mantém
+  os detalhes do erro visíveis. Depois de uma atualização do Python,
+  pode ser necessário excluir só a pasta .venv e abrir INICIAR.bat novamente.
+- Se precisar de ajuda, envie somente o erro exibido, sem token e sem .env.
+
+O QUE FOI AJUSTADO
+Código enviado preservado com comandos slash e fila por servidor.
+FFmpeg incluído pela dependência imageio-ffmpeg, sem instalar manualmente.
+Runtime Deno e suporte EJS do yt-dlp para a extração atual de vídeos.
+Carregamento de .env pela pasta do programa e configuração local do token.
+Comandos limitados a servidores, evitando falhas ao usar em mensagens privadas.
+Discord.py com suporte a voz atual, incluindo as dependências do protocolo DAVE.
+
+Verificações: importação das dependências, registro dos comandos e FFmpeg.
+A conexão e o áudio no Discord dependem do seu token e das permissões do servidor.
