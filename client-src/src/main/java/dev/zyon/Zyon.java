@@ -16,7 +16,7 @@ import org.lwjgl.input.Mouse;
 import java.util.*;
 import static dev.zyon.Setting.*;
 import static dev.zyon.Feature.Category.*;
-@Mod(modid="zyon",name="Zyon Client",version="1.2.1",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
+@Mod(modid="zyon",name="Zyon Client",version="1.2.2",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
 public final class Zyon {
  public static Zyon instance;public final List<Feature> features=new ArrayList<Feature>();public Engine engine;public Profiles profiles;public Keystrokes keystrokes;public boolean requestMenu;
  public final KeyBinding menuKey=new KeyBinding("Zyon: abrir menu",Keyboard.KEY_RSHIFT,"Zyon"),panicKey=new KeyBinding("Zyon: desligar tudo",Keyboard.KEY_END,"Zyon");
@@ -52,14 +52,14 @@ public final class Zyon {
   add("autoeat","AutoEat","Come alimentos da hotbar abaixo do limite de fome.",PLAYER,number("hunger","Limite de fome",14,1,19,1));
   add("fastplace","FastPlace","Reduz o intervalo local de colocacao de blocos.",PLAYER,number("delay","Intervalo em ticks",0,0,4,1));
   add("hud","HUD","Marca, FPS, coordenadas, alvo e modulos ativos.",CLIENT,bool("logo","Mostrar icone",true),bool("fps","Mostrar FPS",true),bool("coords","Mostrar coordenadas",true),bool("modules","Mostrar modulos",true),bool("target","Mostrar alvo",true),number("x","Margem X",12,0,500,1),number("y","Margem Y",12,0,300,1));
-  add("theme","Tema","Cores do menu e HUD. Aplicado diretamente.",CLIENT,bool("menu","Menu inicial Zyon",true),choice("accent","Cor de destaque",0,"Violeta","Azul","Ciano","Verde","Rosa","Laranja"),number("opacity","Opacidade",245,160,255,1),bool("rainbow","Cores animadas",false));
+  add("theme","Tema","Cores do menu e HUD. Aplicado diretamente.",CLIENT,bool("menu","Menu inicial Zyon",true),choice("accent","Cor de destaque",0,"Azul neon","Azul","Ciano","Verde","Rosa","Laranja"),number("opacity","Opacidade",245,160,255,1),bool("rainbow","Cores animadas",false));
   add("keystrokes","Keystrokes","Teclas e cliques na tela. Use Editar HUD para arrastar.",CLIENT,
    bool("mouse","Botoes do mouse",true),bool("cps","Cliques por segundo",true),bool("jump","Mostrar pulo",true),
    number("scale","Tamanho",1,.5,2,.1),choice("color","Cor ao pressionar",0,"Tema","Branco","Azul","Verde","Rosa"),number("opacity","Opacidade do fundo",190,0,255,1),
    number("x","Posicao horizontal (%)",2,0,100,.1),number("y","Posicao vertical (%)",35,0,100,.1));
  }
  public Feature feature(String id){for(Feature f:features)if(f.id.equalsIgnoreCase(id)||f.name.equalsIgnoreCase(id))return f;throw new IllegalArgumentException("Modulo desconhecido: "+id);}
- public int accent(){Feature t=feature("theme");return t.flag("rainbow")?java.awt.Color.HSBtoRGB((System.currentTimeMillis()%8000)/8000f,.6f,1):new int[]{0xFFA68BFA,0xFF72A7FF,0xFF58D9E8,0xFF72D9A0,0xFFFF83B7,0xFFFFB266}[t.setting("accent").integer()];}
+ public int accent(){Feature t=feature("theme");return t.flag("rainbow")?java.awt.Color.HSBtoRGB((System.currentTimeMillis()%8000)/8000f,.6f,1):new int[]{0xFF249BFF,0xFF72A7FF,0xFF58D9E8,0xFF72D9A0,0xFFFF83B7,0xFFFFB266}[t.setting("accent").integer()];}
  @SubscribeEvent public void key(InputEvent.KeyInputEvent event){
   if(!Keyboard.getEventKeyState()||Keyboard.isRepeatEvent()||mc.currentScreen!=null)return;int key=Keyboard.getEventKey();
   if(key==menuKey.getKeyCode()){mc.displayGuiScreen(new ClickGui(this));return;}if(key==panicKey.getKeyCode()){panic();return;}

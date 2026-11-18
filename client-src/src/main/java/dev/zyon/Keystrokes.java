@@ -26,9 +26,9 @@ public final class Keystrokes {
  private boolean down(KeyBinding binding){int code=binding.getKeyCode();return code<0?code+100>=0&&code+100<Mouse.getButtonCount()&&Mouse.isButtonDown(code+100):code>0&&code<Keyboard.KEYBOARD_SIZE&&Keyboard.isKeyDown(code);}
  private int pressedColor(){return new int[]{client.accent(),0xFFF0F1FA,0xFF72A7FF,0xFF72D9A0,0xFFFF83B7}[f().setting("color").integer()];}
  private void box(String label,int x,int y,int w,int h,boolean pressed,String extra){
-  int opacity=f().setting("opacity").integer();int bg=pressed?pressedColor():(0x00141925|(opacity<<24));
-  Gui.drawRect(x,y,x+w,y+h,bg);Gui.drawRect(x,y+h-1,x+w,y+h,pressed?0xFFFFFFFF:0xFF38415A);
-  int text=pressed?0xFF111520:0xFFF0F1FA;
+  int opacity=f().setting("opacity").integer();int bg=pressed?pressedColor():(0x00122538|(opacity<<24));
+  Gui.drawRect(x,y,x+w,y+h,bg);Gui.drawRect(x,y+h-1,x+w,y+h,pressed?0xFFFFFFFF:0xFF285271);
+  int text=pressed?0xFF03192C:0xFFF0F1FA;
   String name=mc.fontRendererObj.trimStringToWidth(label,w-4);
   mc.fontRendererObj.drawString(name,x+(w-mc.fontRendererObj.getStringWidth(name))/2,y+(extra==null?(h-8)/2:5),text);
   if(extra!=null)mc.fontRendererObj.drawString(extra,x+(w-mc.fontRendererObj.getStringWidth(extra))/2,y+19,text);

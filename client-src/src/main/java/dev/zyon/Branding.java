@@ -26,6 +26,9 @@ public final class Branding {
         if (event.gui instanceof GuiMainMenu && Zyon.instance.feature("theme").flag("menu")) event.gui = new MainMenu();
     }
     public static void image(ResourceLocation resource, int x, int y, int width, int height) {
+        // Forge splash rendering can leave the texture-state cache out of sync.
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().getTextureManager().bindTexture(resource);
         GlStateManager.color(1, 1, 1, 1); GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
@@ -66,7 +69,7 @@ public final class Branding {
             int backgroundWidth = (int)Math.ceil(1672 * cover), backgroundHeight = (int)Math.ceil(941 * cover);
             image(BACKGROUND, (width - backgroundWidth) / 2, 0, backgroundWidth, backgroundHeight);
             super.drawScreen(mouseX, mouseY, partial);
-            fontRendererObj.drawStringWithShadow("Minecraft 1.8.9 / Zyon 1.2.1", 4, height - 12, 0xFFE0DCEB);
+            fontRendererObj.drawStringWithShadow("Minecraft 1.8.9 / Zyon 1.2.2", 4, height - 12, 0xFFC7DFF4);
         }
         @Override protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));

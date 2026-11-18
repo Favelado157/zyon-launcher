@@ -56,7 +56,7 @@ jobs:
           .\gradlew.bat "-Porg.gradle.java.installations.paths=$env:ZYON_JAVA8" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Pop-Location
-          Copy-Item client-src/build/libs/zyon-1.8.9-1.2.1.jar payload/zyon-1.8.9-1.2.1.jar -Force
+          Copy-Item client-src/build/libs/zyon-1.8.9-1.2.2.jar payload/zyon-1.8.9-1.2.2.jar -Force
           node build/prepare-release.cjs
       - name: Testar o launcher
         shell: pwsh
@@ -83,15 +83,17 @@ jobs:
         run: |
           $v = $env:ZYON_RELEASE_VERSION
           @"
-          Zyon Launcher $v — correção da abertura do Minecraft.
+          Zyon Launcher $v — azul neon e novo menu dentro do jogo.
 
           Instalação para Windows x64. Mundos e configurações são preservados.
-          Removida a opção de ocultar janelas ao iniciar javaw.exe, que podia deixar o jogo sem janela visível.
-          O launcher agora diferencia o processo iniciando do menu carregado, com confirmação enviada pelo cliente.
-          Falhas antes do menu aparecem no launcher com um trecho do erro e indicação de game.log, inclusive quando o processo encerra sem código de erro.
-          Novo modo offline sem conta Microsoft: Minha conta > digite seu nick > Usar este nick > Play offline. A primeira preparação precisa de internet.
+          Novo tema azul neon no launcher inteiro: botões, painéis, navegação, arte do portal e ícone do aplicativo/instalador.
+          Menu do Shift direito reorganizado com categorias, busca, lista de funções e painel de ajustes.
+          Botão ? em cada função: passe o mouse para ler uma explicação detalhada do comportamento, ajustes e dependências.
+          Ajuda e ativação têm áreas separadas. Consultar a ajuda não ativa a função.
+          Cliente 1.2.2. Perfis, atalhos, mundos e posições dos keystrokes são mantidos; o JAR anterior é movido para backup.
+          Modo offline sem conta Microsoft: Minha conta > digite seu nick > Usar este nick > Play offline. A primeira preparação precisa de internet.
           Para mundos locais e servidores sem autenticação. Servidores com autenticação exigem uma conta original e o modo Microsoft. O nick determina a identidade offline; mudar o nome pode mudar seu inventário/progresso em servidores.
-          Novo menu noturno com cerejeiras, lago, ponte iluminada e título ZYON, baseado na imagem enviada pelo publicador. Botões funcionais centralizados, sem imagens de botões duplicadas.
+          Menu noturno com cerejeiras, lago, ponte iluminada e título ZYON, baseado na imagem enviada pelo publicador. Botões funcionais centralizados, sem imagens de botões duplicadas.
           Keystrokes arrastáveis: Shift direito > Editar HUD, ou Ctrl direito. Tamanho, cores, transparência e CPS em Interface > Keystrokes.
           OptiFine opcional: na aba Instalação, baixe o JAR oficial 1.8.9 HD U M5 e use Importar. O zoom usa C; a capa exige uma capa OptiFine ativa. O JAR OptiFine não acompanha o instalador.
           O modo Microsoft é opcional e ainda depende da aprovação do aplicativo e de uma conta com acesso ao Java; a autenticação real não foi validada nesta publicação. O modo offline não depende desse cadastro.

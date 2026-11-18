@@ -1,11 +1,12 @@
 {
-  "file": "zyon-1.8.9-1.2.1.jar",
-  "sha256": "1602509ef1b5438c3fcf6f540659b3e1258d757bbc9a71ce01e125bb1b80233e",
+  "file": "zyon-1.8.9-1.2.2.jar",
+  "sha256": "6ed322ecfad7fffa346c74176bcc5a76e1b5cb1fe68541710ccf978f61a92d39",
   "modules": 19,
   "minecraft": "1.8.9",
   "previousFiles": [
     "zyon-1.8.9-1.0.0.jar",
     "zyon-1.8.9-1.1.0.jar",
-    "zyon-1.8.9-1.2.0.jar"
+    "zyon-1.8.9-1.2.0.jar",
+    "zyon-1.8.9-1.2.1.jar"
   ]
 }

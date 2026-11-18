@@ -16,12 +16,12 @@ public final class HudEditor extends GuiScreen {
  }
  private String label(){return "Keystrokes: "+(client.feature("keystrokes").enabled()?"ON":"OFF");}
  public void drawScreen(int x,int y,float partial){
-  drawRect(0,0,width,height,0x88080B13);
+  drawRect(0,0,width,height,0x9905101D);
   drawCenteredString(fontRendererObj,"EDITOR DO HUD",width/2,10,client.accent());
   drawCenteredString(fontRendererObj,"Arraste os keystrokes. Tamanho, cores e teclas: Interface > Keystrokes.",width/2,25,0xFFE1E4EE);
   int[] b=client.keystrokes.bounds(width,height);
   drawRect(b[0]-2,b[1]-2,b[0]+b[2]+2,b[1]+b[3]+2,client.accent());
-  drawRect(b[0]-1,b[1]-1,b[0]+b[2]+1,b[1]+b[3]+1,0xFF101420);
+  drawRect(b[0]-1,b[1]-1,b[0]+b[2]+1,b[1]+b[3]+1,0xFF091B2E);
   client.keystrokes.draw(width,height,true);
   if(!client.feature("keystrokes").enabled())drawCenteredString(fontRendererObj,"Previa: ative Keystrokes para mostrar durante o jogo.",width/2,height-18,0xFFFFD08A);
   super.drawScreen(x,y,partial);
