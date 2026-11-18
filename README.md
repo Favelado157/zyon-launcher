@@ -1,6 +1,6 @@
 # Bot de música para Discord — Windows
 
-[Baixar o ZIP para Windows](https://github.com/Favelado157/zyon-launcher/releases/download/discord-bot-v1.0.0/Bot-Musica-Windows.zip)
+[Baixar o ZIP para Windows](https://github.com/Favelado157/zyon-launcher/raw/refs/heads/discord-music-bot/Bot-Musica-Windows.zip)
 
 1. Baixe e extraia o ZIP.
 2. Instale Python 3.12 para Windows, marcando **Add python.exe to PATH**, se necessário.
