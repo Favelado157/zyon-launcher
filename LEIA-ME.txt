@@ -1,0 +1,75 @@
+SERVIDOR LOCAL — MINECRAFT JAVA 1.8.9 — WINDOWS 10/11 (64 BITS)
+
+COMO ABRIR
+1. Extraia todo o ZIP para uma pasta no seu PC. Não execute de dentro do ZIP.
+2. Abra INICIAR-SERVIDOR.bat com dois cliques.
+3. Na primeira abertura, leia https://www.minecraft.net/eula.
+   Digite SIM somente se você concordar com os termos. Enter cancela.
+4. Aguarde o download do servidor oficial e do Java 8 portátil.
+   É preciso internet na primeira preparação; depois os arquivos são reutilizados.
+5. Espere aparecer "Done" no terminal. A primeira geração do mundo pode demorar.
+6. Abra Minecraft JAVA 1.8.9 no mesmo PC. No Zyon, use Play offline.
+7. Vá em Multijogador > Conexão direta e digite:
+
+   localhost:25565
+
+   Se necessário, use 127.0.0.1:25565.
+
+Mantenha a janela do servidor aberta enquanto joga.
+
+SALVAR E FECHAR
+No terminal do servidor, digite stop e pressione Enter.
+Espere terminar de salvar o mundo antes de fechar a janela.
+Para jogar de novo, abra INICIAR-SERVIDOR.bat novamente.
+
+NICK OFFLINE
+O servidor usa online-mode=false para funcionar com o nick offline do launcher.
+Ele escuta SOMENTE em 127.0.0.1, acessível apenas neste PC. Não abre portas,
+não configura o roteador e não cria endereço público.
+Outros PCs, mesmo na mesma rede Wi-Fi, não podem entrar nesta configuração.
+Mantenha o mesmo nick para conservar a identidade e o inventário do jogador.
+
+VERSÃO E CONTEÚDO
+Servidor vanilla oficial 1.8.9, sem plugins nem mods de servidor.
+Compatível com o cliente Java 1.8.9. Não funciona com Minecraft Bedrock.
+Mods que dependem de instalação no servidor precisam de um servidor Forge próprio.
+Os arquivos server.jar e Java são baixados de Mojang e Eclipse Temurin/Adoptium
+com verificação de integridade. Os binários não são redistribuídos neste ZIP.
+
+CONFIGURAR O MUNDO
+Pare o servidor antes de alterar os arquivos.
+Em servidor/server.properties:
+- gamemode=0: sobrevivência; gamemode=1: criativo.
+- difficulty=0: pacífico; 1: fácil; 2: normal; 3: difícil.
+- pvp=true ou false: combate entre jogadores.
+- view-distance=6: distância de visão; valores maiores usam mais recursos.
+Mantenha server-ip=127.0.0.1 e server-port=25565 para este pacote local.
+
+No terminal do servidor, os comandos não levam a barra inicial:
+op SeuNick                 Dá permissão de administrador ao seu nick.
+gamemode 1 SeuNick         Coloca seu jogador no criativo.
+time set day               Define dia.
+weather clear              Limpa o tempo.
+stop                       Salva e encerra.
+
+MEMÓRIA
+O arquivo config.json define memoryMB: 1024 (1 GB) por padrão.
+Você pode mudar para 2048 (2 GB), conforme a memória do seu PC.
+O Minecraft aberto junto também precisa de RAM. Não aloque toda a memória ao servidor.
+Não precisa instalar Java manualmente. Este pacote mantém o Java 8 na própria pasta.
+
+MUNDO E BACKUP
+O mundo fica em servidor/world. Pare o servidor e copie essa pasta para um backup.
+A pasta do pacote também guarda jogadores, configurações, logs e Java.
+Mantenha seus dados: não substitua a pasta servidor por uma pasta vazia.
+Não envie um pacote já usado para outra pessoa sem verificar os dados do seu mundo.
+
+SE NÃO ABRIR
+- Extraia o ZIP antes de executar o .bat.
+- Confira a conexão à internet na primeira preparação.
+- Se a porta 25565 já estiver ocupada, feche outro servidor aberto.
+- "Failed to bind to port": confira servidor-ip e outros servidores abertos.
+- Se necessário, use 127.0.0.1:25565 no jogo.
+- Consulte servidor/logs/latest.log. A janela mantém os erros visíveis.
+- Se aparecer "Outdated client/server", confira se o jogo é Java 1.8.9.
+- Se o download falhar na verificação, ele não será executado. Tente novamente.

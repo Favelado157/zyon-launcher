@@ -1,0 +1,6 @@
+runtime-java8/
+.downloads/
+.java-extraindo-*/
+.servidor.lock
+servidor/*
+!servidor/server.properties
