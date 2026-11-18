@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "name": "Zyon • Comunidade",
+  "description": "Comunidade Zyon: Minecraft 1.8.9, launcher, suporte e equipe.",
+  "staff_roles": [
+    "founder",
+    "admin",
+    "mod",
+    "support",
+    "dev"
+  ],
+  "publisher_roles": [
+    "founder",
+    "admin",
+    "mod",
+    "dev"
+  ],
+  "roles": [
+    {
+      "id": "founder",
+      "name": "👑 Zyon • Fundador",
+      "color": "F4C76B",
+      "permissions": []
+    },
+    {
+      "id": "admin",
+      "name": "🛡️ Zyon • Administrador",
+      "color": "E66C7E",
+      "permissions": [
+        "manage_guild",
+        "manage_channels",
+        "manage_messages",
+        "manage_threads",
+        "view_audit_log",
+        "kick_members",
+        "ban_members",
+        "moderate_members",
+        "move_members"
+      ]
+    },
+    {
+      "id": "mod",
+      "name": "🔨 Zyon • Moderador",
+      "color": "A68BFA",
+      "permissions": [
+        "manage_messages",
+        "manage_threads",
+        "kick_members",
+        "moderate_members",
+        "move_members"
+      ]
+    },
+    {
+      "id": "support",
+      "name": "🛠️ Zyon • Suporte",
+      "color": "58D9E8",
+      "permissions": []
+    },
+    {
+      "id": "dev",
+      "name": "💻 Zyon • Desenvolvedor",
+      "color": "72A7FF",
+      "permissions": []
+    },
+    {
+      "id": "vip",
+      "name": "💎 Zyon • VIP",
+      "color": "D68BFF",
+      "permissions": []
+    },
+    {
+      "id": "member",
+      "name": "🎮 Zyon • Membro",
+      "color": "72D9A0",
+      "permissions": []
+    },
+    {
+      "id": "bots",
+      "name": "🤖 Zyon • Bots",
+      "color": "99A3B6",
+      "permissions": []
+    }
+  ],
+  "categories": [
+    {
+      "id": "info",
+      "name": "📌 ┃ ZYON • INFORMAÇÕES",
+      "access": "readonly",
+      "channels": [
+        {
+          "id": "welcome",
+          "name": "👋・boas-vindas",
+          "type": "text",
+          "topic": "Comece por aqui e conheça a comunidade Zyon.",
+          "message": "## Bem-vindo ao Zyon! 💜\nNossa comunidade para Minecraft Java 1.8.9 e Zyon Launcher.\nLeia as regras, confira o download oficial e apresente-se no chat-geral.\nA equipe atende nos canais de suporte."
+        },
+        {
+          "id": "rules",
+          "name": "📜・regras",
+          "type": "text",
+          "topic": "Regras da comunidade.",
+          "message": "## Regras da comunidade\n1. Respeite as pessoas: sem assédio, preconceito ou exposição de dados pessoais.\n2. Evite spam, flood, links maliciosos e propaganda sem autorização.\n3. Use cada canal para seu assunto e siga a orientação da equipe.\n4. Não publique tokens, senhas ou códigos de login.\n5. Envie relatos de bugs com a versão e o erro, removendo dados pessoais.\n6. Baixe o Zyon somente pelos links oficiais divulgados aqui.\n7. Respeite as regras dos servidores em que você joga."
+        },
+        {
+          "id": "news",
+          "name": "📢・anúncios",
+          "type": "text",
+          "topic": "Novidades e comunicados publicados pela equipe."
+        },
+        {
+          "id": "download",
+          "name": "📥・download",
+          "type": "text",
+          "topic": "Links oficiais do Zyon Launcher.",
+          "message": "## Download oficial\nZyon Launcher para Windows:\nhttps://github.com/Favelado157/zyon-launcher/releases/latest\n\nSite da comunidade:\nhttps://favelado157.github.io/zyon-launcher/\n\nMinecraft Java 1.8.9. As novidades serão publicadas pela equipe em anúncios."
+        },
+        {
+          "id": "faq",
+          "name": "❓・perguntas-frequentes",
+          "type": "text",
+          "topic": "Respostas rápidas para começar.",
+          "message": "## Perguntas frequentes\n**Qual versão?** Minecraft Java 1.8.9.\n**Como abrir o menu do Zyon?** Shift direito dentro do jogo.\n**Como editar os keystrokes?** Ctrl direito ou Editar HUD no menu.\n**Zoom?** Importe o OptiFine oficial 1.8.9 HD U M5 no launcher e use C.\n**Jogar offline?** Em Minha conta, escolha seu nick e use Play offline. Servidores com autenticação exigem uma conta original.\n**O jogo não abriu?** Informe a versão do launcher e o erro de game.log em ajuda, removendo dados pessoais."
+        }
+      ]
+    },
+    {
+      "id": "community",
+      "name": "💬 ┃ ZYON • COMUNIDADE",
+      "access": "public",
+      "channels": [
+        {
+          "id": "general",
+          "name": "💬・chat-geral",
+          "type": "text",
+          "topic": "Converse e conheça a comunidade."
+        },
+        {
+          "id": "minecraft",
+          "name": "⛏️・minecraft",
+          "type": "text",
+          "topic": "Mundos, partidas e assuntos de Minecraft."
+        },
+        {
+          "id": "media",
+          "name": "📸・prints-e-clipes",
+          "type": "text",
+          "topic": "Compartilhe capturas e momentos das suas partidas."
+        },
+        {
+          "id": "ideas",
+          "name": "💡・sugestões",
+          "type": "text",
+          "topic": "Sugestões para o launcher e a comunidade.",
+          "message": "## Tem uma ideia?\nExplique o que você sugere, por que seria útil e como imagina o funcionamento. A equipe avaliará as sugestões."
+        },
+        {
+          "id": "bot_commands",
+          "name": "🤖・comandos-bot",
+          "type": "text",
+          "topic": "Use os comandos dos bots que você adicionar ao servidor.",
+          "message": "Canal reservado aos comandos dos seus bots. O template cria a estrutura; adicione e configure seus bots separadamente."
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "name": "🛠️ ┃ ZYON • SUPORTE",
+      "access": "public",
+      "channels": [
+        {
+          "id": "help",
+          "name": "🆘・ajuda",
+          "type": "text",
+          "topic": "Dúvidas e ajuda com o Zyon. Canal público.",
+          "message": "## Precisa de ajuda?\nInforme sua versão do Windows, do launcher e o que aconteceu.\nEste canal é público. Remova tokens, senhas, e-mails e dados pessoais dos registros antes de enviar."
+        },
+        {
+          "id": "bugs",
+          "name": "🐞・relatar-bugs",
+          "type": "text",
+          "topic": "Relate problemas com informações para reproduzi-los.",
+          "message": "## Modelo de relato\n**Versão do launcher:**\n**Versão do Windows:**\n**O que aconteceu:**\n**O que você esperava:**\n**Passos para reproduzir:**\n**Erro ou registro, sem dados pessoais:**"
+        }
+      ]
+    },
+    {
+      "id": "voice",
+      "name": "🔊 ┃ ZYON • SALAS DE VOZ",
+      "access": "public",
+      "channels": [
+        {
+          "id": "voice_general",
+          "name": "🎙️ Geral",
+          "type": "voice"
+        },
+        {
+          "id": "voice_minecraft",
+          "name": "⛏️ Minecraft",
+          "type": "voice"
+        },
+        {
+          "id": "voice_party",
+          "name": "⚔️ Partidas",
+          "type": "voice"
+        },
+        {
+          "id": "voice_music",
+          "name": "🎵 Música",
+          "type": "voice"
+        }
+      ]
+    },
+    {
+      "id": "staff",
+      "name": "👑 ┃ ZYON • EQUIPE",
+      "access": "staff",
+      "channels": [
+        {
+          "id": "staff_chat",
+          "name": "💼・chat-staff",
+          "type": "text",
+          "topic": "Conversa privada da equipe."
+        },
+        {
+          "id": "staff_plan",
+          "name": "🗂️・planejamento",
+          "type": "text",
+          "topic": "Organização e planejamento da equipe."
+        },
+        {
+          "id": "staff_record",
+          "name": "🧾・registro-manual",
+          "type": "text",
+          "topic": "Registro manual de decisões e atendimentos.",
+          "message": "Registre aqui decisões e ações importantes da equipe. Este é um registro manual; o template não instala um bot de logs."
+        },
+        {
+          "id": "staff_meeting",
+          "name": "🔐 Reunião da equipe",
+          "type": "voice"
+        }
+      ]
+    }
+  ]
+}

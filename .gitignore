@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+progresso-*.json
+progresso-*.tmp
+LINK-TEMPLATE-*.txt
+.env
+*.log
