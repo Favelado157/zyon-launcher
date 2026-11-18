@@ -1,0 +1,31 @@
+EMOJIS ZYON — DISCORD
+
+8 emojis estáticos em PNG, com fundo transparente.
+Cores: roxo ametista, lilás e ciano.
+
+COMO ADICIONAR
+1. Extraia o arquivo ZIP.
+2. No Discord, abra seu servidor Zyon.
+3. Vá em Configurações do servidor > Emojis > Enviar emoji.
+4. Selecione os PNGs da pasta emojis (128 x 128 pixels).
+5. Use os nomes abaixo ou personalize como preferir.
+É necessário ter permissão para criar/gerenciar expressões no servidor.
+
+NOMES SUGERIDOS
+:zyon_logo:      Marca Zyon
+:zyon_coracao:   Coração
+:zyon_fogo:      Fogo
+:zyon_gg:        GG / boa partida
+:zyon_coroa:     Coroa / VIP
+:zyon_diamante:  Diamante
+:zyon_feliz:     Carinha feliz
+:zyon_like:      Joinha / aprovado
+
+ARQUIVOS
+emojis/         8 PNGs de 128 x 128 prontos para enviar.
+256px/          Os mesmos 8 emojis em 256 x 256.
+previa.png      Visão geral da coleção sobre fundo escuro.
+
+Cada PNG tem menos de 52 KB. As duas pastas contêm os mesmos desenhos
+em resoluções diferentes; você pode escolher uma delas para o envio.
+O fundo dos emojis individuais é transparente.
