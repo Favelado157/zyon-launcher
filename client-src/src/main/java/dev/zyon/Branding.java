@@ -18,7 +18,11 @@ import java.nio.ByteBuffer;
 public final class Branding {
     public static final ResourceLocation LOGO = new ResourceLocation("zyon", "textures/brand.png");
     private static final ResourceLocation BACKGROUND = new ResourceLocation("zyon", "textures/menu.png");
+    private boolean menuReported;
     @SubscribeEvent public void open(GuiOpenEvent event) {
+        if (event.gui instanceof GuiMainMenu && !menuReported) {
+            menuReported = true; System.out.println("ZYON_MENU_READY");
+        }
         if (event.gui instanceof GuiMainMenu && Zyon.instance.feature("theme").flag("menu")) event.gui = new MainMenu();
     }
     public static void image(ResourceLocation resource, int x, int y, int width, int height) {

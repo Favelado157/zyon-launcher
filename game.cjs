@@ -191,21 +191,35 @@ function redactGameLog(value, session) {
   if (session?.accessToken && session.mode !== 'offline') text = text.split(session.accessToken).join('[sessão omitida]');
   return text.replace(/(access[_-]?token[=: ]+)[^\s,;}]+/gi, '$1[omitido]');
 }
-function launch({ javaExe, ready, session, memoryGB, onOutput = () => {}, onExit = () => {}, spawnProcess = spawn }) {
+function launch({ javaExe, ready, session, memoryGB, onOutput = () => {}, onReady = () => {}, onExit = () => {}, spawnProcess = spawn }) {
   const args = launchArguments(ready, session, memoryGB);
   return new Promise((resolve, reject) => {
-    const child = spawnProcess(javaExe, args, { cwd: ready.instanceDir, shell: false, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    // javaw.exe has no console. Hiding its GUI can also hide LWJGL's first window.
+    const child = spawnProcess(javaExe, args, { cwd: ready.instanceDir, shell: false, windowsHide: false, stdio: ['ignore', 'pipe', 'pipe'] });
+    let menuReady = false, tail = '';
+    const output = value => {
+      const text = redactGameLog(value, session);
+      tail = (tail + text).slice(-6000);
+      onOutput(text);
+      if (!menuReady && text.includes('ZYON_MENU_READY')) { menuReady = true; onReady(); }
+    };
     for (const stream of [child.stdout, child.stderr]) {
       if (!stream) continue;
       // Keep an overlap so a session token split across stream chunks is never persisted.
       let pending = '';
       stream.setEncoding('utf8');
-      stream.on('data', data => { pending += data; const lines = pending.split('\n'); pending = lines.pop(); for (const line of lines) onOutput(redactGameLog(line + '\n', session)); });
-      stream.on('end', () => { if (pending) onOutput(redactGameLog(pending, session)); });
+      stream.on('data', data => { pending += data; const lines = pending.split('\n'); pending = lines.pop(); for (const line of lines) output(line + '\n'); });
+      stream.on('end', () => { if (pending) output(pending); });
     }
     child.once('error', () => reject(new Error('O Java não pôde ser iniciado. Verifique a instalação e os registros.')));
     child.once('spawn', () => resolve(child));
-    child.once('exit', (code, signal) => onExit({ code, signal }));
+    // close waits for stdout/stderr to drain, including the final crash message.
+    child.once('close', (code, signal) => {
+      const failed = !menuReady || code !== 0 || !!signal;
+      const detail = tail.split(/\r?\n/).filter(line => /(?:Caused by:|Exception|Error:|Could not|Unable to|Error occurred)/i.test(line)).slice(-3).join(' ').slice(0, 900);
+      const error = failed ? (menuReady ? 'O Minecraft foi encerrado com erro.' : 'O Minecraft fechou antes de carregar o menu.') + (detail ? ' ' + detail : '') + ' Use Abrir registros para ver game.log.' : '';
+      onExit({ code, signal, startupFailed: !menuReady, error });
+    });
   });
 }
 module.exports = { safePath, allowed, mergeLibraries, libraryPlan, ensureLibrary, pool, extractNatives, ensureArtifacts, readReady, splitArguments, launchArguments, redactGameLog, launch };

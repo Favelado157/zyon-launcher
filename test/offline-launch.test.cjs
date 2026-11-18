@@ -16,7 +16,7 @@ test('desktop IPC saves a nick and reaches Java without a Microsoft account, whi
   await fs.mkdir(path.dirname(executable), { recursive: true });await fs.writeFile(executable, 'fixture');
   await core.atomicWrite(path.join(root, 'java.json'), JSON.stringify({ executable }));
   const handlers = new Map(), calls = { microsoft: 0, external: 0, java: 0, prepare: 0 };
-  let window, exit, prepared = false, loaded;
+  let window, exit, menuReady, prepared = false, loaded;
   const onLoaded = new Promise(resolve => { loaded = resolve; });
   const ready = { classpath: ['minecraft.jar'], natives: 'natives', instanceDir: instance, assetsRoot: 'assets', assetsIndex: '1.8', mainClass: 'net.minecraft.launchwrapper.Launch', arguments: '--username ${auth_player_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type}' };
   class Window {
@@ -34,7 +34,7 @@ test('desktop IPC saves a nick and reaches Java without a Microsoft account, whi
     electron: { app, BrowserWindow: Window, ipcMain: { handle: (name, fn) => handlers.set(name, fn) }, safeStorage: {}, dialog: {}, shell: { openExternal() { calls.external++; } } },
     './auth.cjs': { MicrosoftAccount: Account, validClientId: require('../auth.cjs').validClientId },
     './core.cjs': { ...core, async atomicWrite(file, data) { if (calls.failSave && path.basename(file) === 'config.json') throw new Error('Falha ao salvar configuração');return core.atomicWrite(file, data); }, async prepare(options) { calls.prepare++;await core.installMod(options.payload, options.instanceDir); } },
-    './game.cjs': { ...game, readReady: async () => prepared ? ready : null, async ensureArtifacts() { prepared = true;return ready; }, async launch(options) { calls.java++;calls.session = options.session;calls.args = game.launchArguments(options.ready, options.session, options.memoryGB);exit = options.onExit;return { exitCode: null }; } },
+    './game.cjs': { ...game, readReady: async () => prepared ? ready : null, async ensureArtifacts() { prepared = true;return ready; }, async launch(options) { calls.java++;calls.session = options.session;calls.args = game.launchArguments(options.ready, options.session, options.memoryGB);exit = options.onExit;menuReady = options.onReady;return { exitCode: null }; } },
     './updates.cjs': { ...require('../updates.cjs'), check: async () => ({ available: false }) }
   };
   const repository = path.resolve(__dirname, '..');
@@ -56,13 +56,19 @@ test('desktop IPC saves a nick and reaches Java without a Microsoft account, whi
   const config = await core.readJson(path.join(root, 'config.json'));
   assert.equal(config.loginMode, 'offline');assert.equal(config.offlineNickname, 'ZyonPlayer');assert.equal(config.accessToken, undefined);
   const launched = await invoke('launch');
-  assert.equal(launched.ok, true);assert.equal(launched.value.running, true);
+  assert.equal(launched.ok, true);assert.equal(launched.value.running, true);assert.equal(launched.value.gameReady, false);
+  menuReady();assert.equal((await invoke('state')).value.gameReady, true);
   assert.equal(calls.microsoft, 0);assert.equal(calls.external, 0);assert.equal(calls.java, 1);assert.equal(calls.prepare, 1);
   assert.equal(calls.session.mode, 'offline');assert.equal(calls.args[calls.args.indexOf('--accessToken') + 1], '0');
   assert.equal((await invoke('offline-login', 'OtherPlayer')).ok, false);
   exit({ code: 0 });await new Promise(resolve => setImmediate(resolve));
+  assert.equal((await invoke('state')).value.gameReady, false);
+  const retry = await invoke('launch');assert.equal(retry.value.gameReady, false);
+  exit({ code: 0, error: 'O Minecraft fechou antes de carregar o menu.' });
+  const failed = (await invoke('state')).value;
+  assert.equal(failed.running, false);assert.match(failed.gameError, /antes de carregar/);
   assert.equal((await invoke('session-mode', 'microsoft')).ok, true);
   const online = await invoke('launch');assert.equal(online.ok, false);assert.match(online.error, /Microsoft/);
-  assert.equal(calls.microsoft, 1);assert.equal(calls.java, 1);
+  assert.equal(calls.microsoft, 1);assert.equal(calls.java, 2);
   assert.equal((await invoke('state')).value.loginMode, 'microsoft');
 });

@@ -14,7 +14,7 @@ app.setName('Zyon Launcher');
 app.setPath('userData', path.join(app.getPath('appData'), 'ZyonLauncher'));
 const root = app.getPath('userData');
 const payload = app.isPackaged ? path.join(process.resourcesPath, 'payload') : path.join(__dirname, 'payload');
-let window, config, account, controller, busy = false, busyType = '', gameChild = null, lastUpdate = null, updateMessage = '', promptedVersion = '', updateTimer;
+let window, config, account, controller, busy = false, busyType = '', gameChild = null, gameReady = false, gameError = '', lastUpdate = null, updateMessage = '', promptedVersion = '', updateTimer;
 let logChain = Promise.resolve(), gameLogChain = Promise.resolve();
 const lock = app.requestSingleInstanceLock();
 if (!lock) app.quit();
@@ -48,7 +48,7 @@ async function state() {
     installed = !!ready && typeof java.executable === 'string' && await core.exists(java.executable)
       && await core.exists(modFile) && core.digest(await fs.readFile(modFile)) === manifest.sha256;
   } catch { installed = false; }
-  return { ...config, installed, busy, busyType, running: !!gameChild, version: app.getVersion(),
+  return { ...config, installed, busy, busyType, running: !!gameChild, gameReady, gameError, version: app.getVersion(),
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
     account: await account.profile(), offlineProfile: sessions.validNickname(config.offlineNickname) ? { name: config.offlineNickname, uuid: sessions.offlineSession(config.offlineNickname).uuid } : null,
     authConfigured: account.configured(), update: lastUpdate, updateMessage,
@@ -157,12 +157,15 @@ register('launch', async () => {
     const gameLog = path.join(root, 'game.log');
     if (await core.exists(gameLog) && (await fs.stat(gameLog)).size > 5 * 1024 * 1024) await fs.rename(gameLog, gameLog + '.previous').catch(() => {});
     if (controller.signal.aborted) throw new Error('Inicialização cancelada.');
+    gameReady = false; gameError = '';
+    let ended = false;
     const child = await game.launch({ javaExe: java.executable, ready, session, memoryGB: config.memoryGB,
       onOutput: text => { gameLogChain = gameLogChain.then(() => fs.appendFile(gameLog, text)).catch(() => {}); },
-      onExit: result => { gameChild = null; notify('game-state', { running: false, code: result.code }); log('Minecraft encerrado com código ' + result.code); if (window && !window.isDestroyed() && !window.isVisible()) app.quit(); }
+      onReady: () => { gameReady = true; notify('game-state', { running: true, ready: true }); },
+      onExit: result => { ended = true; gameChild = null; gameReady = false; gameError = result.error || ''; notify('game-state', { running: false, code: result.code, error: gameError }); log('Minecraft encerrado com código ' + result.code + (gameError ? ': ' + gameError : '')); if (window && !window.isDestroyed() && !window.isVisible()) app.quit(); }
     });
-    gameChild = child.exitCode === null ? child : null;
-    await log('Minecraft iniciado diretamente pelo Java no modo ' + config.loginMode + '.'); notify('game-state', { running: !!gameChild });
+    gameChild = !ended && child.exitCode === null ? child : null;
+    await log('Processo Java iniciado no modo ' + config.loginMode + '; aguardando o menu do Minecraft.'); notify('game-state', { running: !!gameChild, ready: gameReady });
   } finally { busy = false; busyType = ''; controller = null; notify('progress', { finished: true }); }
   return state();
 });

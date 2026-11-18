@@ -57,3 +57,39 @@ test('launch starts Java directly without a shell or the official launcher and r
   await new Promise(resolve => setImmediate(resolve));
   assert.ok(output.join('').includes('[sessão omitida]')); assert.ok(!output.join('').includes(session.accessToken));
 });
+
+test('menu readiness is confirmed by the client and early failures retain the final stderr without tokens', async () => {
+  for (const code of [0, 1, null]) {
+    const child = new EventEmitter(); child.exitCode = null;
+    child.stdout = new PassThrough(); child.stderr = new PassThrough();
+    let result, confirmed = 0;
+    await game.launch({ javaExe: 'javaw.exe', ready, session, memoryGB: 2,
+      onReady: () => confirmed++, onExit: value => { result = value; },
+      spawnProcess(_file, _args, options) {
+        assert.equal(options.windowsHide, false);
+        queueMicrotask(() => child.emit('spawn')); return child;
+      }
+    });
+    assert.equal(confirmed, 0);
+    child.emit('exit', code); assert.equal(result, undefined);
+    child.stderr.end('Caused by: java.lang.UnsatisfiedLinkError: TOP_SECRET_TOKEN');
+    await new Promise(resolve => setImmediate(resolve));
+    child.emit('close', code, code === null ? 'SIGTERM' : null);
+    assert.equal(result.startupFailed, true); assert.match(result.error, /antes de carregar/);
+    assert.match(result.error, /UnsatisfiedLinkError/); assert.ok(!result.error.includes(session.accessToken));
+  }
+});
+
+test('a ready menu is reported once and a normal exit is not a startup failure', async () => {
+  const child = new EventEmitter(); child.stdout = new PassThrough(); child.stderr = new PassThrough();
+  let count = 0, result;
+  await game.launch({ javaExe: 'javaw.exe', ready, session, memoryGB: 2,
+    onReady: () => count++, onExit: value => { result = value; },
+    spawnProcess() { queueMicrotask(() => child.emit('spawn')); return child; }
+  });
+  child.stdout.write('ZYON_MENU_'); assert.equal(count, 0);
+  child.stdout.end('READY\nZYON_MENU_READY\n');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(count, 1);
+  child.emit('close', 0, null); assert.equal(result.error, ''); assert.equal(result.startupFailed, false);
+});
