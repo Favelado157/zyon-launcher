@@ -1,10 +1,12 @@
-"""Aplica a estrutura Zyon ao servidor escolhido, sem apagar recursos existentes."""
+"""Aplica ou recria a estrutura Zyon no servidor escolhido."""
 import asyncio
+import argparse
 import getpass
 import json
 from pathlib import Path
 import sys
 import discord
+from limpeza import inventory, make_plan, show_plan, approval_phrase, start_rebuild, delete_approved
 
 BASE = Path(__file__).resolve().parent
 REASON = 'Aplicação do template Zyon solicitada pelo administrador'
@@ -91,7 +93,7 @@ def preflight(guild, manifest, state):
                 raise ValueError('O progresso aponta para um canal de outro tipo.')
             if saved:
                 continue
-            if existing and any(c.name == channel['name'] for c in existing.channels):
+            if existing and any(c.name == channel['name'] for c in guild.channels if getattr(c, 'category_id', getattr(getattr(c, 'category', None), 'id', None)) == existing.id):
                 raise ValueError('Canal existente não gerenciado: ' + channel['name'])
             missing_channels += 1
     if len(guild.roles) + missing_roles > 250:
@@ -172,8 +174,9 @@ async def native_template(guild, manifest, state, path):
 
 
 class SetupClient(discord.Client):
-    def __init__(self, guild_id, manifest):
+    def __init__(self, guild_id, manifest, rebuild=False):
         super().__init__(intents=discord.Intents(guilds=True), allowed_mentions=discord.AllowedMentions.none())
+        self.rebuild = rebuild
         self.target_id = guild_id
         self.manifest = manifest
         self.started = False
@@ -197,18 +200,45 @@ class SetupClient(discord.Client):
                 raise ValueError('O bot precisa das permissões de criação e das permissões usadas pelos cargos de moderação. Autorize pelo link e execute novamente:\n' + url)
             path = BASE / ('progresso-' + str(guild.id) + '.json')
             state = state_for(path, guild.id)
-            count_roles, count_channels = preflight(guild, self.manifest, state)
-            print('\nSERVIDOR ESCOLHIDO: ' + guild.name + ' (ID ' + str(guild.id) + ')')
-            print(str(count_roles) + ' cargos e ' + str(count_channels) + ' categorias/canais novos.')
-            print('Os cargos Administrador e Moderador terão permissões de moderação. Atribua-os apenas à sua equipe.')
-            print('Os canais existentes serão preservados. A criação publica as mensagens iniciais do template.')
-            print('O link nativo incluirá os nomes e permissões de TODOS os canais/cargos deste servidor, inclusive os já existentes. Mensagens não são copiadas.')
-            print('Para obter somente a estrutura Zyon, recomendamos aplicar em um servidor novo e vazio.')
-            answer = await asyncio.to_thread(input, 'Confira ESTRUTURA.md. Para aplicar neste servidor, digite CRIAR: ')
-            if answer.strip().upper() != 'CRIAR':
-                print('Cancelado, sem aplicar alterações.');self.result = 0;return
-            save_state(path, state)
-            await apply_structure(guild, self.manifest, state, path)
+            current = await inventory(guild)
+            marker = state.get('rebuild', {})
+            if self.rebuild and marker.get('phase') != 'building':
+                if marker.get('phase') == 'deleting':
+                    plan = marker
+                    print('Retomando somente as exclusões do plano já aprovado. Itens criados depois não entram na lista.')
+                else:
+                    plan = make_plan(current, self.manifest)
+                show_plan(plan)
+                print('Depois serão criados 6 categorias, 27 canais e 10 cargos do novo Zyon.')
+                phrase = approval_phrase(guild.id)
+                answer = await asyncio.to_thread(input, '\nPara confirmar esta exclusão permanente, digite exatamente ' + phrase + ': ')
+                if answer.strip() != phrase:
+                    print('Cancelado. Nenhuma nova exclusão foi feita.');self.result = 0;return
+                if marker.get('phase') != 'deleting':
+                    state = start_rebuild(current, state, plan, path, save_state)
+                await delete_approved(current, state, path, save_state, answer.strip())
+                current = await inventory(guild)
+                preflight(current, self.manifest, state)
+            else:
+                if marker.get('phase') == 'deleting':
+                    raise ValueError('A limpeza está incompleta. Use RECRIAR-SERVIDOR.bat para retomar antes de criar itens novos.')
+                count_roles, count_channels = preflight(current, self.manifest, state)
+                print('\nSERVIDOR ESCOLHIDO: ' + guild.name + ' (ID ' + str(guild.id) + ')')
+                print(str(count_roles) + ' cargos e ' + str(count_channels) + ' categorias/canais novos.')
+                if marker.get('phase') == 'building':
+                    print('A limpeza já terminou. Esta execução só retoma a criação, sem apagar os itens novos.')
+                else:
+                    print('Modo sem apagar: os canais e cargos existentes serão preservados.')
+                print('Os cargos Administrador e Moderador têm permissões de moderação. Atribua-os apenas à equipe.')
+                print('O link nativo copia nomes e permissões de TODOS os canais/cargos do servidor.')
+                answer = await asyncio.to_thread(input, 'Confira ESTRUTURA.md e digite CRIAR para continuar: ')
+                if answer.strip().upper() != 'CRIAR':
+                    print('Cancelado.');self.result = 0;return
+                save_state(path, state)
+            await apply_structure(current, self.manifest, state, path)
+            if state.get('rebuild', {}).get('phase') == 'building':
+                state['rebuild']['phase'] = 'complete'
+                save_state(path, state)
             print('\nEstrutura criada! Atribua os cargos manualmente e envie os PNGs da pasta emojis nas configurações do servidor.', flush=True)
             try:
                 url = await native_template(guild, self.manifest, state, path)
@@ -217,7 +247,7 @@ class SetupClient(discord.Client):
                 print('O link nativo copia a estrutura e cargos; mensagens, membros, bots e emojis não são copiados.')
             except (discord.HTTPException, ValueError) as error:
                 print('A estrutura está pronta, mas o link nativo não foi gerado:', str(error))
-                print('Use Configurações do servidor > Modelo de servidor ou execute novamente para tentar gerar o link.')
+                print('Use APLICAR-SEM-APAGAR.bat para tentar gerar o link sem uma nova limpeza, ou Configurações do servidor > Modelo de servidor.')
             self.result = 0
         except (discord.HTTPException, ValueError, OSError) as error:
             print('\nNão foi possível concluir:', str(error), flush=True)
@@ -227,6 +257,9 @@ class SetupClient(discord.Client):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Template Zyon v2 para Discord')
+    parser.add_argument('--recriar', action='store_true', help='Exclui canais/cargos antigos após mostrar o plano e confirmar o ID do servidor')
+    args = parser.parse_args()
     manifest = load_manifest()
     print('TEMPLATE ZYON — aplicação de estrutura no seu servidor Discord.')
     print('Leia LEIA-ME.txt e ESTRUTURA.md antes de começar.')
@@ -237,7 +270,7 @@ def main():
     token = getpass.getpass('Token do bot (não será mostrado nem salvo): ').strip()
     if not token:
         raise ValueError('Token vazio.')
-    client = SetupClient(int(server_id), manifest)
+    client = SetupClient(int(server_id), manifest, rebuild=args.recriar)
     try:
         client.run(token)
     except discord.LoginFailure:

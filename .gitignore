@@ -5,3 +5,5 @@ progresso-*.tmp
 LINK-TEMPLATE-*.txt
 .env
 *.log
+ESTRUTURA-ANTIGA-*.json
+.aplicador.lock

@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "name": "Zyon • Comunidade",
-  "description": "Comunidade Zyon: Minecraft 1.8.9, launcher, suporte e equipe.",
+  "name": "Zyon • Azul Neon v2",
+  "description": "Modelo Zyon azul neon com início, launcher, comunidade, suporte, voz e equipe.",
   "staff_roles": [
     "founder",
     "admin",
@@ -19,13 +19,13 @@
     {
       "id": "founder",
       "name": "👑 Zyon • Fundador",
-      "color": "F4C76B",
+      "color": "37CFFF",
       "permissions": []
     },
     {
       "id": "admin",
       "name": "🛡️ Zyon • Administrador",
-      "color": "E66C7E",
+      "color": "249BFF",
       "permissions": [
         "manage_guild",
         "manage_channels",
@@ -41,7 +41,7 @@
     {
       "id": "mod",
       "name": "🔨 Zyon • Moderador",
-      "color": "A68BFA",
+      "color": "4E94FF",
       "permissions": [
         "manage_messages",
         "manage_threads",
@@ -53,38 +53,50 @@
     {
       "id": "support",
       "name": "🛠️ Zyon • Suporte",
-      "color": "58D9E8",
+      "color": "52DFFF",
       "permissions": []
     },
     {
       "id": "dev",
       "name": "💻 Zyon • Desenvolvedor",
-      "color": "72A7FF",
+      "color": "5AB0FF",
       "permissions": []
     },
     {
       "id": "vip",
       "name": "💎 Zyon • VIP",
-      "color": "D68BFF",
+      "color": "6AE8FF",
+      "permissions": []
+    },
+    {
+      "id": "creator",
+      "name": "🎨 Zyon • Criador",
+      "color": "77CAFF",
+      "permissions": []
+    },
+    {
+      "id": "tester",
+      "name": "🧪 Zyon • Tester",
+      "color": "38BFC7",
       "permissions": []
     },
     {
       "id": "member",
       "name": "🎮 Zyon • Membro",
-      "color": "72D9A0",
+      "color": "92B6D6",
       "permissions": []
     },
     {
       "id": "bots",
       "name": "🤖 Zyon • Bots",
-      "color": "99A3B6",
+      "color": "8296AF",
       "permissions": []
     }
   ],
   "categories": [
     {
-      "id": "info",
-      "name": "📌 ┃ ZYON • INFORMAÇÕES",
+      "id": "start",
+      "name": "📌 ┃ ZYON • COMECE AQUI",
       "access": "readonly",
       "channels": [
         {
@@ -120,6 +132,47 @@
           "type": "text",
           "topic": "Respostas rápidas para começar.",
           "message": "## Perguntas frequentes\n**Qual versão?** Minecraft Java 1.8.9.\n**Como abrir o menu do Zyon?** Shift direito dentro do jogo.\n**Como editar os keystrokes?** Ctrl direito ou Editar HUD no menu.\n**Zoom?** Importe o OptiFine oficial 1.8.9 HD U M5 no launcher e use C.\n**Jogar offline?** Em Minha conta, escolha seu nick e use Play offline. Servidores com autenticação exigem uma conta original.\n**O jogo não abriu?** Informe a versão do launcher e o erro de game.log em ajuda, removendo dados pessoais."
+        },
+        {
+          "id": "roles_guide",
+          "name": "🎭・cargos",
+          "type": "text",
+          "topic": "Conheça os cargos e como a equipe os atribui.",
+          "message": "## Cargos do Zyon\nA equipe atribui os cargos manualmente.\n**Fundador:** identificação do dono.\n**Administrador / Moderador:** gestão e moderação.\n**Suporte / Desenvolvedor:** atendimento e desenvolvimento.\n**Criador / Tester:** conteúdo e testes da comunidade.\n**VIP / Membro:** organização da comunidade.\n**Bots:** identificação de aplicativos.\nProcure a equipe em ajuda-launcher para dúvidas."
+        }
+      ]
+    },
+    {
+      "id": "launcher",
+      "name": "⚡ ┃ ZYON • LAUNCHER",
+      "access": "public",
+      "channels": [
+        {
+          "id": "zyon_chat",
+          "name": "⚡・conversa-zyon",
+          "type": "text",
+          "topic": "Converse sobre o Zyon Launcher."
+        },
+        {
+          "id": "profiles_hud",
+          "name": "🎛️・perfis-e-hud",
+          "type": "text",
+          "topic": "Compartilhe seus ajustes, perfis e HUD.",
+          "message": "## Seu Zyon, seu estilo\nMostre seu HUD e seus perfis. Informe qual versão do launcher e quais ajustes você usou.\nNo jogo, Shift direito abre o painel; passe o mouse no ? para consultar a ajuda de cada função."
+        },
+        {
+          "id": "suggestions",
+          "name": "💡・ideias-e-sugestões",
+          "type": "text",
+          "topic": "Sugestões de melhorias para o launcher.",
+          "message": "## Sugira uma melhoria\n**Ideia:**\n**Como funcionaria:**\n**Por que seria útil:**\nSe puder, inclua uma imagem ou exemplo."
+        },
+        {
+          "id": "tests",
+          "name": "🧪・testes-da-comunidade",
+          "type": "text",
+          "topic": "Resultados de testes de novas versões.",
+          "message": "## Resultado de teste\nInforme versão do launcher, versão do Windows, o que testou e o resultado. Remova dados pessoais dos registros."
         }
       ]
     },
@@ -147,11 +200,10 @@
           "topic": "Compartilhe capturas e momentos das suas partidas."
         },
         {
-          "id": "ideas",
-          "name": "💡・sugestões",
+          "id": "offtopic",
+          "name": "☕・fora-do-jogo",
           "type": "text",
-          "topic": "Sugestões para o launcher e a comunidade.",
-          "message": "## Tem uma ideia?\nExplique o que você sugere, por que seria útil e como imagina o funcionamento. A equipe avaliará as sugestões."
+          "topic": "Conversa livre dentro das regras da comunidade."
         },
         {
           "id": "bot_commands",
@@ -164,12 +216,12 @@
     },
     {
       "id": "support",
-      "name": "🛠️ ┃ ZYON • SUPORTE",
+      "name": "🛟 ┃ ZYON • SUPORTE",
       "access": "public",
       "channels": [
         {
           "id": "help",
-          "name": "🆘・ajuda",
+          "name": "🆘・ajuda-launcher",
           "type": "text",
           "topic": "Dúvidas e ajuda com o Zyon. Canal público.",
           "message": "## Precisa de ajuda?\nInforme sua versão do Windows, do launcher e o que aconteceu.\nEste canal é público. Remova tokens, senhas, e-mails e dados pessoais dos registros antes de enviar."
@@ -180,6 +232,12 @@
           "type": "text",
           "topic": "Relate problemas com informações para reproduzi-los.",
           "message": "## Modelo de relato\n**Versão do launcher:**\n**Versão do Windows:**\n**O que aconteceu:**\n**O que você esperava:**\n**Passos para reproduzir:**\n**Erro ou registro, sem dados pessoais:**"
+        },
+        {
+          "id": "minecraft_help",
+          "name": "🧭・dúvidas-minecraft",
+          "type": "text",
+          "topic": "Dúvidas sobre Minecraft Java 1.8.9 e sua instalação."
         }
       ]
     },
@@ -189,22 +247,27 @@
       "access": "public",
       "channels": [
         {
-          "id": "voice_general",
+          "id": "lobby",
           "name": "🎙️ Geral",
           "type": "voice"
         },
         {
-          "id": "voice_minecraft",
-          "name": "⛏️ Minecraft",
+          "id": "minecraft1",
+          "name": "⛏️ Minecraft 1",
           "type": "voice"
         },
         {
-          "id": "voice_party",
+          "id": "minecraft2",
+          "name": "⛏️ Minecraft 2",
+          "type": "voice"
+        },
+        {
+          "id": "party",
           "name": "⚔️ Partidas",
           "type": "voice"
         },
         {
-          "id": "voice_music",
+          "id": "music",
           "name": "🎵 Música",
           "type": "voice"
         }
@@ -212,7 +275,7 @@
     },
     {
       "id": "staff",
-      "name": "👑 ┃ ZYON • EQUIPE",
+      "name": "🔒 ┃ ZYON • EQUIPE",
       "access": "staff",
       "channels": [
         {

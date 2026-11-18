@@ -1,4 +1,6 @@
-# Template Zyon para Discord
+# Template Zyon v2 — Azul Neon
+
+6 categorias · 27 canais · 10 cargos.
 
 ## Cargos
 
@@ -8,54 +10,67 @@
 - 🛠️ Zyon • Suporte
 - 💻 Zyon • Desenvolvedor
 - 💎 Zyon • VIP
+- 🎨 Zyon • Criador
+- 🧪 Zyon • Tester
 - 🎮 Zyon • Membro
 - 🤖 Zyon • Bots
 
-## 📌 ┃ ZYON • INFORMAÇÕES
+## 📌 ┃ ZYON • COMECE AQUI
 
-Acesso: readonly.
+Acesso: readonly
 
 - 👋・boas-vindas
 - 📜・regras
 - 📢・anúncios
 - 📥・download
 - ❓・perguntas-frequentes
+- 🎭・cargos
+
+## ⚡ ┃ ZYON • LAUNCHER
+
+Acesso: public
+
+- ⚡・conversa-zyon
+- 🎛️・perfis-e-hud
+- 💡・ideias-e-sugestões
+- 🧪・testes-da-comunidade
 
 ## 💬 ┃ ZYON • COMUNIDADE
 
-Acesso: public.
+Acesso: public
 
 - 💬・chat-geral
 - ⛏️・minecraft
 - 📸・prints-e-clipes
-- 💡・sugestões
+- ☕・fora-do-jogo
 - 🤖・comandos-bot
 
-## 🛠️ ┃ ZYON • SUPORTE
+## 🛟 ┃ ZYON • SUPORTE
 
-Acesso: public.
+Acesso: public
 
-- 🆘・ajuda
+- 🆘・ajuda-launcher
 - 🐞・relatar-bugs
+- 🧭・dúvidas-minecraft
 
 ## 🔊 ┃ ZYON • SALAS DE VOZ
 
-Acesso: public.
+Acesso: public
 
 - 🎙️ Geral
-- ⛏️ Minecraft
+- ⛏️ Minecraft 1
+- ⛏️ Minecraft 2
 - ⚔️ Partidas
 - 🎵 Música
 
-## 👑 ┃ ZYON • EQUIPE
+## 🔒 ┃ ZYON • EQUIPE
 
-Acesso: staff.
+Acesso: staff
 
 - 💼・chat-staff
 - 🗂️・planejamento
 - 🧾・registro-manual
 - 🔐 Reunião da equipe
 
-Os cargos são atribuídos manualmente pelo dono/equipe. A função Fundador identifica o dono; a propriedade do servidor continua sendo controlada pelo Discord.
-Os canais de informações são de leitura para a comunidade. A categoria Equipe é privada. Não há bots de tickets, logs, música ou automoderação instalados por este template.
-O link nativo do Discord copia a estrutura e os cargos; mensagens e emojis devem ser adicionados ao novo servidor separadamente.
+Os cargos são atribuídos manualmente. A categoria Equipe fica restrita aos cargos de equipe.
+Não acompanha bots de música, tickets ou registros automáticos. Ajuda e bugs são canais públicos.

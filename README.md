@@ -1,31 +1,35 @@
-# Template de servidor Discord — Zyon
+# Zyon Discord v2 — recriar o servidor
 
-[Baixar o pacote para Windows](https://github.com/Favelado157/zyon-launcher/raw/refs/heads/discord-server-template/Template-Zyon-Discord.zip)
+[Baixar Template-Zyon-Recriar-v2.zip](https://github.com/Favelado157/zyon-launcher/raw/refs/heads/discord-server-template/Template-Zyon-Recriar-v2.zip)
 
-**5 categorias · 20 canais · 8 cargos · 8 emojis personalizados**
+**6 categorias · 27 canais · 10 cargos em azul neon**
 
-- Informações: boas-vindas, regras, anúncios, download e perguntas frequentes.
-- Comunidade: chat geral, Minecraft, prints e clipes, sugestões e comandos de bot.
-- Suporte: ajuda e relatos de bugs.
-- Salas de voz: Geral, Minecraft, Partidas e Música.
-- Equipe privada: chat staff, planejamento, registro manual e reunião de voz.
+Comece Aqui, Launcher, Comunidade, Suporte, Salas de Voz e Equipe privada. Inclui os oito emojis Zyon já criados e os textos iniciais.
 
-Cargos: Fundador, Administrador, Moderador, Suporte, Desenvolvedor, VIP, Membro e Bots. Os cargos são atribuídos manualmente.
+## Recriar
 
-## Aplicar
+Extraia o ZIP, leia **LEIA-ME.txt**, confira **ESTRUTURA.md** e abra **RECRIAR-SERVIDOR.bat**. Requer Python 3.11 ou mais recente (recomendado 3.12) e um bot que você controla. ID do servidor e token são digitados somente no seu PC; o token não é salvo.
 
-Extraia o ZIP, leia **LEIA-ME.txt** e confira **ESTRUTURA.md**. Abra **APLICAR-TEMPLATE.bat** no Windows com Python 3.11 ou mais recente (recomendado 3.12). As dependências são instaladas automaticamente.
+O aplicador mostra o nome, o ID e a lista exata do que será apagado. Para autorizar, digite **APAGAR seguido do ID do servidor**. Depois ele exclui os canais/categorias antigos e os cargos gerenciáveis antes de criar a nova estrutura.
 
-O aplicador usa um bot que você cria no Discord Developer Portal. Digite o ID do seu servidor e o token do bot somente no terminal do seu PC. O token não é mostrado nem salvo. Um link de convite é exibido se o bot ainda não tiver acesso. Antes de criar recursos, o programa mostra o servidor escolhido e pede que você confirme o plano.
+**Apagar canais remove permanentemente suas mensagens, anexos e tópicos. Apagar cargos remove suas atribuições aos membros.** A referência estrutural salva no PC contém nomes/IDs/permissões, sem mensagens ou restauração do histórico.
 
-Ele preserva os canais e cargos existentes e guarda o progresso localmente para retomar sem duplicar itens. Os cargos de administração/moderação têm permissões de moderação; revise-os antes de atribuí-los. Não é solicitada a permissão Administrator ao bot.
+São preservados o servidor, membros, emojis, integrações, `@everyone`, cargos gerenciados pelo Discord e cargos atribuídos ao próprio bot aplicador. Mova o cargo do bot acima dos cargos antigos que ele deve apagar. Comunidade precisa estar desativada para permitir a remoção de seus canais obrigatórios; essa condição é conferida antes de excluir itens.
 
-## Link nativo
+## Retomar
 
-Após aplicar, o programa tenta criar e salvar o link nativo do template. **Esse link copia nomes e permissões de todos os canais/cargos do servidor, inclusive os preexistentes.** Para obter somente o modelo Zyon, recomendamos um servidor novo e vazio. Mensagens, membros, bots e emojis não são copiados pelo link nativo. Os textos prontos estão em **TEXTOS-PARA-COPIAR.md** e os PNGs em **emojis**.
+Mantenha o arquivo `progresso-<ID>.json` na mesma pasta. Uma limpeza interrompida retoma apenas os IDs do plano original. Depois de encerrada a limpeza, a retomada cria os itens faltantes sem apagar a estrutura nova.
 
-Não acompanha bots de tickets, música, logs ou automoderação. O canal registro-manual recebe anotações da equipe.
+Depois de uma recriação concluída, executar o modo de recriação prepara uma nova limpeza e exige outra confirmação. Para somente criar itens faltantes ou gerar/sincronizar o link nativo, use **APLICAR-SEM-APAGAR.bat**.
+
+Os cargos são atribuídos manualmente. Administrador e Moderador possuem permissões de moderação. A estrutura não inclui bots de tickets, música ou logs automáticos. Envie os PNGs da pasta `emojis` manualmente pelo Discord.
+
+O link nativo copia a estrutura e cargos do servidor; mensagens, membros, bots e emojis devem ser configurados separadamente.
+
+## Versão anterior
+
+[Pacote original, que preserva os canais e cargos existentes](https://github.com/Favelado157/zyon-launcher/raw/refs/heads/discord-server-template/Template-Zyon-Discord.zip). Esse ZIP anterior permanece sem alterações.
 
 ## Validação
 
-Testes com API simulada: criação, equipe privada, canais de leitura, retomada após interrupção, reaplicação sem duplicatas, conflitos com recursos existentes e geração/sincronização do link. A conexão real depende do seu bot e das permissões no Discord; nenhum token está incluído.
+Testes com API simulada: confirmação exata, exclusão por IDs, proteção de cargos essenciais, hierarquia, Comunidade/canais privados, interrupção e retomada, cancelamento e continuação da montagem sem repetir a limpeza. A aplicação real acontece somente ao executar o pacote no seu PC e confirmar o servidor escolhido.
