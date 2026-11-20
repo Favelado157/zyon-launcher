@@ -1,9 +1,5 @@
-# Site Zyon Launcher
+# Zyon Launcher — GitHub Pages
 
-Versão estática do site para GitHub Pages.
+Site da edição visual 1.3. Somente HUD, keystrokes, mira, zoom e tema. Requer conta Microsoft com propriedade verificada; autorização do aplicativo pendente após recusa anterior.
 
-Endereço: https://favelado157.github.io/zyon-launcher/
-
-Publicação pela branch `gh-pages`, pasta raiz `/`. As fontes do launcher continuam na branch `main`.
-
-O site contém a apresentação, o catálogo dos 19 módulos, instalação, modo offline, OptiFine, keystrokes e downloads pelo GitHub Releases.
+Espelho estático da apresentação pública, com link fixo para o instalador visual. Captura de demonstração sem conta conectada. Fontes Manrope e licença em assets.
