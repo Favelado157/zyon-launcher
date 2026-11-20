@@ -14,7 +14,7 @@ import static dev.zyon.ClickLayout.*;
 public final class ClickGui extends GuiScreen {
     private static final int TEXT = 0xFFE8F4FF, MUTED = 0xFF91A9C2, LINE = 0xFF203B56;
     private final Zyon client;
-    private Feature.Category category = Feature.Category.COMBAT;
+    private Feature.Category category = Feature.Category.RENDER;
     private Feature selected, hoveredHelp;
     private GuiTextField search, profile;
     private boolean profilesPage, binding;
@@ -23,7 +23,7 @@ public final class ClickGui extends GuiScreen {
     private Setting dragging;
     private String status = "";
 
-    public ClickGui(Zyon client) { this.client = client; selected = client.feature("killaura"); }
+    public ClickGui(Zyon client) { this.client = client; selected = client.feature("crosshair"); }
     @Override public void initGui() {
         Keyboard.enableRepeatEvents(true);
         String query = search == null ? "" : search.getText(), name = profile == null ? "principal" : profile.getText();
@@ -98,7 +98,7 @@ public final class ClickGui extends GuiScreen {
         Branding.image(Branding.LOGO, 18, 20, 32, 32);
         label("\u00a7lZYON", 59, 23, TEXT); label("NEON / 1.8.9", 59, 39, MUTED);
         drawRect(18, 69, 129, 70, LINE); label("CATEGORIAS", 21, 85, MUTED);
-        String[] icons = {"C", "M", "V", "J", "I"};
+        String[] icons = {"V", "H", "I"};
         for (Feature.Category item : Feature.Category.values()) {
             int top = 105 + item.ordinal() * 40;
             boolean active = !profilesPage && item == category;
@@ -111,8 +111,8 @@ public final class ClickGui extends GuiScreen {
         drawRect(18, 312, 130, 313, LINE);
         button("Meus perfis", 18, 324, 112, 28, x, y, profilesPage);
         button("Editar HUD", 18, 359, 112, 28, x, y, false);
-        button("Desligar tudo", 18, 394, 112, 28, x, y, false);
-        label("END: desligar", 25, 442, MUTED);
+        button("Ocultar extras", 18, 394, 112, 28, x, y, false);
+        label("END: ocultar", 25, 442, MUTED);
     }
     private void drawModules(int x, int y) {
         List<Feature> list = visible(); listScroll = clampScroll(listScroll, list.size(), ROW, ROW - CARD_H, LIST_H);
@@ -214,7 +214,7 @@ public final class ClickGui extends GuiScreen {
     @Override protected void mouseClicked(int mouseX, int mouseY, int button) throws IOException {
         if (button != 0) return;
         int x = mx(mouseX), y = my(mouseY); binding = false;
-        if (contains(x, y, 18, 394, 112, 28)) { client.panic(); status = "Todos os modulos desligados."; return; }
+        if (contains(x, y, 18, 394, 112, 28)) { client.panic(); status = "Recursos visuais ocultados."; return; }
         if (contains(x, y, 18, 359, 112, 28)) { mc.displayGuiScreen(new HudEditor(client, this)); return; }
         if (contains(x, y, 18, 324, 112, 28)) { profilesPage = true; search.setFocused(false); return; }
         for (Feature.Category item : Feature.Category.values()) if (contains(x, y, 12, 105 + item.ordinal() * 40, 124, 32)) {
@@ -268,10 +268,10 @@ public final class ClickGui extends GuiScreen {
         else if (!profilesPage && selected != null && contains(x, y, SETTINGS_X, SETTINGS_Y, SETTINGS_W, SETTINGS_H)) settingsScroll = clampScroll(settingsScroll + delta, selected.settings.size(), SETTING_ROW, 10, SETTINGS_H);
     }
     @Override protected void keyTyped(char typed, int key) throws IOException {
-        if (!binding && key == client.panicKey.getKeyCode()) { client.panic(); status = "Todos os modulos desligados."; return; }
+        if (!binding && key == client.panicKey.getKeyCode()) { client.panic(); status = "Recursos visuais ocultados."; return; }
         if (binding) {
             if (key == Keyboard.KEY_ESCAPE) { binding = false; status = "Atalho mantido."; return; }
-            if (key == client.menuKey.getKeyCode() || key == client.panicKey.getKeyCode() || key == client.editorKey.getKeyCode()) { status = "Tecla reservada."; return; }
+            if (key == client.menuKey.getKeyCode() || key == client.panicKey.getKeyCode() || key == client.editorKey.getKeyCode() || key == client.zoomKey.getKeyCode()) { status = "Tecla reservada."; return; }
             selected.key = key == Keyboard.KEY_DELETE || key == Keyboard.KEY_BACK ? 0 : key; binding = false; status = "Atalho atualizado: " + selected.name; client.profiles.saveAutomatic(); return;
         }
         if (key == Keyboard.KEY_ESCAPE || key == client.menuKey.getKeyCode()) { mc.displayGuiScreen(null); return; }

@@ -4,10 +4,8 @@ const call = (name, ...args) => ipcRenderer.invoke('zyon:' + name, ...args);
 contextBridge.exposeInMainWorld('zyon', Object.freeze({
   state: () => call('state'), pick: kind => call('pick', kind), settings: value => call('settings', value),
   prepare: () => call('prepare'), cancel: () => call('cancel'), launch: () => call('launch'),
-  login: () => call('login'), logout: () => call('logout'), legacy: () => call('legacy'),
-  offlineLogin: name => call('offline-login', name), selectMicrosoft: () => call('session-mode', 'microsoft'),
+  login: () => call('login'), logout: () => call('logout'),
   checkUpdates: () => call('check-updates'), installUpdate: () => call('install-update'),
-  importOptifine: () => call('import-optifine'), removeOptifine: () => call('remove-optifine'),
   folder: kind => call('folder', kind), external: kind => call('external', kind),
   onProgress(callback) {
     const listener = (_event, value) => callback(value);

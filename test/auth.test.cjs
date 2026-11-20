@@ -40,7 +40,7 @@ test('missing ownership blocks a direct game session', async () => {
 test('Minecraft app registration rejection is reported without leaking credentials', async () => {
   let index = 0;
   const responses = [{ Token: 'XBOX' }, { Token: 'XSTS', DisplayClaims: { xui: [{ uhs: 'HASH' }] } }];
-  await assert.rejects(minecraftSession('MS_TOKEN', null, async () => index < 2 ? new Response(JSON.stringify(responses[index++])) : new Response('{"errorMessage":"Invalid app registration"}', { status: 403 })), error => error.message.includes('aprovado') && !error.message.includes('MS_TOKEN'));
+  await assert.rejects(minecraftSession('MS_TOKEN', null, async () => index < 2 ? new Response(JSON.stringify(responses[index++])) : new Response('{"errorMessage":"Invalid app registration"}', { status: 403 })), error => error.message.includes('HTTP 403') && !error.message.includes('MS_TOKEN'));
 });
 test('cancelling device login stops before exchanging or persisting account tokens', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'zyon-auth-')); t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -51,4 +51,13 @@ test('cancelling device login stops before exchanging or persisting account toke
   });
   await assert.rejects(account.signIn(controller.signal), /cancelado/); assert.equal(deviceRequest.cancel, true);
   await assert.rejects(fs.readFile(path.join(root, 'account.json')));
+});
+test('unrelated entitlements cannot be used as Minecraft ownership',async()=>{const {verifyGameAccess}=require('../auth.cjs');let count=0;await assert.rejects(verifyGameAccess('GAME_TOKEN',null,async()=>{count++;return new Response(JSON.stringify({items:[{name:'other_product'}]}));}),/não possui acesso/);assert.equal(count,1);});
+test('a cached game token must pass ownership checks again and is discarded on revocation',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'zyon-revalidate-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));let owned=true,calls=0;
+ const account=new MicrosoftAccount({root,getClientId:()=>CLIENT,secureStore:secure,request:async url=>{calls++;return new Response(JSON.stringify(url.includes('entitlements')?{items:owned?[{name:'game_minecraft'}]:[]}:{id:'a'.repeat(32),name:'Player'}));}});
+ account.clientId=CLIENT;account.session={accessToken:'GAME_TOKEN_SECRET',expiresAt:Date.now()+3600000};
+ const first=await account.getSession();assert.equal(first.ownershipVerified,true);assert.equal(calls,2);
+ owned=false;await assert.rejects(account.getSession(),/não possui acesso/);assert.equal(calls,3);assert.equal(account.session,null);
+ assert.equal((await fs.readFile(path.join(root,'account.json'),'utf8')).includes('GAME_TOKEN_SECRET'),false);
 });

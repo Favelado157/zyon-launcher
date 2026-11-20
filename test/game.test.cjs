@@ -39,7 +39,7 @@ test('native extraction omits META-INF and rejects traversal', async t => {
   const file = path.join(root, 'natives.jar'); await fs.writeFile(file, zip.toBuffer()); await game.extractNatives(file, path.join(root, 'out'), ['META-INF/']);
   assert.equal(await core.exists(path.join(root, 'out', 'META-INF')), false); assert.equal(await fs.readFile(path.join(root, 'out', 'lwjgl64.dll'), 'utf8'), 'native');
 });
-const session = { uuid: 'a'.repeat(32), name: 'Player_Test', accessToken: 'TOP_SECRET_TOKEN', expiresAt: Date.now() + 100000 };
+const session = { uuid: 'a'.repeat(32), name: 'Player_Test', accessToken: 'TOP_SECRET_TOKEN', expiresAt: Date.now() + 100000, mode: 'microsoft', userType: 'mojang', ownershipVerified: true, verifiedAt: Date.now() };
 const ready = { classpath: ['C:\\cache\\one.jar', 'C:\\cache\\two.jar'], natives: 'C:\\natives', instanceDir: 'C:\\My Games\\Zyon', assetsRoot: 'C:\\assets', assetsIndex: '1.8', mainClass: 'net.minecraft.launchwrapper.Launch', arguments: '--username ${auth_player_name} --gameDir ${game_directory} --accessToken ${auth_access_token} --uuid ${auth_uuid} --userProperties ${user_properties}', logging: { file: 'C:\\config\\client-1.7.xml', argument: '-Dlog4j.configurationFile=${path}' } };
 test('direct launch uses a Windows classpath and keeps paths with spaces as separate arguments', () => {
   const args = game.launchArguments(ready, session, 3);

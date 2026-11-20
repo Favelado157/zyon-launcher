@@ -56,7 +56,7 @@ jobs:
           .\gradlew.bat "-Porg.gradle.java.installations.paths=$env:ZYON_JAVA8" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Pop-Location
-          Copy-Item client-src/build/libs/zyon-1.8.9-1.2.2.jar payload/zyon-1.8.9-1.2.2.jar -Force
+          Copy-Item client-src/build/libs/zyon-1.8.9-1.3.0.jar payload/zyon-1.8.9-1.3.0.jar -Force
           node build/prepare-release.cjs
       - name: Testar o launcher
         shell: pwsh
@@ -83,19 +83,15 @@ jobs:
         run: |
           $v = $env:ZYON_RELEASE_VERSION
           @"
-          Zyon Launcher $v — azul neon e novo menu dentro do jogo.
+          Zyon Visual $v — cliente independente para Minecraft Java 1.8.9.
 
-          Instalação para Windows x64. Mundos e configurações são preservados.
-          Novo tema azul neon no launcher inteiro: botões, painéis, navegação, arte do portal e ícone do aplicativo/instalador.
-          Menu do Shift direito reorganizado com categorias, busca, lista de funções e painel de ajustes.
-          Botão ? em cada função: passe o mouse para ler uma explicação detalhada do comportamento, ajustes e dependências.
-          Ajuda e ativação têm áreas separadas. Consultar a ajuda não ativa a função.
-          Cliente 1.2.2. Perfis, atalhos, mundos e posições dos keystrokes são mantidos; o JAR anterior é movido para backup.
-          Modo offline sem conta Microsoft: Minha conta > digite seu nick > Usar este nick > Play offline. A primeira preparação precisa de internet.
-          Para mundos locais e servidores sem autenticação. Servidores com autenticação exigem uma conta original e o modo Microsoft. O nick determina a identidade offline; mudar o nome pode mudar seu inventário/progresso em servidores.
-          Menu noturno com cerejeiras, lago, ponte iluminada e título ZYON, baseado na imagem enviada pelo publicador. Botões funcionais centralizados, sem imagens de botões duplicadas.
-          Keystrokes arrastáveis: Shift direito > Editar HUD, ou Ctrl direito. Tamanho, cores, transparência e CPS em Interface > Keystrokes.
-          OptiFine opcional: na aba Instalação, baixe o JAR oficial 1.8.9 HD U M5 e use Importar. O zoom usa C; a capa exige uma capa OptiFine ativa. O JAR OptiFine não acompanha o instalador.
-          O modo Microsoft é opcional e ainda depende da aprovação do aplicativo e de uma conta com acesso ao Java; a autenticação real não foi validada nesta publicação. O modo offline não depende desse cadastro.
-          "@ | Set-Content release-notes.txt -Encoding UTF8
+          Cinco recursos: HUD, keystrokes arrastáveis, mira, zoom próprio (C) e tema azul neon.
+          Shift direito abre o menu; Ctrl direito edita os keystrokes. O botão ? explica cada recurso.
+          Removidos do código os recursos de combate, movimento automatizado, ESP e outras automações. Removidos o login por nick e a importação de OptiFine/capas de terceiros.
+          Conta Microsoft com acesso ao Minecraft Java é obrigatória. Propriedade e perfil são consultados nos serviços oficiais antes de preparar e a cada abertura. Erros de autorização ou licença interrompem a operação.
+          Edição preparada para nova análise. O pedido anterior foi recusado; a autorização do aplicativo Microsoft/Minecraft e o teste de login real continuam pendentes. Publicar este instalador não concede essa autorização.
+          Nova pasta de jogo zyon-visual-1.8.9. A pasta anterior, seus mundos e arquivos permanecem preservados; somente configurações visuais compatíveis são copiadas. Mods externos não são carregados pela edição visual.
+          Instalador Windows 10/11 x64 e SHA256SUMS.txt. Atualizações são oferecidas pelo canal GitHub do Zyon.
+          Aplicativo independente de terceiros. Não é um produto oficial, aprovado, endossado ou associado à Mojang ou Microsoft.
+                    "@ | Set-Content release-notes.txt -Encoding UTF8
           gh release create "v$v" "dist/Zyon-Launcher-Setup-$v.exe" "dist/SHA256SUMS.txt" --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title "Zyon $v" --notes-file release-notes.txt

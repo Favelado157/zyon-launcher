@@ -9,7 +9,7 @@ const extractZip = require('extract-zip');
 const FORGE_URL = 'https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar';
 const FORGE_SHA256 = 'f9fdf4945ca02d73ec6cc46300942f4e199e4add068877d517157b3677563656';
 const VERSION = 'zyon-1.8.9-forge';
-const MOD = 'zyon-1.8.9-1.2.2.jar';
+const MOD = 'zyon-1.8.9-1.3.0.jar';
 const digest = (data, algorithm = 'sha256') => crypto.createHash(algorithm).update(data).digest('hex');
 const exists = async file => { try { await fs.access(file); return true; } catch { return false; } };
 function checkAbort(signal) { if (signal?.aborted) throw new Error('Operação cancelada. Você pode retomar a instalação.'); }
@@ -105,32 +105,6 @@ function parseForge(data) {
   version.libraries = version.libraries.map(lib => ({ ...lib, ...(lib.url ? { url: lib.url.replace(/^http:/, 'https:') } : {}) }));
   return { version, jar, relativeJar: coordinatePath(profile.install.path) };
 }
-async function updateProfiles(root, instanceDir, javaExe, memoryGB) {
-  const files = [];
-  for (const name of ['launcher_profiles.json', 'launcher_profiles_microsoft_store.json']) {
-    const file = path.join(root, name); if (await exists(file)) files.push(file);
-  }
-  if (!files.length) files.push(path.join(root, 'launcher_profiles.json'));
-  const id = 'zyon-' + digest(path.resolve(instanceDir)).slice(0, 12);
-  const gb = Number(memoryGB);
-  if (!Number.isInteger(gb) || gb < 1 || gb > 16) throw new Error('Memória inválida.');
-  // Parse every profile file before writing any of them. Other profiles and account fields are preserved.
-  const changes = [];
-  for (const file of files) {
-    const json = await readJson(file, { profiles: {}, version: 3 });
-    if (!json || typeof json !== 'object' || Array.isArray(json) || (json.profiles && (typeof json.profiles !== 'object' || Array.isArray(json.profiles)))) throw new Error('O arquivo de perfis do Minecraft é inválido. Ele foi preservado.');
-    json.profiles ||= {};
-    const previous = json.profiles[id] || {};
-    json.profiles[id] = {
-      ...previous, name: 'Zyon 1.8.9', type: 'custom', created: previous.created || new Date().toISOString(),
-      lastVersionId: VERSION, gameDir: instanceDir, javaDir: javaExe,
-      javaArgs: `-Xmx${gb}G -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M`
-    };
-    changes.push([file, JSON.stringify(json, null, 2)]);
-  }
-  for (const [file, json] of changes) { await backup(file); await atomicWrite(file, json); }
-  return id;
-}
 async function ensureJava(root, options = {}) {
   const stateFile = path.join(root, 'java.json');
   const current = await readJson(stateFile, {});
@@ -162,7 +136,7 @@ async function ensureJava(root, options = {}) {
     return executable;
   } catch (error) { await fs.rm(folder, { recursive: true, force: true }); throw error; }
 }
-async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2, signal, emit = () => {}, beforeProfiles = async () => {}, registerProfiles = true }) {
+async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2, signal, emit = () => {} }) {
   if (inside(minecraftRoot, instanceDir) || inside(instanceDir, minecraftRoot)) throw new Error('A instância e a pasta base devem ficar separadas.');
   const stage = (step, percent, message) => { checkAbort(signal); emit({ step, percent, message }); };
   const options = { signal };
@@ -191,7 +165,7 @@ async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2
   const forgeLibrary = path.join(minecraftRoot, 'libraries', ...forge.relativeJar.split('/'));
   if (await exists(forgeLibrary) && digest(await fs.readFile(forgeLibrary)) !== digest(forge.jar)) throw new Error('Já existe uma biblioteca Forge diferente. Ela foi preservada.');
   await atomicWrite(forgeLibrary, forge.jar);
-  // The official launcher resolves inherited libraries, assets, and native components when Play is pressed.
+  // game.ensureArtifacts resolves the verified libraries, assets and native components.
   await atomicWrite(path.join(minecraftRoot, 'versions', VERSION, VERSION + '.json'), JSON.stringify(forge.version, null, 2));
   stage('java', 50, 'Baixando e verificando o Java 8 para esta instalação…');
   let lastProgress = 0;
@@ -200,12 +174,11 @@ async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2
     lastProgress = Date.now();
     emit({ step: 'java', percent: 50 + Math.min(27, Math.floor(27 * received / total)), message: `Baixando Java 8: ${(received / 1024 / 1024).toFixed(1)} de ${(total / 1024 / 1024).toFixed(1)} MB…` });
   } });
-  stage('client', 82, 'Instalando os 19 módulos e criando o perfil separado…');
+  stage('client', 82, 'Instalando os cinco recursos visuais na instância separada…');
   await installMod(payload, instanceDir);
   checkAbort(signal);
-  if (registerProfiles) { await beforeProfiles(); checkAbort(signal); await updateProfiles(minecraftRoot, instanceDir, javaExe, memoryGB); }
   await atomicWrite(path.join(root, 'installation.json'), JSON.stringify({ version: VERSION, instanceDir, minecraftRoot, javaExe, memoryGB, prepared: new Date().toISOString() }, null, 2));
-  stage('done', 100, 'Instalação pronta. No Minecraft Launcher, selecione Zyon 1.8.9 e clique em Jogar.');
+  stage('done', 100, 'Edição visual preparada. A propriedade será verificada novamente ao iniciar.');
 }
 function launchExecutable(file) {
   return new Promise((resolve, reject) => {
@@ -213,4 +186,4 @@ function launchExecutable(file) {
     child.once('error', reject); child.once('spawn', () => { child.unref(); resolve(); });
   });
 }
-module.exports = { MOD, VERSION, FORGE_SHA256, FORGE_URL, digest, exists, inside, atomicWrite, readJson, coordinatePath, fetchBuffer, downloadVerified, installMod, parseForge, updateProfiles, ensureJava, prepare, launchExecutable };
+module.exports = { MOD, VERSION, FORGE_SHA256, FORGE_URL, digest, exists, inside, atomicWrite, readJson, coordinatePath, fetchBuffer, downloadVerified, installMod, parseForge, ensureJava, prepare, launchExecutable };

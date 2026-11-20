@@ -6,9 +6,9 @@ const os = require('node:os');
 const core = require('./core.cjs');
 const game = require('./game.cjs');
 const updates = require('./updates.cjs');
-const optifine = require('./optifine.cjs');
+const edition = require('./edition.cjs');
 const sessions = require('./sessions.cjs');
-const { MicrosoftAccount, validClientId } = require('./auth.cjs');
+const { MicrosoftAccount } = require('./auth.cjs');
 const publisher = require('./release-config.json');
 app.setName('Zyon Launcher');
 app.setPath('userData', path.join(app.getPath('appData'), 'ZyonLauncher'));
@@ -20,9 +20,9 @@ const lock = app.requestSingleInstanceLock();
 if (!lock) app.quit();
 app.on('second-instance', () => { if (window) { if (window.isMinimized()) window.restore(); window.focus(); } });
 const defaults = () => ({
-  instanceDir: path.join(root, 'instances', '1.8.9'), minecraftRoot: path.join(root, 'minecraft'),
-  memoryGB: 2, microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || '', legacyLauncherPath: '',
-  loginMode: 'offline', offlineNickname: ''
+  instanceDir: path.join(root, 'instances', 'zyon-visual-1.8.9'), minecraftRoot: path.join(root, 'minecraft'),
+  memoryGB: 2, microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || '',
+  edition: edition.EDITION, loginMode: 'microsoft', previousInstanceDir: ''
 });
 async function log(message) {
   const line = `${new Date().toISOString()}  ${String(message).replaceAll(/[\r\n]/g, ' ')}\n`;
@@ -41,6 +41,7 @@ function noOperation(requireGameClosed = false) {
 async function state() {
   let installed = false;
   try {
+    await edition.validateInstance(config.instanceDir, payload);
     const manifest = await core.readJson(path.join(payload, 'manifest.json'));
     const modFile = path.join(config.instanceDir, 'mods', core.MOD);
     const ready = await game.readReady(root, config.instanceDir, config.minecraftRoot);
@@ -50,9 +51,9 @@ async function state() {
   } catch { installed = false; }
   return { ...config, installed, busy, busyType, running: !!gameChild, gameReady, gameError, version: app.getVersion(),
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
-    account: await account.profile(), offlineProfile: sessions.validNickname(config.offlineNickname) ? { name: config.offlineNickname, uuid: sessions.offlineSession(config.offlineNickname).uuid } : null,
+    account: await account.profile(),
     authConfigured: account.configured(), update: lastUpdate, updateMessage,
-    updatesConfigured: !!config.githubRepository, optifine: await optifine.status(config.instanceDir), profile: 'Zyon 1.8.9', root };
+    updatesConfigured: !!config.githubRepository, profile: 'Zyon Visual 1.8.9', root };
 }
 function register(channel, handler) {
   ipcMain.handle('zyon:' + channel, async (event, ...args) => {
@@ -62,7 +63,9 @@ function register(channel, handler) {
   });
 }
 async function prepareInstallation() {
-  await core.prepare({ root, payload, ...config, registerProfiles: false, signal: controller.signal,
+  await edition.validateInstance(config.instanceDir, payload);
+  await edition.migrateProfiles(config.previousInstanceDir, config.instanceDir);
+  await core.prepare({ root, payload, ...config, signal: controller.signal,
     emit: value => { if (value.step === 'done') return; notify('progress', { ...value, percent: Math.floor(value.percent * .47) }); } });
   await game.ensureArtifacts({ root, ...config, signal: controller.signal, emit: value => { notify('progress', value); } });
   await log('Instância própria preparada.');
@@ -70,68 +73,31 @@ async function prepareInstallation() {
 register('state', state);
 register('pick', async kind => {
   noOperation(true);
-  if (!['instance', 'launcher'].includes(kind)) throw new Error('Destino inválido.');
-  const launcher = kind === 'launcher';
-  const result = await dialog.showOpenDialog(window, { title: launcher ? 'Selecione o launcher oficial para compatibilidade' : 'Pasta da instância Zyon',
-    properties: launcher ? ['openFile'] : ['openDirectory', 'createDirectory'], ...(launcher ? { filters: [{ name: 'Aplicativo Windows', extensions: ['exe'] }] } : {}) });
+  if (kind !== 'instance') throw new Error('Destino inválido.');
+  const result = await dialog.showOpenDialog(window, { title: 'Pasta da edição visual Zyon', properties: ['openDirectory', 'createDirectory'] });
   if (result.canceled) return state();
   const selected = path.resolve(result.filePaths[0]);
-  if (launcher) { if (path.extname(selected).toLowerCase() !== '.exe') throw new Error('Selecione um aplicativo .exe.'); config.legacyLauncherPath = selected; }
-  else {
-    if (core.inside(config.minecraftRoot, selected) || core.inside(selected, config.minecraftRoot)) throw new Error('Escolha uma pasta fora do cache do Minecraft.');
-    config.instanceDir = selected;
-  }
+  if (core.inside(config.minecraftRoot, selected) || core.inside(selected, config.minecraftRoot)) throw new Error('Escolha uma pasta fora do cache do Minecraft.');
+  await edition.validateInstance(selected, payload);
+  config.instanceDir = selected;
   await saveConfig(); return state();
 });
 register('settings', async value => {
   noOperation(true);
   const gb = Number(value?.memoryGB), max = (await state()).maxMemoryGB;
   if (!Number.isInteger(gb) || gb < 1 || gb > max) throw new Error('Quantidade de memória inválida.');
-  const id = String(value?.microsoftClientId ?? config.microsoftClientId).trim();
-  if (id && !validClientId(id)) throw new Error('O Application (client) ID precisa ser um identificador Microsoft válido. Não informe senhas ou client secrets.');
-  const repo = updates.normalizeRepository(value?.githubRepository ?? config.githubRepository);
-  const oldRepo = config.githubRepository;
-  config = { ...config, memoryGB: gb, microsoftClientId: id, githubRepository: repo };
-  if (repo !== oldRepo) { lastUpdate = null; updateMessage = ''; promptedVersion = ''; }
+  if (value?.microsoftClientId !== undefined && value.microsoftClientId !== publisher.microsoftClientId) throw new Error('O aplicativo Microsoft é definido pelo publicador. Não use IDs de outros aplicativos.');
+  config = { ...config, memoryGB: gb };
   await saveConfig(); return state();
 });
 register('prepare', async () => {
   noOperation(true); if (process.platform !== 'win32') throw new Error('Esta distribuição prepara Minecraft para Windows x64.');
   busy = true; busyType = 'prepare'; controller = new AbortController();
-  try { await prepareInstallation(); }
+  try { await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal }); await prepareInstallation(); }
   finally { busy = false; busyType = ''; controller = null; notify('progress', { finished: true }); }
   return state();
 });
 register('cancel', async () => { controller?.abort(); return true; });
-register('offline-login', async name => {
-  noOperation(true);busy = true;busyType = 'profile';
-  try {
-    const session = sessions.offlineSession(name);
-    const next = { ...config, offlineNickname: session.name, loginMode: 'offline' };
-    await saveConfig(next);config = next;
-  } finally { busy = false;busyType = ''; }
-  return state();
-});
-register('session-mode', async mode => {
-  noOperation(true);
-  if (mode !== 'microsoft') throw new Error('Para usar o modo offline, salve um nick válido.');
-  busy = true;busyType = 'profile';
-  try { const next = { ...config, loginMode: mode };await saveConfig(next);config = next; } finally { busy = false;busyType = ''; }
-  return state();
-});
-register('import-optifine', async () => {
-  noOperation(true);busy = true;busyType = 'optifine';
-  try {
-    const picked = await dialog.showOpenDialog(window, { title: 'Importar OptiFine 1.8.9 HD U M5', properties: ['openFile'], filters: [{ name: 'OptiFine Java', extensions: ['jar'] }] });
-    if (!picked.canceled && picked.filePaths[0]) await optifine.install(picked.filePaths[0], config.instanceDir);
-  } finally { busy = false;busyType = ''; }
-  return state();
-});
-register('remove-optifine', async () => {
-  noOperation(true);busy = true;busyType = 'optifine';
-  try { await optifine.remove(config.instanceDir); } finally { busy = false;busyType = ''; }
-  return state();
-});
 register('login', async () => {
   noOperation(true); busy = true; busyType = 'login'; controller = new AbortController();
   try {
@@ -149,8 +115,13 @@ register('launch', async () => {
   noOperation(true); if (process.platform !== 'win32') throw new Error('A inicialização desta versão é para Windows x64.');
   busy = true; busyType = 'launch'; controller = new AbortController();
   try {
-    const session = await sessions.resolveSession({ mode: config.loginMode, name: config.offlineNickname, microsoftAccount: account, signal: controller.signal });
-    if (!(await state()).installed) await prepareInstallation();
+    let session = await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal });
+    if (!(await state()).installed) {
+      await prepareInstallation();
+      // Large first-time downloads can outlast the session freshness window.
+      session = await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal });
+    }
+    await edition.validateInstance(config.instanceDir, payload);
     const ready = await game.readReady(root, config.instanceDir, config.minecraftRoot);
     if (!ready) throw new Error('A instalação está incompleta. Prepare-a novamente.');
     const java = await core.readJson(path.join(root, 'java.json'));
@@ -168,16 +139,6 @@ register('launch', async () => {
     await log('Processo Java iniciado no modo ' + config.loginMode + '; aguardando o menu do Minecraft.'); notify('game-state', { running: !!gameChild, ready: gameReady });
   } finally { busy = false; busyType = ''; controller = null; notify('progress', { finished: true }); }
   return state();
-});
-register('legacy', async () => {
-  noOperation(true);
-  if (!config.legacyLauncherPath || !await core.exists(config.legacyLauncherPath)) throw new Error('Escolha o launcher oficial nas opções de compatibilidade.');
-  if (!await core.exists(path.join(app.getPath('appData'), '.minecraft', 'versions', core.VERSION, core.VERSION + '.json'))) throw new Error('A compatibilidade precisa da instalação anterior preparada na versão 1.0. Use o Play direto após ativar o login próprio.');
-  const java = await core.readJson(path.join(root, 'java.json'), {});
-  if (!java.executable) throw new Error('Prepare a instalação primeiro.');
-  await core.updateProfiles(path.join(app.getPath('appData'), '.minecraft'), config.instanceDir, java.executable, config.memoryGB);
-  await core.launchExecutable(config.legacyLauncherPath);
-  return { message: 'Modo de compatibilidade: selecione Zyon 1.8.9 no launcher oficial. O Play principal usa a inicialização direta.' };
 });
 async function checkUpdates(prompt = false) {
   if (!config) return;
@@ -208,32 +169,28 @@ register('install-update', async () => {
   } finally { busy = false; busyType = ''; controller = null; }
 });
 register('folder', async kind => {
-  const folder = kind === 'logs' ? root : config.instanceDir; await fs.mkdir(folder, { recursive: true });
+  if (!['logs', 'instance', 'previous'].includes(kind)) throw new Error('Pasta inválida.');
+  if (kind === 'previous' && !config.previousInstanceDir) throw new Error('Não há pasta anterior registrada.');
+  const folder = kind === 'logs' ? root : kind === 'previous' ? config.previousInstanceDir : config.instanceDir; await fs.mkdir(folder, { recursive: true });
   const error = await shell.openPath(folder); if (error) throw new Error(error); return true;
 });
 register('external', async kind => {
-  const urls = { launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid', optifine: 'https://optifine.net/adloadx?f=OptiFine_1.8.9_HD_U_M5.jar', cape: 'https://optifine.net/cape' };
+  const urls = { launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid' };
   if (!urls[kind]) throw new Error('Link inválido.'); await shell.openExternal(urls[kind]); return true;
 });
 if (lock) app.whenReady().then(async () => {
   await fs.mkdir(root, { recursive: true }); config = defaults();
   try {
     const previous = await core.readJson(path.join(root, 'config.json'), {});
-    Object.assign(config, sessions.loginSettings(previous));
-    if (typeof previous.instanceDir === 'string' && path.isAbsolute(previous.instanceDir)) config.instanceDir = previous.instanceDir;
-    // 1.0 shared the official folder; 1.1 has its own cache and preserves the existing instance directory.
+    Object.assign(config, edition.migrate(previous, root, publisher));
     if (typeof previous.minecraftRoot === 'string' && core.inside(root, previous.minecraftRoot)) config.minecraftRoot = previous.minecraftRoot;
-    const legacyPath = previous.legacyLauncherPath || previous.launcherPath;
-    if (typeof legacyPath === 'string' && path.isAbsolute(legacyPath)) config.legacyLauncherPath = legacyPath;
     if (Number.isInteger(previous.memoryGB) && previous.memoryGB >= 1 && previous.memoryGB <= 16) config.memoryGB = previous.memoryGB;
-    if (!publisher.microsoftClientId && validClientId(previous.microsoftClientId)) config.microsoftClientId = previous.microsoftClientId;
-    if (!publisher.githubRepository) config.githubRepository = updates.normalizeRepository(previous.githubRepository);
   } catch { await log('Configuração inválida; valores padrão aplicados.'); }
   config.memoryGB = Math.min(config.memoryGB, Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)));
   await saveConfig();
   account = new MicrosoftAccount({ root, getClientId: () => config.microsoftClientId, secureStore: safeStorage });
   window = new BrowserWindow({ width: 1240, height: 900, minWidth: 1020, minHeight: 740, show: false,
-    title: 'Zyon Launcher', backgroundColor: '#101116', icon: path.join(__dirname, 'assets/icon.png'),
+    title: 'Zyon Launcher', backgroundColor: '#060f1b', icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true } });
   window.removeMenu(); window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault()); window.once('ready-to-show', () => window.show());

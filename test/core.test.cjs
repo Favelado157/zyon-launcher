@@ -58,25 +58,6 @@ test('upgrading moves the old Zyon jar to backup even when the new jar was alrea
   await core.installMod(path.join(__dirname, '../payload'), root);
   assert.equal((await fs.readdir(path.join(root, 'zyon-backups'))).length, 4);
 });
-test('profile update preserves existing profiles, settings, and account fields', async t => {
-  const root = await folder(t), original = { profiles: { vanilla: { name: 'Vanilla', gameDir: 'original' } }, settings: { locale: 'pt-br' }, authenticationDatabase: { fixture: 'preserved' }, version: 3 };
-  const file = path.join(root, 'launcher_profiles.json'); await fs.writeFile(file, JSON.stringify(original));
-  const instance = path.join(root, 'separate');
-  const id = await core.updateProfiles(root, instance, 'C:\\Java 8\\bin\\javaw.exe', 3);
-  const result = JSON.parse(await fs.readFile(file));
-  assert.deepEqual(result.profiles.vanilla, original.profiles.vanilla);
-  assert.deepEqual(result.settings, original.settings); assert.deepEqual(result.authenticationDatabase, original.authenticationDatabase);
-  assert.equal(result.profiles[id].gameDir, instance); assert.equal(result.profiles[id].lastVersionId, core.VERSION);
-  assert.ok(result.profiles[id].javaArgs.startsWith('-Xmx3G'));
-  const copy = (await fs.readdir(root)).find(name => name.includes('.zyon-backup-'));
-  assert.deepEqual(JSON.parse(await fs.readFile(path.join(root, copy))), original);
-});
-test('invalid second launcher profile file cannot modify first one', async t => {
-  const root = await folder(t), file = path.join(root, 'launcher_profiles.json'), content = '{"profiles":{"a":{"name":"Original"}}}';
-  await fs.writeFile(file, content); await fs.writeFile(path.join(root, 'launcher_profiles_microsoft_store.json'), '{broken');
-  await assert.rejects(core.updateProfiles(root, path.join(root, 'new'), 'javaw.exe', 2));
-  assert.equal(await fs.readFile(file, 'utf8'), content);
-});
 test('download verifies hash before committing a file', async t => {
   const root = await folder(t), file = path.join(root, 'download.bin');
   await assert.rejects(core.downloadVerified('https://example.test/file', file, '0'.repeat(64), 'sha256', { request: async () => response('corrupted') }), /verificação/);

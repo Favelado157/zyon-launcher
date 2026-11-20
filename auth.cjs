@@ -15,7 +15,7 @@ async function jsonRequest(url, body, signal, request = fetch, bearer) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    if (url.includes('minecraftservices.com') && response.status === 403) throw new Error('O aplicativo Microsoft deste launcher ainda não foi aprovado para os serviços do Minecraft. O publicador precisa concluir a configuração.');
+    if (url.includes('minecraftservices.com') && response.status === 403) throw new Error('Os serviços do Minecraft recusaram o acesso (HTTP 403). Confira a autorização do aplicativo e a conta. A preparação e a abertura foram interrompidas.');
     if (data.XErr === 2148916233) throw new Error('Sua conta precisa de um perfil Xbox. Configure-o no site oficial do Xbox.');
     if (data.XErr === 2148916238) throw new Error('O Xbox exige configuração da conta familiar antes de continuar.');
     throw new Error(`O login foi recusado por ${new URL(url).hostname} (HTTP ${response.status}).`);
@@ -34,12 +34,17 @@ async function minecraftSession(microsoftToken, signal, request = fetch) {
   if (!hash || !xsts.Token) throw new Error('O Xbox retornou uma sessão incompleta.');
   const game = await jsonRequest('https://api.minecraftservices.com/authentication/login_with_xbox', { identityToken: 'XBL3.0 x=' + hash + ';' + xsts.Token }, signal, request);
   if (typeof game.access_token !== 'string' || !game.access_token) throw new Error('O Minecraft não retornou uma sessão válida.');
-  const ownership = await jsonRequest('https://api.minecraftservices.com/entitlements/mcstore', null, signal, request, game.access_token);
-  if (!Array.isArray(ownership.items) || ownership.items.length === 0) throw new Error('Esta conta não possui acesso ao Minecraft Java. Confira sua compra ou assinatura no site oficial.');
-  const profile = await jsonRequest('https://api.minecraftservices.com/minecraft/profile', null, signal, request, game.access_token);
-  if (!/^[a-f0-9]{32}$/i.test(profile.id || '') || !/^[A-Za-z0-9_]{1,16}$/.test(profile.name || '')) throw new Error('O perfil Minecraft não foi encontrado. Configure o nome Java na sua conta.');
-  return { uuid: profile.id, name: profile.name, accessToken: game.access_token, expiresAt: Date.now() + Number(game.expires_in || 3600) * 1000 };
+  const verified = await verifyGameAccess(game.access_token, signal, request);
+  return { ...verified, accessToken: game.access_token, expiresAt: Date.now() + Number(game.expires_in || 3600) * 1000 };
 }
+async function verifyGameAccess(accessToken, signal, request = fetch) {
+  const ownership = await jsonRequest('https://api.minecraftservices.com/entitlements/mcstore', null, signal, request, accessToken);
+  if (!Array.isArray(ownership.items) || !ownership.items.some(item => item && ['game_minecraft', 'product_minecraft'].includes(item.name))) throw new Error('Esta conta não possui acesso ao Minecraft Java. Confira sua compra ou assinatura no site oficial.');
+  const profile = await jsonRequest('https://api.minecraftservices.com/minecraft/profile', null, signal, request, accessToken);
+  if (!/^[a-f0-9]{32}$/i.test(profile.id || '') || !/^[A-Za-z0-9_]{1,16}$/.test(profile.name || '')) throw new Error('O perfil Minecraft não foi encontrado. Configure o nome Java na sua conta.');
+  return { uuid: profile.id, name: profile.name, ownershipVerified: true, verifiedAt: Date.now() };
+}
+
 class MicrosoftAccount {
   constructor({ root, getClientId, secureStore, publicClientFactory = config => new PublicClientApplication(config), request = fetch }) {
     this.root = root; this.getClientId = getClientId; this.secureStore = secureStore; this.factory = publicClientFactory; this.request = request;
@@ -98,7 +103,11 @@ class MicrosoftAccount {
     } finally { signal?.removeEventListener('abort', cancel); }
   }
   async getSession(signal) {
-    if (this.session && this.session.expiresAt > Date.now() + 60000 && this.clientId === this.getClientId()) return this.session;
+    if (this.session && this.session.expiresAt > Date.now() + 60000 && this.clientId === this.getClientId()) {
+      const old = this.session; this.session = null;
+      const verified = await verifyGameAccess(old.accessToken, signal, this.request);
+      const refreshed = { ...old, ...verified }; await this.record(refreshed); return refreshed;
+    }
     const client = await this.publicClient();
     const accounts = await client.getTokenCache().getAllAccounts();
     if (!accounts.length) throw new Error('Entre na sua conta Microsoft antes de clicar em Play.');
@@ -113,4 +122,4 @@ class MicrosoftAccount {
     await fs.rm(path.join(this.root, 'account.json'), { force: true }); this.client = null; this.session = null; this.clientId = null;
   }
 }
-module.exports = { MicrosoftAccount, minecraftSession, jsonRequest, validClientId };
+module.exports = { MicrosoftAccount, minecraftSession, verifyGameAccess, jsonRequest, validClientId };
