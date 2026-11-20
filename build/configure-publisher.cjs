@@ -14,6 +14,8 @@ if (require.main === module) {
   const value = name => { const index = args.indexOf(name); return index < 0 ? '' : args[index + 1] || ''; };
   try {
     const config = publisherConfiguration(value('--repository'), value('--client-id'));
+    const existing = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'release-config.json'), 'utf8'));
+    if (existing.discordInvite) config.discordInvite = existing.discordInvite;
     fs.writeFileSync(path.join(__dirname, '..', 'release-config.json'), JSON.stringify(config, null, 2) + '\n');
     console.log('Canal público configurado: ' + config.githubRepository);
     console.log(config.microsoftClientId ? 'Client ID incluído. O login depende da aprovação Microsoft/Minecraft.' : 'Client ID não informado: atualizações habilitadas; login online próprio continua pendente.');

@@ -65,7 +65,7 @@ Section "Zyon Launcher" main
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "Publisher" "Zyon"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "DisplayIcon" "$INSTDIR\resources\zyon-icon-${VERSION}.ico"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "UninstallString" '$"$INSTDIR\Uninstall Zyon Launcher.exe$"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "UninstallString" '"$INSTDIR\Uninstall Zyon Launcher.exe"'
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZyonLauncher" "NoRepair" 1
 SectionEnd

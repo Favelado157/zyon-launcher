@@ -15,7 +15,7 @@ function applyBusy(){
  if(busy)$('statusBadge').textContent={login:'Conectando sua conta',prepare:'Verificando e preparando',launch:'Verificando e iniciando',update:'Baixando atualização'}[operation||current?.busyType]||'Aguarde…';
 }
 function render(state){
- current=state;
+ current=state; $('discordAction').disabled=!state.discordConfigured;$('discordAction').title=state.discordConfigured?'Abrir o servidor Discord do Zyon':'Convite do Discord em configuração';$('discordCaption').textContent=state.discordConfigured?'Entre para a comunidade':'Convite em configuração';
  $('statusBadge').textContent=state.running?state.gameReady?'Minecraft em execução':'Iniciando Minecraft…':!state.account?'Conecte sua conta':state.installed?'Arquivos preparados':'Prepare os arquivos';
  $('statusBadge').classList.toggle('ready',state.installed||state.running);$('installDot').classList.toggle('hidden',state.installed);
  $('appVersion').textContent='v'+state.version;$('currentVersion').textContent='v'+state.version;
@@ -82,6 +82,7 @@ document.addEventListener('click',async event=>{
    case 'folder':await call('folder','instance');break;
    case 'previous':await call('folder','previous');break;
    case 'logs':await call('folder','logs');break;
+   case 'discord':await call('external','discord');break;
    case 'official':await call('external','launcher');break;
    case 'save':render(await call('settings',{memoryGB:Number($('memory').value)}));toast('Memória salva.');break;
    case 'check-updates':$('checkUpdatesAction').disabled=true;try{const r=await call('checkUpdates');renderUpdate(r.update,r.message);}finally{$('checkUpdatesAction').disabled=false;}applyBusy();break;

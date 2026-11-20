@@ -10,6 +10,11 @@ const edition = require('./edition.cjs');
 const sessions = require('./sessions.cjs');
 const { MicrosoftAccount } = require('./auth.cjs');
 const publisher = require('./release-config.json');
+function discordInvite(value){
+ if(!value)return '';try{const u=new URL(String(value).trim());if(u.protocol!=='https:'||u.username||u.password||u.port||u.search||u.hash)return '';
+ const valid=u.hostname==='discord.gg'&&/^\/[A-Za-z0-9_-]{1,64}\/?$/.test(u.pathname)||u.hostname==='discord.com'&&/^\/invite\/[A-Za-z0-9_-]{1,64}\/?$/.test(u.pathname);return valid?u.toString():'';}catch{return '';}
+}
+const discordUrl=discordInvite(publisher.discordInvite);
 app.setName('Zyon Launcher');
 app.setPath('userData', path.join(app.getPath('appData'), 'ZyonLauncher'));
 const root = app.getPath('userData');
@@ -53,7 +58,7 @@ async function state() {
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
     account: await account.profile(),
     authConfigured: account.configured(), update: lastUpdate, updateMessage,
-    updatesConfigured: !!config.githubRepository, profile: 'Zyon Visual 1.8.9', root };
+    updatesConfigured: !!config.githubRepository, discordConfigured: !!discordUrl, profile: 'Zyon Visual 1.8.9', root };
 }
 function register(channel, handler) {
   ipcMain.handle('zyon:' + channel, async (event, ...args) => {
@@ -175,7 +180,7 @@ register('folder', async kind => {
   const error = await shell.openPath(folder); if (error) throw new Error(error); return true;
 });
 register('external', async kind => {
-  const urls = { launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid' };
+  const urls = { discord: discordUrl, launcher: 'https://www.minecraft.net/download', help: 'https://help.minecraft.net/', azure: 'https://entra.microsoft.com/', github: 'https://github.com/new', review: 'https://aka.ms/mce-reviewappid' };
   if (!urls[kind]) throw new Error('Link inválido.'); await shell.openExternal(urls[kind]); return true;
 });
 if (lock) app.whenReady().then(async () => {

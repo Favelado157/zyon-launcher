@@ -1,5 +1,7 @@
 Zyon Visual {{VERSION}} — cliente independente para Minecraft Java 1.8.9.
 
+Botão Discord do Zyon no canto inferior esquerdo do launcher, com acesso ao servidor da comunidade. Esta atualização não inclui os cosméticos experimentais.
+
 Cinco recursos: HUD, keystrokes arrastáveis, mira, zoom próprio (C) e tema azul neon.
 Shift direito abre o menu; Ctrl direito edita os keystrokes. O botão ? explica cada recurso.
 Removidos do código os recursos de combate, movimento automatizado, ESP e outras automações. Removidos o login por nick e a importação de OptiFine/capas de terceiros.
