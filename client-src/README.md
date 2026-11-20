@@ -1,4 +1,4 @@
-# Zyon Visual Client 1.3.0
+# Zyon Visual Client 1.3.1
 
 Cliente Forge para Minecraft Java 1.8.9 / Forge 11.15.1.2318. Contém exclusivamente HUD, keystrokes, mira, zoom e tema. Não contém o motor de combate/movimento da edição anterior, visualização de entidades ou automação. Não fornece capas de terceiros nem integração com OptiFine.
 
@@ -14,8 +14,8 @@ Comandos locais: `/zyon`, `/zyon toggle crosshair`, `/zyon bind crosshair R`, `/
 
 ## Compilar
 
-Instale JDK 21 para executar Gradle e JDK 8 para compilar o cliente. Execute `./gradlew build` ou `.\gradlew.bat build`. Se necessário, informe `-Porg.gradle.java.installations.paths=/caminho/para/jdk8`. O JAR distribuível é `build/libs/zyon-1.8.9-1.3.0.jar`, sem sufixos dev/sources.
+Instale JDK 21 para executar Gradle e JDK 8 para compilar o cliente. Execute `./gradlew build` ou `.\gradlew.bat build`. Se necessário, informe `-Porg.gradle.java.installations.paths=/caminho/para/jdk8`. O JAR distribuível é `build/libs/zyon-1.8.9-1.3.1.jar`, sem sufixos dev/sources.
 
-Os testes verificam os cinco recursos registrados, a matemática do zoom, limites de layout, ajuda e persistência de perfis. O ambiente atual não valida uma sessão Microsoft real nem uma partida autenticada. Veja [informações para revisão](../docs/API-review.md).
+Os testes verificam os sete recursos registrados, a matemática do zoom, limites de layout, ajuda e persistência de perfis. O ambiente atual não valida uma sessão Microsoft real nem uma partida autenticada. Veja [informações para revisão](../docs/API-review.md).
 
 Aplicativo independente de terceiros. NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.

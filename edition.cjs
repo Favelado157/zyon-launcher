@@ -19,9 +19,11 @@ async function validateInstance(instanceDir, payload) {
   if ((await fs.lstat(mods)).isSymbolicLink()) throw new Error('Escolha uma pasta nova para a edição visual. A pasta mods não pode ser um link.');
   const manifest = await core.readJson(path.join(payload, 'manifest.json'));
   for (const entry of await fs.readdir(mods, { withFileTypes: true })) {
-    if (entry.name !== core.MOD || !entry.isFile() || entry.isSymbolicLink()) throw new Error('Esta pasta contém mods externos à edição visual. Escolha uma pasta nova; os arquivos anteriores serão preservados.');
+    if (!entry.isFile() || entry.isSymbolicLink()) throw new Error('Esta pasta contém mods externos à edição visual. Escolha uma pasta nova; os arquivos anteriores serão preservados.');
+    const expected = entry.name === core.MOD ? [manifest.sha256] : manifest.previousVisuals?.[entry.name];
+    if (!Array.isArray(expected) || !expected.length) throw new Error('Esta pasta contém mods externos à edição visual. Escolha uma pasta nova; os arquivos anteriores serão preservados.');
     const bytes = await fs.readFile(path.join(mods, entry.name));
-    if (manifest.file !== core.MOD || core.digest(bytes) !== manifest.sha256) throw new Error('O cliente visual existente tem conteúdo diferente. Escolha uma pasta nova para preservar esse arquivo.');
+    if (manifest.file !== core.MOD || !expected.includes(core.digest(bytes))) throw new Error('O cliente visual existente tem conteúdo diferente. Escolha uma pasta nova para preservar esse arquivo.');
   }
 }
 module.exports = { EDITION, migrate, validateInstance };
@@ -31,7 +33,7 @@ async function migrateProfiles(previousDir, instanceDir) {
   const source = path.join(previousDir, 'config', 'zyon'), destination = path.join(instanceDir, 'config', 'zyon');
   const allowed = {
     hud: ['logo','fps','coords','modules','x','y'], keystrokes: ['mouse','cps','jump','scale','color','opacity','x','y'],
-    theme: ['menu','accent','opacity','rainbow'], crosshair: ['size','gap','dot']
+    theme: ['menu','accent','opacity','rainbow'], badge: [], selfname: ['scale'], crosshair: ['size','gap','dot']
   };
   if (!await core.exists(source) || (await fs.lstat(source)).isSymbolicLink()) return;
   for (const entry of await fs.readdir(source, { withFileTypes: true })) {

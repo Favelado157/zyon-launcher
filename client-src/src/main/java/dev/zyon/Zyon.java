@@ -16,7 +16,7 @@ import org.lwjgl.input.Mouse;
 import java.util.*;
 import static dev.zyon.Setting.*;
 import static dev.zyon.Feature.Category.*;
-@Mod(modid="zyon",name="Zyon Client",version="1.3.0",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
+@Mod(modid="zyon",name="Zyon Client",version="1.3.1",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
 public final class Zyon {
  public static Zyon instance;public final List<Feature> features=new ArrayList<Feature>();public Visuals visuals;public Profiles profiles;public Keystrokes keystrokes;public boolean requestMenu;
  public final KeyBinding menuKey=new KeyBinding("Zyon: abrir menu",Keyboard.KEY_RSHIFT,"Zyon"),panicKey=new KeyBinding("Zyon: ocultar extras",Keyboard.KEY_END,"Zyon");
@@ -26,7 +26,7 @@ public final class Zyon {
  @Mod.EventHandler public void init(FMLInitializationEvent event){
   instance=this;registerFeatures();visuals=new Visuals(this);keystrokes=new Keystrokes(this);profiles=new Profiles(this,new java.io.File(mc.mcDataDir,"config/zyon"));
   ClientRegistry.registerKeyBinding(menuKey);ClientRegistry.registerKeyBinding(panicKey);ClientRegistry.registerKeyBinding(editorKey);ClientRegistry.registerKeyBinding(zoomKey);
-  FMLCommonHandler.instance().bus().register(this);FMLCommonHandler.instance().bus().register(visuals);MinecraftForge.EVENT_BUS.register(visuals);MinecraftForge.EVENT_BUS.register(new Branding());Branding.applyWindowIcons();
+  FMLCommonHandler.instance().bus().register(this);FMLCommonHandler.instance().bus().register(visuals);MinecraftForge.EVENT_BUS.register(visuals);MinecraftForge.EVENT_BUS.register(new Nameplates(this));MinecraftForge.EVENT_BUS.register(new Branding());Branding.applyWindowIcons();
   ClientCommandHandler.instance.registerCommand(new ZyonCommand(this));profiles.loadAutomatic();
   Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){public void run(){profiles.flushOnExit();}},"Zyon-save"));
  }
@@ -39,6 +39,8 @@ public final class Zyon {
    bool("mouse","Botoes do mouse",true),bool("cps","Cliques por segundo",true),bool("jump","Mostrar pulo",true),
    number("scale","Tamanho",1,.5,2,.1),choice("color","Cor ao pressionar",0,"Tema","Branco","Azul","Verde","Rosa"),number("opacity","Opacidade do fundo",190,0,255,1),
    number("x","Posicao horizontal (%)",2,0,100,.1),number("y","Posicao vertical (%)",35,0,100,.1));
+  add("badge","Insignia Zyon","Mostra seu emblema antes do nick no TAB e no proprio nick em terceira pessoa. Visivel neste cliente; nao altera cargos ou prefixos do servidor.",CLIENT);
+  add("selfname","Meu nick no F5","Mostra seu proprio nick acima da cabeca nas duas cameras do F5. Preserva as cores do servidor; oculta com F1, ao agachar ou ficar invisivel.",CLIENT,number("scale","Tamanho do nick",1,.7,1.5,.1));
   add("theme","Tema","Cores do menu e HUD. Aplicado diretamente.",INTERFACE,bool("menu","Menu inicial Zyon",true),choice("accent","Cor de destaque",0,"Azul neon","Azul","Ciano","Verde","Rosa","Laranja"),number("opacity","Opacidade",245,160,255,1),bool("rainbow","Cores animadas",false));
  }
  public Feature feature(String id){for(Feature f:features)if(f.id.equalsIgnoreCase(id)||f.name.equalsIgnoreCase(id))return f;throw new IllegalArgumentException("Modulo desconhecido: "+id);}

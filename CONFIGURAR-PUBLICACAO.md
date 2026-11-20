@@ -6,7 +6,7 @@ O repositório público `Favelado157/zyon-launcher` hospeda o código e os insta
 
 No [Entra](https://entra.microsoft.com/), use Registros de aplicativo > Zyon Launcher > Autenticação. O aplicativo precisa aceitar contas Microsoft pessoais e ter **Permitir fluxos de cliente público** habilitado. O launcher usa código de dispositivo pelo endpoint consumers, com os escopos XboxLive.signin e offline_access; não distribua um client secret no desktop.
 
-Revise sua candidatura em https://aka.ms/mce-reviewappid com descrição exata dos cinco recursos, links para a fonte e o instalador atuais e informações de contato verdadeiras. Use [docs/API-review.md](docs/API-review.md) como referência técnica, conferindo os campos e as exigências atuais do formulário. Não declare aprovação inexistente nem omita o histórico do projeto. Alterações de capacidades e identidade precisam ser informadas com precisão conforme solicitado na análise.
+Revise sua candidatura em https://aka.ms/mce-reviewappid com descrição exata dos sete recursos, links para a fonte e o instalador atuais e informações de contato verdadeiras. Use [docs/API-review.md](docs/API-review.md) como referência técnica, conferindo os campos e as exigências atuais do formulário. Não declare aprovação inexistente nem omita o histórico do projeto. Alterações de capacidades e identidade precisam ser informadas com precisão conforme solicitado na análise.
 
 Não use IDs de outros aplicativos para contornar a recusa. O Client ID e o canal são definidos pelo publicador na compilação, sem campos para troca no launcher. Somente uma mudança legítima do aplicativo publicado deve alterar esses valores. Não compartilhe senhas, códigos de login, cookies ou tokens de jogadores.
 
@@ -28,7 +28,7 @@ npm ci
 cd client-src
 .\gradlew.bat build
 cd ..
-Copy-Item client-src/build/libs/zyon-1.8.9-1.3.0.jar payload/zyon-1.8.9-1.3.0.jar -Force
+Copy-Item client-src/build/libs/zyon-1.8.9-1.3.1.jar payload/zyon-1.8.9-1.3.1.jar -Force
 npm run prepare:release
 npm test
 npm run dist:win

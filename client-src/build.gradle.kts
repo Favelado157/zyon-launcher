@@ -4,7 +4,7 @@ plugins {
  id("dev.architectury.architectury-pack200") version "0.1.3"
 }
 group = "dev.zyon"
-version = "1.3.0"
+version = "1.3.1"
 base.archivesName.set("zyon-1.8.9")
 java { toolchain.languageVersion.set(JavaLanguageVersion.of(8)); withSourcesJar() }
 loom {
