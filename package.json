@@ -51,7 +51,7 @@
         "to": "payload",
         "filter": [
           "manifest.json",
-          "zyon-1.8.9-1.5.2.jar"
+          "zyon-1.8.9-1.5.3.jar"
         ]
       }
     ],

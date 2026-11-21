@@ -1,9 +1,13 @@
 {
-  "file": "zyon-1.8.9-1.5.2.jar",
-  "sha256": "95376683717a950ccc1a679d2df658c2e40fa83cc47d3876e5259890873d21a0",
+  "file": "zyon-1.8.9-1.5.3.jar",
+  "sha256": "b8a186ef9c2cf21c4f447d1337a2b8fcb0717a22d8062f0683208d7c82a6479f",
   "modules": 20,
   "minecraft": "1.8.9",
   "previousVisuals": {
+    "zyon-1.8.9-1.5.2.jar": [
+      "e44afcdadb4fb81ed8d14bdf11964596d4d8700c80a23fa1db675a2cb7492d8e",
+      "95376683717a950ccc1a679d2df658c2e40fa83cc47d3876e5259890873d21a0"
+    ],
     "zyon-1.8.9-1.5.1.jar": [
       "4ccaf11c27719b2c1a974a903fb3810cda034266dbd9db98b098950ce20793eb",
       "621ef3f2482c961942a7ab18fb875e0bfdc898e5aff1c0ae7ca5a5705a196489"
@@ -23,6 +27,7 @@
     ]
   },
   "previousFiles": [
+    "zyon-1.8.9-1.5.2.jar",
     "zyon-1.8.9-1.5.1.jar",
     "zyon-1.8.9-1.5.0.jar",
     "zyon-1.8.9-1.3.1.jar",

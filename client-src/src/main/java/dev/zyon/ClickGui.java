@@ -39,7 +39,8 @@ public final class ClickGui extends GuiScreen {
  private void toggle(boolean on,int x,int y){Ui.box(x,y,30,15,4,on?accent():0xFF454B59);Ui.box(x+(on?17:2),y+2,11,11,3,0xFFF2F4FC);}
  private void sound(){if(theme().flag("sounds"))mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"),1));}
  private void clip(int x,int y,int w,int h){ScaledResolution res=new ScaledResolution(mc);int s=res.getScaleFactor();GL11.glEnable(GL11.GL_SCISSOR_TEST);GL11.glScissor((int)((ox+x*scale)*s),(int)((height-oy-(y+h)*scale)*s),(int)(w*scale*s),(int)(h*scale*s));}
- public void drawScreen(int x,int y,float partial){
+ public void drawScreen(int x,int y,float partial){try(HudRenderState state=new HudRenderState()){drawContents(x,y,partial);}}
+ private void drawContents(int x,int y,float partial){
   mx=vx(x);my=vy(y);tip="";updateBlur();
   if(!theme().flag("hideBackground")){int a=theme().flag("transitions")?(int)(150*Math.min(1,(System.currentTimeMillis()-opened)/180f)):150;drawRect(0,0,width,height,(a<<24)|0x080B14);}
   GlStateManager.pushMatrix();GlStateManager.translate(ox,oy,0);GlStateManager.scale(scale,scale,1);

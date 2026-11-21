@@ -7,8 +7,8 @@ public final class Overlay {
  private final Minecraft mc=Minecraft.getMinecraft();private final Zyon client;
  public Overlay(Zyon client){this.client=client;}private Feature f(String id){return client.feature(id);}
  private void text(String value,int x,int y,int color){mc.fontRendererObj.drawStringWithShadow(value,x,y,color);}
- public void hud(){
-  if(mc.thePlayer==null||mc.gameSettings.showDebugInfo||mc.gameSettings.hideGUI||mc.currentScreen instanceof ClickGui||mc.currentScreen instanceof HudEditor||mc.currentScreen instanceof KeyLayoutEditor)return;
+ public void hud(){if(mc.thePlayer==null||mc.gameSettings.showDebugInfo||mc.gameSettings.hideGUI||mc.currentScreen instanceof ClickGui||mc.currentScreen instanceof HudEditor||mc.currentScreen instanceof KeyLayoutEditor)return;try(HudRenderState state=new HudRenderState()){drawHud();}}
+ private void drawHud(){
   ScaledResolution res=new ScaledResolution(mc);int width=res.getScaledWidth(),height=res.getScaledHeight(),accent=client.accent();
   client.keystrokes.draw(width,height,false);Widgets widgets=new Widgets(client);for(Feature feature:client.features)if(Catalog.widget(feature)&&!feature.id.equals("keystrokes")&&feature.enabled())widgets.draw(feature,width,height,false);
   if(f("crosshair").enabled()&&mc.gameSettings.thirdPersonView==0){int cx=width/2,cy=height/2,s=f("crosshair").setting("size").integer(),g=f("crosshair").setting("gap").integer();Gui.drawRect(cx-g-s,cy,cx-g,cy+1,accent);Gui.drawRect(cx+g+1,cy,cx+g+s+1,cy+1,accent);Gui.drawRect(cx,cy-g-s,cx+1,cy-g,accent);Gui.drawRect(cx,cy+g+1,cx+1,cy+g+s+1,accent);if(f("crosshair").flag("dot"))Gui.drawRect(cx,cy,cx+1,cy+1,accent);}

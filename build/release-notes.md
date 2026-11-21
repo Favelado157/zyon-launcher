@@ -1,7 +1,9 @@
-Zyon {{VERSION}} — correção da pasta de texturas
+Zyon {{VERSION}} — renderização de equipamentos e teclas de autotexto
 
-Corrige o botão Abrir pasta na tela de pacotes de recursos do Minecraft 1.8.9, inclusive em nomes de usuário como Win 11 Pro. A pasta real da instalação é aberta diretamente no Explorador do Windows, com o caminho passado como um único argumento, sem o comando antigo cmd /C start.
+- Isola os estados gráficos do HUD e das prévias para impedir interferências de cores, transparência, iluminação e profundidade na renderização de itens, armadura e personagem. Preserva o brilho normal de encantamento.
+- O campo Atalho do autotexto virou um seletor de tecla. Pressione a tecla escolhida durante o jogo para enviar uma mensagem uma vez; segurar não repete. Menus, chat e perda de foco bloqueiam o envio.
+- Mantém o envio manual pelo botão Enviar e preserva as mensagens existentes. Teclas antigas não são atribuídas automaticamente. Controles reservados e teclas duplicadas são rejeitados.
 
-Se a pasta não existir, ela é criada. Pacotes de textura existentes são preservados. Se o gerenciador de arquivos não puder ser iniciado, o jogo mostra o caminho e um botão para copiá-lo.
+T → AT → Definir tecla; escreva a mensagem e salve. No seletor, Del remove e Esc cancela.
 
-Inclui zyon-1.8.9-1.5.2.jar para Forge 1.8.9 / Java 8. Para o mod separado, feche o jogo e substitua o JAR Zyon anterior. A atualização mantém mundos, configurações, mensagens de autotexto e os 20 módulos existentes.
+Inclui zyon-1.8.9-1.5.3.jar para Forge 1.8.9 / Java 8 pelo launcher oficial. Feche o jogo e substitua o JAR Zyon anterior. Preserva mundos, texturas, configurações e a correção de Abrir pasta da versão anterior.
