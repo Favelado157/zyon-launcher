@@ -9,7 +9,7 @@ const extractZip = require('extract-zip');
 const FORGE_URL = 'https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar';
 const FORGE_SHA256 = 'f9fdf4945ca02d73ec6cc46300942f4e199e4add068877d517157b3677563656';
 const VERSION = 'zyon-1.8.9-forge';
-const MOD = 'zyon-1.8.9-1.5.1.jar';
+const MOD = 'zyon-1.8.9-1.5.2.jar';
 const digest = (data, algorithm = 'sha256') => crypto.createHash(algorithm).update(data).digest('hex');
 const exists = async file => { try { await fs.access(file); return true; } catch { return false; } };
 function checkAbort(signal) { if (signal?.aborted) throw new Error('Operação cancelada. Você pode retomar a instalação.'); }

@@ -16,7 +16,7 @@ import org.lwjgl.input.Mouse;
 import java.util.*;
 import static dev.zyon.Setting.*;
 import static dev.zyon.Feature.Category.*;
-@Mod(modid="zyon",name="Zyon Client",version="1.5.1",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
+@Mod(modid="zyon",name="Zyon Client",version="1.5.2",acceptedMinecraftVersions="[1.8.9]",clientSideOnly=true)
 public final class Zyon {
  public static Zyon instance;public final List<Feature> features=new ArrayList<Feature>();public Visuals visuals;public Profiles profiles;public Keystrokes keystrokes;public boolean requestMenu;public AutoTextStore autoText;
  public final KeyBinding menuKey=new KeyBinding("Zyon: abrir menu",Keyboard.KEY_RSHIFT,"Zyon"),panicKey=new KeyBinding("Zyon: ocultar extras",Keyboard.KEY_END,"Zyon");
@@ -27,7 +27,7 @@ public final class Zyon {
   instance=this;registerFeatures();visuals=new Visuals(this);keystrokes=new Keystrokes(this);profiles=new Profiles(this,new java.io.File(mc.mcDataDir,"config/zyon"));
   autoText=new AutoTextStore(new java.io.File(mc.mcDataDir,"config/zyon/chat/autotext.json"));try{autoText.load();}catch(java.io.IOException e){org.apache.logging.log4j.LogManager.getLogger("Zyon").warn("Autotexto nao foi carregado; arquivo original preservado.");}
   ClientRegistry.registerKeyBinding(menuKey);ClientRegistry.registerKeyBinding(panicKey);ClientRegistry.registerKeyBinding(editorKey);ClientRegistry.registerKeyBinding(zoomKey);
-  FMLCommonHandler.instance().bus().register(this);FMLCommonHandler.instance().bus().register(visuals);MinecraftForge.EVENT_BUS.register(visuals);MinecraftForge.EVENT_BUS.register(new Nameplates(this));MinecraftForge.EVENT_BUS.register(new PlayerHealth(this));MinecraftForge.EVENT_BUS.register(new ChatAutoText(this));MinecraftForge.EVENT_BUS.register(new LocalEffects(this));FMLCommonHandler.instance().bus().register(new LocalEffects.Brightness(this));MinecraftForge.EVENT_BUS.register(new Branding());Branding.applyWindowIcons();
+  FMLCommonHandler.instance().bus().register(this);FMLCommonHandler.instance().bus().register(visuals);MinecraftForge.EVENT_BUS.register(visuals);MinecraftForge.EVENT_BUS.register(new Nameplates(this));MinecraftForge.EVENT_BUS.register(new PlayerHealth(this));MinecraftForge.EVENT_BUS.register(new ChatAutoText(this));MinecraftForge.EVENT_BUS.register(new LocalEffects(this));FMLCommonHandler.instance().bus().register(new LocalEffects.Brightness(this));MinecraftForge.EVENT_BUS.register(new ResourcePackFolders());MinecraftForge.EVENT_BUS.register(new Branding());Branding.applyWindowIcons();
   ClientCommandHandler.instance.registerCommand(new ZyonCommand(this));profiles.loadAutomatic();
   Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){public void run(){profiles.flushOnExit();}},"Zyon-save"));
  }

@@ -56,7 +56,7 @@ jobs:
           .\gradlew.bat "-Porg.gradle.java.installations.paths=$env:ZYON_JAVA8" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Pop-Location
-          Copy-Item client-src/build/libs/zyon-1.8.9-1.5.1.jar payload/zyon-1.8.9-1.5.1.jar -Force
+          Copy-Item client-src/build/libs/zyon-1.8.9-1.5.2.jar payload/zyon-1.8.9-1.5.2.jar -Force
           node build/prepare-release.cjs
       - name: Testar o launcher
         shell: pwsh
@@ -84,4 +84,4 @@ jobs:
           $v = $env:ZYON_RELEASE_VERSION
           $notes = (Get-Content build/release-notes.md -Raw).Replace('{{VERSION}}', $v)
           Set-Content release-notes.txt -Value $notes -Encoding UTF8
-          gh release create "v$v" "dist/Zyon-Launcher-Setup-$v.exe" "dist/SHA256SUMS.txt" "payload/zyon-1.8.9-1.5.1.jar" --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title "Zyon $v" --notes-file release-notes.txt
+          gh release create "v$v" "dist/Zyon-Launcher-Setup-$v.exe" "dist/SHA256SUMS.txt" "payload/zyon-1.8.9-1.5.2.jar" --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title "Zyon $v" --notes-file release-notes.txt

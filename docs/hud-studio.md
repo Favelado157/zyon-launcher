@@ -1,4 +1,4 @@
-# HUD Studio — cliente 1.5.1
+# HUD Studio — cliente 1.5.2
 
 O menu aberto com **Shift direito** segue a organização da referência enviada: catálogo com busca, favoritos, grade de duas colunas ou lista, páginas individuais de ajustes, prévias e editor de widgets. A arte e a marca são do Zyon.
 
@@ -41,12 +41,18 @@ Os renderizadores de itens/animações respeitam renderizadores externos já reg
 
 ## Instalação e atualização
 
-O instalador publica o mod 1.5.1 e preserva o diretório da edição visual, os mundos e as preferências. JARs conhecidos anteriores são guardados em `zyon-backups`. Arquivos modificados ou mods externos continuam bloqueados pelo launcher e são preservados.
+O instalador publica o mod 1.5.2 e preserva o diretório da edição visual, os mundos e as preferências. JARs conhecidos anteriores são guardados em `zyon-backups`. Arquivos modificados ou mods externos continuam bloqueados pelo launcher e são preservados.
 
-Para usar pelo launcher oficial, crie uma instalação Forge **1.8.9 / 11.15.1.2318**, com Java 8, e coloque somente `zyon-1.8.9-1.5.1.jar` como mod Zyon na pasta `mods`. Retire versões anteriores ou experimentais do Zyon dessa pasta antes. O acesso pelo launcher Zyon continua sujeito à autorização das APIs Microsoft/Minecraft e à propriedade da conta. Esta atualização não resolve um HTTP 403 de autorização.
+Para usar pelo launcher oficial, crie uma instalação Forge **1.8.9 / 11.15.1.2318**, com Java 8, e coloque somente `zyon-1.8.9-1.5.2.jar` como mod Zyon na pasta `mods`. Retire versões anteriores ou experimentais do Zyon dessa pasta antes. O acesso pelo launcher Zyon continua sujeito à autorização das APIs Microsoft/Minecraft e à propriedade da conta. Esta atualização não resolve um HTTP 403 de autorização.
 
 ## Autotexto no chat
 
 Abra o chat com T e clique em **AT**, no canto inferior direito, acima da linha de digitação. Edite o nome e o conteúdo de até seis mensagens. **Salvar** e Enter apenas salvam; **Enviar** manda uma única mensagem de até 100 caracteres por clique e fecha o painel. Mensagens vazias não são enviadas. Comandos escritos pelo usuário também podem ser salvos. Não há envio periódico ou repetição automática.
 
 Ao voltar, o texto que estava sendo digitado no chat continua no campo. O painel também pode ser aberto por Shift direito → Autotexto → Editar mensagens. O interruptor Autotexto controla a exibição do botão AT. Mensagens são locais deste PC, em `config/zyon/chat/autotext.json`, e não são publicadas no GitHub.
+
+## Abrir a pasta de texturas
+
+Em Opções → Pacotes de recursos, o botão Abrir pasta usa o diretório real do Minecraft em execução. O mod 1.5.2 substitui o comando antigo da 1.8.9 pela abertura nativa, preservando espaços e acentos no caminho. Não há um diretório Zyon fixo: funciona também na instalação usada pelo launcher oficial.
+
+Se a pasta estiver ausente, ela é criada. Arquivos existentes são preservados. Se o gerenciador não puder ser iniciado, use Copiar caminho da pasta e cole esse endereço no Explorador de Arquivos.
