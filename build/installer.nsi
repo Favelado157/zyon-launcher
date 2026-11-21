@@ -53,6 +53,7 @@ Section "Zyon Launcher" main
   Delete "$INSTDIR\resources\payload\zyon-1.8.9-1.2.1.jar"
   Delete "$INSTDIR\resources\payload\zyon-1.8.9-1.2.2.jar"
   Delete "$INSTDIR\resources\payload\zyon-1.8.9-1.3.0.jar"
+  Delete "$INSTDIR\resources\payload\zyon-1.8.9-1.3.1.jar"
   File /r "${PROJECT_DIR}\dist\win-unpacked\*"
   FileOpen $0 "$INSTDIR\zyon-install.marker" w
   FileWrite $0 "dev.zyon.launcher"

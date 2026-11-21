@@ -70,6 +70,7 @@ public final class Nameplates implements IResourceManagerReloadListener {
  }
  @SubscribeEvent public void player(RenderPlayerEvent.Post event){
   if(mc.thePlayer==null||mc.getRenderViewEntity()!=mc.thePlayer)return;
+  Feature tags=client.feature("nametag");if(tags.enabled()&&(tags.flag("hide")||!tags.flag("own")))return;
   if(!NametagPolicy.selfVisible(client.feature("selfname").enabled(),mc.gameSettings.thirdPersonView,
       event.entityPlayer==mc.thePlayer,mc.gameSettings.hideGUI,event.entityPlayer.isInvisible(),event.entityPlayer.isSneaking(),
       event.entityPlayer.isSpectator(),event.entityPlayer.isPlayerSleeping()))return;

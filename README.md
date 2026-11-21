@@ -1,6 +1,6 @@
 # Zyon Visual — Zyon Launcher
 
-Cliente independente para **Minecraft Java 1.8.9 / Forge**, com tema azul neon e sete recursos locais: **HUD, keystrokes arrastáveis, mira, zoom por tecla, tema, insígnia e nick no F5**. Requer conta Microsoft com acesso ao Minecraft Java, verificado nos serviços oficiais antes de preparar e a cada abertura.
+Cliente independente para **Minecraft Java 1.8.9 / Forge**, com tema azul neon, catálogo de mods e **17 recursos visuais locais**, incluindo widgets arrastáveis, ajustes de cores e animações. Requer conta Microsoft com acesso ao Minecraft Java, verificado nos serviços oficiais antes de preparar e a cada abertura.
 
 **Autorização pendente:** o pedido anterior de acesso às APIs foi recusado. Esta edição foi preparada para uma nova análise; não foi aprovada pela Microsoft/Mojang. Até os serviços autorizarem o aplicativo e validarem a conta, preparar e jogar ficam bloqueados. Incluir um Client ID ou publicar um instalador não concede autorização. O login real ainda precisa ser validado após essa autorização.
 
@@ -22,7 +22,7 @@ Cliente independente para **Minecraft Java 1.8.9 / Forge**, com tema azul neon e
 
 O navegador abre o login oficial Microsoft por código de dispositivo. O Zyon consulta os serviços Xbox/Minecraft e verifica a propriedade e o perfil antes de preparar ou iniciar. Não há entrada só por nick, fallback sem autenticação ou importação de contas de outros launchers. O cache de autenticação usa o armazenamento criptografado do Windows.
 
-O cliente distribuído contém somente os sete recursos acima. O motor antigo de combate, movimento automatizado e visualização de entidades foi removido. Não há importação de OptiFine, capas de terceiros, automação de jogo ou carregamento de mods externos nesta edição.
+A versão 1.5 adiciona Fullbright, Item Physics, Nametag, PvP Clássico, FPS, Vida, Mão principal, Peitoral, Botas e Contorno de blocos aos sete recursos anteriores. Consulte o [guia do novo HUD](docs/hud-studio.md) para controles e limitações. O motor antigo de combate, movimento automatizado e visualização de entidades foi removido. Não há importação de OptiFine, capas de terceiros, automação de jogo ou carregamento de mods externos nesta edição.
 
 Atualizações são oferecidas ao abrir e periodicamente pelo canal público `Favelado157/zyon-launcher`. A pessoa escolhe quando instalar; o instalador é conferido pelo SHA-256 publicado.
 
@@ -30,7 +30,7 @@ Atualizações são oferecidas ao abrir e periodicamente pelo canal público `Fa
 
 A nova instância fica em `%APPDATA%\ZyonLauncher\instances\zyon-visual-1.8.9`. A instalação anterior, seus mundos e arquivos ficam na pasta original. O botão **Abrir pasta da instalação anterior** permite localizá-la. Somente campos de perfis visuais compatíveis são copiados, sem copiar os mods antigos. Pastas com mods externos são recusadas sem apagar esses arquivos.
 
-Versões antigas no histórico Git/Releases pertencem à edição anterior e **não representam esta edição visual**. Para avaliação, use a fonte e o instalador da série 1.3. As demais branches guardam ferramentas separadas da comunidade; não acompanham o instalador.
+Versões antigas no histórico Git/Releases pertencem à edição anterior e **não representam esta edição visual**. Para avaliação, use a fonte e o instalador da série 1.5. As demais branches guardam ferramentas separadas da comunidade; não acompanham o instalador.
 
 ## Desenvolvimento e publicação
 

@@ -2,7 +2,7 @@
 package dev.zyon;
 import java.util.Locale;
 public final class Setting {
- public enum Kind { BOOLEAN, NUMBER, CHOICE }
+ public enum Kind { BOOLEAN, NUMBER, CHOICE, COLOR }
  public final String id,label; public final Kind kind;
  public final double min,max,step; public final String[] choices; private double value;
  private Setting(String id,String label,Kind kind,double value,double min,double max,double step,String[] choices) {
@@ -11,8 +11,10 @@ public final class Setting {
  public static Setting bool(String id,String label,boolean value){return new Setting(id,label,Kind.BOOLEAN,value?1:0,0,1,1,new String[0]);}
  public static Setting number(String id,String label,double value,double min,double max,double step){return new Setting(id,label,Kind.NUMBER,value,min,max,step,new String[0]);}
  public static Setting choice(String id,String label,int value,String... choices){return new Setting(id,label,Kind.CHOICE,value,0,choices.length-1,1,choices);}
+ public static Setting color(String id,String label,int rgb){return new Setting(id,label,Kind.COLOR,rgb & 0xFFFFFF,0,0xFFFFFF,1,new String[0]);}
+ public int rgb(){return 0xFF000000|integer();}
  public double get(){return value;} public boolean on(){return value>.5;} public int integer(){return (int)Math.round(value);}
  public void set(double next){if(Double.isNaN(next)||Double.isInfinite(next))return;value=Math.max(min,Math.min(max,min+Math.round((next-min)/step)*step));}
  public void cycle(){set(value>=max?min:value+step);}
- public String display(){if(kind==Kind.BOOLEAN)return on()?"ON":"OFF";if(kind==Kind.CHOICE)return choices[integer()];return step>=1?Integer.toString(integer()):String.format(Locale.ROOT,step<.1?"%.2f":"%.1f",value);}
+ public String display(){if(kind==Kind.COLOR)return String.format(Locale.ROOT,"#%06X",integer());if(kind==Kind.BOOLEAN)return on()?"ON":"OFF";if(kind==Kind.CHOICE)return choices[integer()];return step>=1?Integer.toString(integer()):String.format(Locale.ROOT,step<.1?"%.2f":"%.1f",value);}
 }

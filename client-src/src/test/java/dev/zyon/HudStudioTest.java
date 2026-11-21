@@ -1,0 +1,16 @@
+package dev.zyon;
+import java.io.*;
+import java.util.*;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.*;
+public class HudStudioTest {
+ @Rule public TemporaryFolder folder=new TemporaryFolder();
+ private Zyon client(){Zyon c=new Zyon();Catalog.register(c.features);return c;}
+ @Test public void brightnessRestoresTheExactUserSettingBetweenFrames(){BrightnessState b=new BrightnessState();assertEquals(16,b.apply(.67f,true),0);assertEquals(16,b.apply(16,true),0);assertEquals(.67f,b.apply(16,false),0);assertFalse(b.active());assertEquals(.4f,b.apply(.4f,false),0);assertEquals(16,b.apply(.4f,true),0);assertEquals(.4f,b.apply(16,false),0);}
+ @Test public void everyWidgetSurvivesDragResizeAndManualAlignment(){Zyon c=client();Widgets w=new Widgets(c);for(Feature f:c.features)if(Catalog.widget(f)&&!f.id.equals("keystrokes")){w.move(f,9999,-9999,320,240);int[] b=w.bounds(f,320,240);assertTrue(b[0]>=0&&b[0]+b[2]<=320);assertEquals(0,b[1]);f.setting("alignX").set(3);f.setting("alignY").set(2);b=w.bounds(f,128,80);assertTrue(b[0]>=0&&b[0]+b[2]<=128);assertTrue(b[1]>=0&&b[1]+b[3]<=80);}}
+ @Test public void colorsFavoritesCustomKeysAndNewWidgetsRoundTrip()throws Exception{Zyon c=client();File dir=folder.newFolder();Profiles p=new Profiles(c,dir);c.feature("theme").setting("highlight").set(0xC0FFEE);c.feature("fps").setEnabled(true);c.feature("fps").setting("_favorite").set(1);c.feature("keystrokes").setting("_code7").set(33);c.feature("keystrokes").setting("_kx7").set(160);p.save("custom");Zyon d=client();new Profiles(d,dir).load("custom");assertEquals(0xFFC0FFEE,d.feature("theme").setting("highlight").rgb());assertTrue(d.feature("fps").enabled());assertTrue(d.feature("fps").flag("_favorite"));assertEquals(33,d.feature("keystrokes").number("_code7"),0);assertEquals(160,d.feature("keystrokes").number("_kx7"),0);}
+ @Test public void smallWindowsKeepWidgetsInBounds(){Zyon c=client();Keystrokes keys=new Keystrokes(c);for(int i=0;i<8;i++){c.feature("keystrokes").setting("_key"+i).set(1);c.feature("keystrokes").setting("_kx"+i).set(180);c.feature("keystrokes").setting("_ky"+i).set(180);}for(int[] size:new int[][]{{160,100},{320,240},{1280,720}}){int[] b=keys.bounds(size[0],size[1]);assertTrue(b[0]>=0&&b[1]>=0);assertTrue(b[0]+b[2]<=size[0]);assertTrue(b[1]+b[3]<=size[1]);}}
+ @Test public void nonDamageableAndBrokenItemsHaveSafeDurability(){assertEquals(0,Widgets.durability(0,0),0);assertEquals(.75,Widgets.durability(100,25),0);assertEquals(0,Widgets.durability(100,999),0);assertEquals(1,Widgets.durability(100,-9),0);}
+ @Test public void legacyProfileKeepsPreferencesAndNewFeaturesDisabled()throws Exception{Zyon c=client();File dir=folder.newFolder();java.nio.file.Files.write(new File(dir,"old.json").toPath(),"{\"schema\":1,\"modules\":{\"keystrokes\":{\"enabled\":true,\"settings\":{\"x\":55,\"color\":3}},\"theme\":{\"settings\":{\"accent\":2}}}}".getBytes("UTF-8"));new Profiles(c,dir).load("old");assertEquals(55,c.feature("keystrokes").number("x"),0);assertEquals(3,c.feature("keystrokes").number("color"),0);assertFalse(c.feature("fullbright").enabled());assertFalse(c.feature("classicpvp").enabled());assertEquals(0xFF58D9E8,c.accent());}
+}

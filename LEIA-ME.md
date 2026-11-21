@@ -4,7 +4,7 @@ Esta edição tem somente HUD, keystrokes, mira, zoom próprio e tema. O aplicat
 
 ## Instalar e conectar
 
-1. Feche o Minecraft e o Zyon. Baixe o instalador da série **1.3** na página [Releases](https://github.com/Favelado157/zyon-launcher/releases/latest) e execute-o.
+1. Feche o Minecraft e o Zyon. Baixe o instalador da série **1.5** na página [Releases](https://github.com/Favelado157/zyon-launcher/releases/latest) e execute-o.
 2. Em **Minha conta**, escolha **Entrar com Microsoft**. Confirme seu código somente na página oficial aberta pelo navegador, usando uma conta com acesso ao Minecraft Java.
 3. Quando os serviços autorizarem o aplicativo e confirmarem a propriedade, use **Verificar e preparar**. A primeira preparação baixa os arquivos oficiais, o Forge, o Java 8 e o cliente visual.
 4. Use **Verificar e jogar**. A propriedade será consultada novamente, inclusive quando os arquivos já estiverem instalados. Sem internet ou se o serviço recusar o acesso, a abertura é interrompida.
@@ -14,7 +14,7 @@ O Zyon nunca solicita sua senha dentro do aplicativo. Códigos de dispositivo e 
 ## Dentro do jogo
 
 - **Shift direito:** painel com categorias, busca, interruptores e ajustes. O botão **?** explica cada recurso ao passar o mouse.
-- **Ctrl direito**, ou **Editar HUD:** arraste os keystrokes e solte para salvar. Configure tamanho, cor, opacidade, CPS, mouse e pulo na função Keystrokes.
+- **Ctrl direito**, ou **Editar HUD:** arraste os widgets ativos e solte para salvar. Configure tamanho, cor, opacidade, CPS, mouse e pulo na função Keystrokes.
 - **C:** segure para ampliar a imagem. Ative Zoom e ajuste o fator no painel. O zoom não depende do OptiFine.
 - **End:** oculta os extras visuais. Reative os que desejar no painel.
 - **Esc:** fecha o painel.
@@ -38,3 +38,7 @@ Somente campos de perfis visuais compatíveis são recuperados. Mods antigos nã
 Não há promessa de aumento de FPS. Ajuste a memória em Configurações e a distância de visão/limite de FPS nas opções do Minecraft conforme seu PC.
 
 NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
+
+## Novo menu de mods
+
+Use Shift direito para busca, favoritos e configurações individuais. O [guia HUD Studio](docs/hud-studio.md) detalha todas as telas e adaptações da referência.

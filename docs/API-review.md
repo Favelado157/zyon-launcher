@@ -1,10 +1,10 @@
-# Edição visual 1.3 — informações para nova análise
+# Edição visual 1.5 — informações para nova análise
 
 **Estado:** pedido anterior recusado; nova edição preparada para reavaliação, sem aprovação ou garantia de aprovação. O login Microsoft real e a abertura autenticada ainda precisam ser validados após autorização oficial. A publicação por si só não modifica as permissões do App ID.
 
 ## Escopo atual
 
-Cliente independente de terceiros para Minecraft Java 1.8.9, com sete recursos: HUD com informações do próprio jogador, keystrokes com contagem de cliques físicos, mira, zoom local por tecla, tema, insígnia local e nome próprio em terceira pessoa. Não promete aumento de FPS; oferece ajuste de memória e orienta opções de vídeo do jogo.
+Cliente independente de terceiros para Minecraft Java 1.8.9, com recursos locais: HUD com informações do próprio jogador, keystrokes com contagem de cliques físicos, mira, zoom local por tecla, tema, insígnia local e nome próprio em terceira pessoa. Não promete aumento de FPS; oferece ajuste de memória e orienta opções de vídeo do jogo.
 
 O código antigo de combate, ataques automáticos, movimentação automatizada, visualização de entidades e demais automações foi removido fisicamente do cliente. A classe Engine não integra o novo JAR. Não há importação OptiFine, capas de terceiros, mod loader aberto para extensões na instância visual ou escolha de executável externo pela interface.
 
@@ -24,7 +24,7 @@ Histórico Git e releases anteriores documentam uma edição diferente com capac
 
 ## Evidência e limites
 
-Os testes automatizados verificam entitlement desconhecido/ausente, revogação de propriedade com token em cache, rejeição de sessões sem validação recente, bloqueio das rotas desktop de preparação e abertura, migração sem tocar nos mundos e rejeição de mods externos. O teste do payload confere o hash, a versão e a ausência do motor anterior no JAR distribuído. Os testes Java verificam exatamente sete registros, zoom, layout, ajuda e perfis.
+Os testes automatizados verificam entitlement desconhecido/ausente, revogação de propriedade com token em cache, rejeição de sessões sem validação recente, bloqueio das rotas desktop de preparação e abertura, migração sem tocar nos mundos e rejeição de mods externos. O teste do payload confere o hash, a versão e a ausência do motor anterior no JAR distribuído. Os testes Java verificam 17 registros, zoom, layout, ajuda e perfis.
 
 Validação desta edição: 44 testes Node e 22 Java passaram. A interface desktop foi conferida em seis telas, a 1280 e 1020 pixels, com erros de autorização/licença simulados e sem erros JavaScript. A captura `launcher-visual.png` usa estado de demonstração sem conta conectada; não representa login real.
 
@@ -39,3 +39,7 @@ Nome e ícone próprios Zyon; aplicativo de terceiros. Não usa logotipo oficial
 ## Identificação visual local — cliente 1.3.1
 
 Inclui insígnia gráfica opcional antes do próprio nome no TAB e Meu nick no F5, para mostrar o próprio nome formatado em terceira pessoa. Não modifica identidade, equipes, cargos, pacotes ou nomes de outros jogadores. Não há descoberta ou compartilhamento público de perfis. Não inclui os cosméticos experimentais 1.4.
+
+## Atualização HUD Studio 1.5
+
+O catálogo agora inclui 17 módulos locais. O [guia completo](hud-studio.md) descreve Fullbright, apresentação de itens, animações clássicas, nomes e novos widgets de FPS/vida/equipamento. Não houve alteração das verificações de autenticação e propriedade. A aplicação não deve ser apresentada como aprovada enquanto houver recusa/HTTP 403.
