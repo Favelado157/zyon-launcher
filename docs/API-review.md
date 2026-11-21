@@ -24,7 +24,7 @@ Histórico Git e releases anteriores documentam uma edição diferente com capac
 
 ## Evidência e limites
 
-Os testes automatizados verificam entitlement desconhecido/ausente, revogação de propriedade com token em cache, rejeição de sessões sem validação recente, bloqueio das rotas desktop de preparação e abertura, migração sem tocar nos mundos e rejeição de mods externos. O teste do payload confere o hash, a versão e a ausência do motor anterior no JAR distribuído. Os testes Java verificam 17 registros, zoom, layout, ajuda e perfis.
+Os testes automatizados verificam entitlement desconhecido/ausente, revogação de propriedade com token em cache, rejeição de sessões sem validação recente, bloqueio das rotas desktop de preparação e abertura, migração sem tocar nos mundos e rejeição de mods externos. O teste do payload confere o hash, a versão e a ausência do motor anterior no JAR distribuído. Os testes Java verificam 20 registros, zoom, layout, ajuda e perfis.
 
 Validação desta edição: 44 testes Node e 22 Java passaram. A interface desktop foi conferida em seis telas, a 1280 e 1020 pixels, com erros de autorização/licença simulados e sem erros JavaScript. A captura `launcher-visual.png` usa estado de demonstração sem conta conectada; não representa login real.
 
@@ -42,4 +42,6 @@ Inclui insígnia gráfica opcional antes do próprio nome no TAB e Meu nick no F
 
 ## Atualização HUD Studio 1.5
 
-O catálogo agora inclui 17 módulos locais. O [guia completo](hud-studio.md) descreve Fullbright, apresentação de itens, animações clássicas, nomes e novos widgets de FPS/vida/equipamento. Não houve alteração das verificações de autenticação e propriedade. A aplicação não deve ser apresentada como aprovada enquanto houver recusa/HTTP 403.
+O catálogo agora inclui 20 módulos locais. O [guia completo](hud-studio.md) descreve Fullbright, apresentação de itens, animações clássicas, nomes e novos widgets de FPS/vida/equipamento. Não houve alteração das verificações de autenticação e propriedade. A aplicação não deve ser apresentada como aprovada enquanto houver recusa/HTTP 403.
+
+A atualização 1.5.1 adiciona Capacete, Calça e um painel de autotexto acionado pelo usuário. Vida passa a aparecer sobre os jogadores, sem widget arrastável. Consulte o guia HUD Studio para os dados disponíveis em servidores e os controles.

@@ -1,15 +1,10 @@
-Zyon {{VERSION}} — HUD Studio
+Zyon {{VERSION}} — equipamentos, autotexto e vida sobre os jogadores
 
-Menu de mods reorganizado com busca, favoritos, grade/lista, páginas de ajustes, prévias e identidade azul do Zyon.
+- Novos widgets de Capacete e Calça, com ícone, durabilidade, cor, escala e posição editáveis.
+- Botão AT no canto inferior direito do chat. Seis mensagens locais editáveis; Enviar manda uma única mensagem por clique. O texto que estava sendo digitado no chat é preservado ao voltar.
+- Vida agora aparece acima da cabeça dos jogadores, inclusive no próprio personagem em F5 quando Meu nick no F5 estiver ativo. Foi removida dos widgets arrastáveis.
+- A vida respeita F1, distância, invisibilidade, agachamento, regras de nomes das equipes e blocos. Usa somente os dados que o servidor disponibiliza; alguns servidores não informam a vida real de outros jogadores.
 
-- Editor geral de widgets e editor de layout das teclas.
-- Paleta HEX, números digitáveis, atalhos e perfis persistentes.
-- Novos widgets: FPS, Vida, Mão principal, Peitoral e Botas.
-- Fullbright, Item Physics, Nametag, animações clássicas e contorno do bloco selecionado, todos locais e desligados por padrão.
-- Insígnia, nick no F5, Zoom, Mira e HUD anterior preservados.
+Inclui zyon-1.8.9-1.5.1.jar para Forge 1.8.9 / Java 8 pelo launcher oficial com conta licenciada. Feche o jogo e mantenha somente um JAR Zyon na pasta mods. O login pelo Zyon continua sujeito à autorização Microsoft.
 
-O guia docs/hud-studio.md explica controles e limitações. Bandeiras/transmissões compartilhadas e roda de gestos ainda não estão disponíveis. O desfoque depende do OpenGL e respeita shaders existentes. Animações são uma adaptação visual à 1.8.9.
-
-Inclui zyon-1.8.9-1.5.0.jar para Forge 1.8.9 / Java 8 pelo launcher oficial com conta licenciada. Feche o jogo e mantenha somente um JAR Zyon na pasta mods. Não misture com o mod experimental 1.4.x.
-
-A atualização preserva mundos e preferências, guardando JARs conhecidos anteriores em zyon-backups. O login pelo Zyon continua sujeito à autorização Microsoft; esta versão não contorna HTTP 403.
+A atualização preserva mundos, preferências e versões conhecidas anteriores em zyon-backups. Os textos ficam neste PC em config/zyon/chat/autotext.json. Abrir o painel, editar, carregar ou salvar não envia mensagens.

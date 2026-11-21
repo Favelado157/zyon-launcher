@@ -1,4 +1,4 @@
-# HUD Studio — cliente 1.5.0
+# HUD Studio — cliente 1.5.1
 
 O menu aberto com **Shift direito** segue a organização da referência enviada: catálogo com busca, favoritos, grade de duas colunas ou lista, páginas individuais de ajustes, prévias e editor de widgets. A arte e a marca são do Zyon.
 
@@ -11,11 +11,11 @@ O menu aberto com **Shift direito** segue a organização da referência enviada
 - **PvP Clássico:** transformações visuais inspiradas na 1.7 para posição dos itens, bloqueio, comida, vara e equipar; inventário centralizado com efeitos. Não automatiza combate, não altera a duração dos ataques e não representa uma reprodução exata de outro cliente.
 - **Keystrokes:** texto, fundo, cor pressionada, opacidade, contorno, cantos, raio, tamanho, CPS, mouse e pulo. O editor de layout permite mover, adicionar, remover e trocar até oito teclas.
 - **FPS:** taxa real, cores separadas, formatação, altura e escala.
-- **Vida:** valor, percentual ou absorção; ícone e aparência hardcore.
-- **Mão principal, Peitoral e Botas:** itens realmente equipados, durabilidade em barra, percentual ou valor, com cor fixa ou gradiente.
+- **Vida:** valor, percentual ou absorção acima da cabeça dos jogadores. Ícone, aparência hardcore e escala editáveis; deixou de ser um widget arrastável. No próprio personagem aparece em F5 com Meu nick no F5 ativo. Respeita distância de 32 blocos, F1, nomes ocultos, invisibilidade, agachamento, regras de equipes e a profundidade dos blocos. Alguns servidores não disponibilizam a vida real de outros jogadores; o Zyon não tenta descobrir esses dados por outros meios.
+- **Mão principal, Capacete, Peitoral, Calça e Botas:** itens realmente equipados, durabilidade em barra, percentual ou valor, com cor fixa ou gradiente.
 - **Contorno de blocos:** contorno e preenchimento do bloco selecionado pela mira, com profundidade normal.
 
-Mira, Zoom, HUD Zyon, Insígnia Zyon e Meu nick no F5 permanecem disponíveis. São **17 módulos locais**, dos quais seis são widgets independentes: Keystrokes, FPS, Vida, Mão principal, Peitoral e Botas. Novos módulos ficam desligados até serem ativados; preferências antigas são preservadas.
+Mira, Zoom, HUD Zyon, Insígnia Zyon e Meu nick no F5 permanecem disponíveis. São **20 módulos locais**, dos quais sete são widgets independentes: Keystrokes, FPS, Mão principal, Capacete, Peitoral, Calça e Botas. O autotexto fica disponível no chat por padrão; os novos equipamentos ficam desligados até serem ativados; preferências antigas são preservadas.
 
 ## Usar
 
@@ -41,6 +41,12 @@ Os renderizadores de itens/animações respeitam renderizadores externos já reg
 
 ## Instalação e atualização
 
-O instalador publica o mod 1.5.0 e preserva o diretório da edição visual, os mundos e as preferências. JARs conhecidos anteriores são guardados em `zyon-backups`. Arquivos modificados ou mods externos continuam bloqueados pelo launcher e são preservados.
+O instalador publica o mod 1.5.1 e preserva o diretório da edição visual, os mundos e as preferências. JARs conhecidos anteriores são guardados em `zyon-backups`. Arquivos modificados ou mods externos continuam bloqueados pelo launcher e são preservados.
 
-Para usar pelo launcher oficial, crie uma instalação Forge **1.8.9 / 11.15.1.2318**, com Java 8, e coloque somente `zyon-1.8.9-1.5.0.jar` como mod Zyon na pasta `mods`. Retire versões anteriores ou experimentais do Zyon dessa pasta antes. O acesso pelo launcher Zyon continua sujeito à autorização das APIs Microsoft/Minecraft e à propriedade da conta. Esta atualização não resolve um HTTP 403 de autorização.
+Para usar pelo launcher oficial, crie uma instalação Forge **1.8.9 / 11.15.1.2318**, com Java 8, e coloque somente `zyon-1.8.9-1.5.1.jar` como mod Zyon na pasta `mods`. Retire versões anteriores ou experimentais do Zyon dessa pasta antes. O acesso pelo launcher Zyon continua sujeito à autorização das APIs Microsoft/Minecraft e à propriedade da conta. Esta atualização não resolve um HTTP 403 de autorização.
+
+## Autotexto no chat
+
+Abra o chat com T e clique em **AT**, no canto inferior direito, acima da linha de digitação. Edite o nome e o conteúdo de até seis mensagens. **Salvar** e Enter apenas salvam; **Enviar** manda uma única mensagem de até 100 caracteres por clique e fecha o painel. Mensagens vazias não são enviadas. Comandos escritos pelo usuário também podem ser salvos. Não há envio periódico ou repetição automática.
+
+Ao voltar, o texto que estava sendo digitado no chat continua no campo. O painel também pode ser aberto por Shift direito → Autotexto → Editar mensagens. O interruptor Autotexto controla a exibição do botão AT. Mensagens são locais deste PC, em `config/zyon/chat/autotext.json`, e não são publicadas no GitHub.

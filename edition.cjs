@@ -128,12 +128,8 @@ async function migrateProfiles(previousDir, instanceDir) {
     "icon",
     "hardcore",
     "text",
-    "_favorite",
-    "x",
-    "y",
     "scale",
-    "alignX",
-    "alignY"
+    "_favorite"
   ],
   "mainhand": [
     "durability",
@@ -218,6 +214,29 @@ async function migrateProfiles(previousDir, instanceDir) {
     "_code7",
     "_kx7",
     "_ky7"
+  ],
+  "helmet": [
+    "durability",
+    "durabilityColor",
+    "_favorite",
+    "x",
+    "y",
+    "scale",
+    "alignX",
+    "alignY"
+  ],
+  "leggings": [
+    "durability",
+    "durabilityColor",
+    "_favorite",
+    "x",
+    "y",
+    "scale",
+    "alignX",
+    "alignY"
+  ],
+  "autotext": [
+    "_favorite"
   ]
 };
   if (!await core.exists(source) || (await fs.lstat(source)).isSymbolicLink()) return;

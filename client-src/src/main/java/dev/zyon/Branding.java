@@ -70,7 +70,7 @@ public final class Branding {
             image(BACKGROUND, (width - backgroundWidth) / 2, 0, backgroundWidth, backgroundHeight);
             super.drawScreen(mouseX, mouseY, partial);
             fontRendererObj.drawStringWithShadow("Cliente independente de terceiros", 4, height - 24, 0xFFC7DFF4);
-            fontRendererObj.drawStringWithShadow("Zyon Visual 1.5.0 / Minecraft 1.8.9", 4, height - 12, 0xFFC7DFF4);
+            fontRendererObj.drawStringWithShadow("Zyon Visual 1.5.1 / Minecraft 1.8.9", 4, height - 12, 0xFFC7DFF4);
         }
         @Override protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));
