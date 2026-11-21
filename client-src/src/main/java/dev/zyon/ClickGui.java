@@ -117,7 +117,7 @@ public final class ClickGui extends GuiScreen {
   if(selected==null){search.mouseClicked(mx,my,b);if(hit(601,68,125,23)){mc.displayGuiScreen(new HudEditor(client,this));return;}if(hit(484,102,127,23)){category=(category+1)%5;scroll=0;return;}if(hit(619,102,107,23)){list=!list;scroll=0;return;}if(my<140||my>=408)return;for(Card c:cards)if(hit(c.x,c.y,c.w,53)){sound();if(!c.f.id.equals("theme")&&hit(c.x+c.w-45,c.y+5,40,23))c.f.toggle();else{selected=c.f;scroll=0;}client.profiles.saveAutomatic();return;}}
   else{
    if(hit(72,68,125,23)){selected=null;scroll=0;binding=false;return;}if(hit(562,68,27,23)){selected.setting("_favorite").cycle();client.profiles.saveAutomatic();return;}
-   if(Catalog.widget(selected)){if(hit(597,68,129,23)||hit(498,209,75,23)&&selected.enabled()){mc.displayGuiScreen(new HudEditor(client,this));return;}if(hit(555,209,161,23)){selected.toggle();client.profiles.saveAutomatic();return;}if(hit(626,182,84,16)){scene=Math.min(3,(mx-626)/21);return;}}
+   if(Catalog.widget(selected)){if(hit(597,68,129,23)||hit(498,209,75,23)&&selected.enabled()){mc.displayGuiScreen(new HudEditor(client,this));return;}if(hit(555,209,161,23)){boolean adding=!selected.enabled();selected.toggle();client.profiles.saveAutomatic();if(adding)mc.displayGuiScreen(new HudEditor(client,this));return;}if(hit(626,182,84,16)){scene=Math.min(3,(mx-626)/21);return;}}
    else if(!selected.id.equals("theme")&&hit(692,73,30,15)){selected.toggle();client.profiles.saveAutomatic();return;}
    int top=settingsTop();if(my<top||my>=414)return;int yy=top-scroll;
    if(!selected.id.equals("theme")){if(hit(83,yy+4,275,23)){binding=true;return;}yy+=37;}
