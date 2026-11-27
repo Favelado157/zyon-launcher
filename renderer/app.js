@@ -1,32 +1,32 @@
 'use strict';
 const $ = id => document.getElementById(id);
 let current,operation='',page='home',currentStep=-1,updateAvailable=null;
-const steps=['minecraft','forge','java','client'],activity=[];
+const steps=['minecraft','engine','java','client'],activity=[];
 function toast(message,error=false){$('toastText').textContent=String(message);$('toast').classList.remove('hidden');$('toast').classList.toggle('error',error);}
-async function call(name,...args){if(!window.zyon)throw Error('Abra o Zyon Visual instalado.');const result=await window.zyon[name](...args);if(!result.ok)throw Error(result.error||'Não foi possível concluir.');return result.value;}
+async function call(name,...args){if(!window.zyon)throw Error('Abra o Zyon Client instalado.');const result=await window.zyon[name](...args);if(!result.ok)throw Error(result.error||'Não foi possível concluir.');return result.value;}
 function showPage(next){page=next;for(const element of document.querySelectorAll('.page'))element.classList.toggle('hidden',element.id!=='page-'+next);for(const element of document.querySelectorAll('.nav'))element.classList.toggle('active',element.dataset.page===next);}
 function applyBusy(){
  const busy=!!operation||!!current?.busy,running=!!current?.running,blocked=busy||running;
- for(const element of document.querySelectorAll('[data-pick],#memory,#saveAction,#prepareAction,#loginAction,#logoutAction'))element.disabled=blocked;
+ for(const element of document.querySelectorAll('[data-pick],#memory,#saveAction,#prepareAction,#nicknameAction,#nicknameInput'))element.disabled=blocked;
  $('mainAction').disabled=blocked;$('launchAction').disabled=blocked||!current?.installed;
  $('installUpdateAction').disabled=blocked||!updateAvailable?.available;
  $('cancelAction').classList.toggle('hidden',!busy);$('updateCancel').classList.toggle('hidden',operation!=='update');
- $('mainAction').textContent=busy?'Aguarde…':running?current.gameReady?'Minecraft aberto':'Iniciando Minecraft…':!current?.account?'Entrar com Microsoft':!current.installed?'Verificar e preparar':'Verificar e jogar';
+ $('mainAction').textContent=busy?'Aguarde…':running?current.gameReady?'Minecraft aberto':'Iniciando Minecraft…':!current?.account?'Escolher nick':'Jogar offline';
  if(busy)$('statusBadge').textContent={login:'Conectando sua conta',prepare:'Verificando e preparando',launch:'Verificando e iniciando',update:'Baixando atualização'}[operation||current?.busyType]||'Aguarde…';
 }
 function render(state){
  current=state; $('discordAction').disabled=!state.discordConfigured;$('discordAction').title=state.discordConfigured?'Abrir o servidor Discord do Zyon':'Convite do Discord em configuração';$('discordCaption').textContent=state.discordConfigured?'Entre para a comunidade':'Convite em configuração';
- $('statusBadge').textContent=state.running?state.gameReady?'Minecraft em execução':'Iniciando Minecraft…':!state.account?'Conecte sua conta':state.installed?'Arquivos preparados':'Prepare os arquivos';
+ $('statusBadge').textContent=state.running?state.gameReady?'Minecraft em execução':'Iniciando Minecraft…':!state.account?'Escolha seu nick':state.installed?'Arquivos preparados':'Prepare os arquivos';
  $('statusBadge').classList.toggle('ready',state.installed||state.running);$('installDot').classList.toggle('hidden',state.installed);
  $('appVersion').textContent='v'+state.version;$('currentVersion').textContent='v'+state.version;
  $('instancePath').value=state.instanceDir;$('minecraftPath').value=state.minecraftRoot;$('previousAction').classList.toggle('hidden',!state.previousInstanceDir);
  $('memory').max=state.maxMemoryGB;if(document.activeElement!==$('memory')){$('memory').value=state.memoryGB;$('memoryValue').textContent=state.memoryGB;}$('maxMemory').textContent=state.maxMemoryGB+' GB';
- $('heroStatus').textContent=state.running?state.gameReady?'Seu Minecraft está aberto':'Carregando Minecraft':!state.account?'Conecte sua conta Microsoft':state.installed?'Pronto para verificar e jogar':'Prepare a edição visual';
- $('heroHint').textContent=state.gameError|| (state.running?'Instância visual separada do Zyon.':state.account?'Perfil '+state.account.name+' · propriedade verificada novamente ao jogar.':'É necessário acesso ao Minecraft Java na conta conectada.');
- $('accountName').textContent=state.account?state.account.name:'Conta Microsoft';$('accountDescription').textContent=state.account?'Perfil conectado. A propriedade é consultada antes de preparar ou jogar.':'A senha é digitada somente na página oficial da Microsoft.';
- $('loginAction').textContent=state.account?'Conectar novamente':'Entrar com Microsoft';$('logoutAction').classList.toggle('hidden',!state.account);
- $('prepareAction').textContent=state.installed?'Verificar e preparar novamente':'Verificar conta e preparar';
- if(state.installed&&!operation)progress({step:'done',percent:100,message:'Arquivos preparados. A propriedade será verificada ao jogar.'},false);
+ $('heroStatus').textContent=state.running?state.gameReady?'Seu Minecraft está aberto':'Carregando Minecraft':!state.account?'Escolha seu nick':state.installed?'Pronto para jogar offline':'Prepare seu Zyon';
+ $('heroHint').textContent=state.gameError|| (state.running?'Zyon Client em execução.':state.account?'Perfil '+state.account.name+' · modo offline, sem login neste aplicativo.':state.profileError||'Digite seu nick para jogar offline.');
+ $('accountName').textContent=state.account?state.account.name:'Seu nick offline';$('accountDescription').textContent=state.account?'Nick salvo neste PC. Servidores que exigem autenticação online precisam de uma sessão online válida.':state.profileError;
+ if(document.activeElement!==$('nicknameInput'))$('nicknameInput').value=state.offlineNickname||'';
+ $('prepareAction').textContent=state.installed?'Conferir arquivos locais':'Preparar arquivos';
+ if(state.installed&&!operation)progress({step:'done',percent:100,message:'Arquivos preparados. Pronto para jogar offline.'},false);
  renderUpdate(state.update||updateAvailable,state.updateMessage);applyBusy();
 }
 function progress(value, record = true) {
@@ -64,20 +64,19 @@ async function run(kind, task) {
     applyBusy();
   }
 }
-async function login(){showPage('account');await run('login',async()=>{await call('login');toast('Conta conectada e acesso ao Minecraft Java verificado.');});}
-async function prepare(){if(!current.account){await login();return;}showPage('install');currentStep=-1;await run('prepare',async()=>{await call('prepare');toast('Propriedade verificada e arquivos preparados.');});}
-async function play(){if(!current.account){await login();return;}await run('launch',async()=>{const started=await call('launch');if(started.gameError)throw Error(started.gameError);if(!started.gameReady)toast('Acesso verificado. Iniciando Minecraft.');});}
+function needProfile(){showPage('account');$('nicknameInput').focus();toast(current.profileError||'Escolha um nick antes de jogar.',true);}
+async function prepare(){if(!current.account){needProfile();return;}showPage('install');currentStep=-1;await run('prepare',async()=>{await call('prepare');toast('Zyon preparado para jogar offline.');});}
+async function play(){if(!current.account){needProfile();return;}await run('launch',async()=>{const started=await call('launch');if(started.gameError)throw Error(started.gameError);if(!started.gameReady)toast('Iniciando Zyon offline.');});}
 document.addEventListener('click',async event=>{
  const button=event.target.closest('button');if(!button||button.disabled)return;
  try{
   if(button.dataset.page){showPage(button.dataset.page);return;}
   if(button.dataset.pick){render(await call('pick',button.dataset.pick));return;}
   switch(button.dataset.action){
-   case 'primary':if(!current.account)await login();else if(!current.installed)await prepare();else await play();break;
+   case 'primary':await play();break;
    case 'prepare':await prepare();break;
    case 'launch':await play();break;
-   case 'login':await login();break;
-   case 'logout':await call('logout');await refresh();break;
+   case 'nickname':render(await call('nickname',$('nicknameInput').value));toast('Nick salvo. Pronto para jogar offline.');break;
    case 'cancel':await call('cancel');toast('Cancelando…');break;
    case 'folder':await call('folder','instance');break;
    case 'previous':await call('folder','previous');break;
@@ -90,8 +89,9 @@ document.addEventListener('click',async event=>{
   }
  }catch(error){toast(error.message,true);}
 });
+$('nicknameInput').addEventListener('keydown',async event=>{if(event.key==='Enter'&&!event.isComposing&&!$('nicknameAction').disabled){event.preventDefault();$('nicknameAction').click();}});
 $('memory').addEventListener('input',()=>{$('memoryValue').textContent=$('memory').value;});$('dismissToast').addEventListener('click',()=>$('toast').classList.add('hidden'));
-window.zyon?.onProgress(progress);window.zyon?.onEvent('auth-code',value=>{$('deviceCodePanel').classList.toggle('hidden',!!value.finished);if(!value.finished){showPage('account');$('deviceCode').textContent=value.code;$('deviceUrl').textContent=value.url;}});
+window.zyon?.onProgress(progress);
 window.zyon?.onEvent('game-state',value=>{if(current)current.running=value.running;refresh().catch(()=>{});if(value.error)toast(value.error,true);else if(value.ready)toast('Minecraft carregado.');});
 window.zyon?.onEvent('update-state',value=>{renderUpdate(value,value.error);applyBusy();});window.zyon?.onEvent('update-download',value=>{$('updateProgress').textContent='Baixando atualização: '+(value.total?Math.floor(100*value.received/value.total):0)+'%';});
 refresh().catch(error=>toast(error.message,true));

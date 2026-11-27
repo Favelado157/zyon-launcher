@@ -1,5 +1,5 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, dialog, shell, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
@@ -7,8 +7,7 @@ const core = require('./core.cjs');
 const game = require('./game.cjs');
 const updates = require('./updates.cjs');
 const edition = require('./edition.cjs');
-const sessions = require('./sessions.cjs');
-const { MicrosoftAccount } = require('./auth.cjs');
+const offline = require('./offline.cjs');
 const publisher = require('./release-config.json');
 function discordInvite(value){
  if(!value)return '';try{const u=new URL(String(value).trim());if(u.protocol!=='https:'||u.username||u.password||u.port||u.search||u.hash)return '';
@@ -19,15 +18,15 @@ app.setName('Zyon Launcher');
 app.setPath('userData', path.join(app.getPath('appData'), 'ZyonLauncher'));
 const root = app.getPath('userData');
 const payload = app.isPackaged ? path.join(process.resourcesPath, 'payload') : path.join(__dirname, 'payload');
-let window, config, account, controller, busy = false, busyType = '', gameChild = null, gameReady = false, gameError = '', lastUpdate = null, updateMessage = '', promptedVersion = '', updateTimer;
+let window, config, controller, busy = false, busyType = '', gameChild = null, gameReady = false, gameError = '', lastUpdate = null, updateMessage = '', promptedVersion = '', updateTimer;
 let logChain = Promise.resolve(), gameLogChain = Promise.resolve();
 const lock = app.requestSingleInstanceLock();
 if (!lock) app.quit();
 app.on('second-instance', () => { if (window) { if (window.isMinimized()) window.restore(); window.focus(); } });
 const defaults = () => ({
-  instanceDir: path.join(root, 'instances', 'zyon-visual-1.8.9'), minecraftRoot: path.join(root, 'minecraft'),
-  memoryGB: 2, microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || '',
-  edition: edition.EDITION, loginMode: 'microsoft', previousInstanceDir: ''
+  instanceDir: path.join(root, 'instances', 'zyon-client-1.8.9'), minecraftRoot: path.join(root, 'minecraft'),
+  memoryGB: 2, githubRepository: publisher.githubRepository || '',
+  edition: edition.EDITION, loginMode: 'nickname-offline', offlineNickname: '', previousInstanceDir: ''
 });
 async function log(message) {
   const line = `${new Date().toISOString()}  ${String(message).replaceAll(/[\r\n]/g, ' ')}\n`;
@@ -48,17 +47,18 @@ async function state() {
   try {
     await edition.validateInstance(config.instanceDir, payload);
     const manifest = await core.readJson(path.join(payload, 'manifest.json'));
-    const modFile = path.join(config.instanceDir, 'mods', core.MOD);
+    const modFile = core.clientFile(config.instanceDir);
     const ready = await game.readReady(root, config.instanceDir, config.minecraftRoot);
     const java = await core.readJson(path.join(root, 'java.json'), {});
     installed = !!ready && typeof java.executable === 'string' && await core.exists(java.executable)
       && await core.exists(modFile) && core.digest(await fs.readFile(modFile)) === manifest.sha256;
   } catch { installed = false; }
+  const profile = await offline.profileStatus(config.offlineNickname);
   return { ...config, installed, busy, busyType, running: !!gameChild, gameReady, gameError, version: app.getVersion(),
     maxMemoryGB: Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)), platform: process.platform,
-    account: await account.profile(),
-    authConfigured: account.configured(), update: lastUpdate, updateMessage,
-    updatesConfigured: !!config.githubRepository, discordConfigured: !!discordUrl, profile: 'Zyon Visual 1.8.9', root };
+    account: profile.profile, profileError: profile.error, offlinePreview: false,
+    authConfigured: false, update: lastUpdate, updateMessage,
+    updatesConfigured: !!config.githubRepository, discordConfigured: !!discordUrl, profile: 'Zyon Client 1.8.9 — offline', root };
 }
 function register(channel, handler) {
   ipcMain.handle('zyon:' + channel, async (event, ...args) => {
@@ -70,6 +70,16 @@ function register(channel, handler) {
 async function prepareInstallation() {
   await edition.validateInstance(config.instanceDir, payload);
   await edition.migrateProfiles(config.previousInstanceDir, config.instanceDir);
+  const localReady = await game.readReady(root, config.instanceDir, config.minecraftRoot);
+  const localJava = await core.readJson(path.join(root, 'java.json'), null).catch(() => null);
+  const expectedClient = await core.readJson(path.join(payload, 'manifest.json'));
+  const localClient = core.clientFile(config.instanceDir);
+  const matchesClient = await core.exists(localClient) && core.digest(await fs.readFile(localClient)) === expectedClient.sha256;
+  if (localReady && matchesClient && typeof localJava?.executable === 'string' && await core.exists(localJava.executable)) {
+    await core.installClient(payload, config.instanceDir);
+    notify('progress', { step: 'done', percent: 100, message: 'Zyon Client atualizado com os arquivos locais.' });
+    return;
+  }
   await core.prepare({ root, payload, ...config, signal: controller.signal,
     emit: value => { if (value.step === 'done') return; notify('progress', { ...value, percent: Math.floor(value.percent * .47) }); } });
   await game.ensureArtifacts({ root, ...config, signal: controller.signal, emit: value => { notify('progress', value); } });
@@ -79,7 +89,7 @@ register('state', state);
 register('pick', async kind => {
   noOperation(true);
   if (kind !== 'instance') throw new Error('Destino inválido.');
-  const result = await dialog.showOpenDialog(window, { title: 'Pasta da edição visual Zyon', properties: ['openDirectory', 'createDirectory'] });
+  const result = await dialog.showOpenDialog(window, { title: 'Pasta do Zyon Client', properties: ['openDirectory', 'createDirectory'] });
   if (result.canceled) return state();
   const selected = path.resolve(result.filePaths[0]);
   if (core.inside(config.minecraftRoot, selected) || core.inside(selected, config.minecraftRoot)) throw new Error('Escolha uma pasta fora do cache do Minecraft.');
@@ -91,40 +101,27 @@ register('settings', async value => {
   noOperation(true);
   const gb = Number(value?.memoryGB), max = (await state()).maxMemoryGB;
   if (!Number.isInteger(gb) || gb < 1 || gb > max) throw new Error('Quantidade de memória inválida.');
-  if (value?.microsoftClientId !== undefined && value.microsoftClientId !== publisher.microsoftClientId) throw new Error('O aplicativo Microsoft é definido pelo publicador. Não use IDs de outros aplicativos.');
   config = { ...config, memoryGB: gb };
   await saveConfig(); return state();
 });
 register('prepare', async () => {
   noOperation(true); if (process.platform !== 'win32') throw new Error('Esta distribuição prepara Minecraft para Windows x64.');
   busy = true; busyType = 'prepare'; controller = new AbortController();
-  try { await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal }); await prepareInstallation(); }
+  try { await offline.resolveSession(config.offlineNickname); await prepareInstallation(); }
   finally { busy = false; busyType = ''; controller = null; notify('progress', { finished: true }); }
   return state();
 });
 register('cancel', async () => { controller?.abort(); return true; });
-register('login', async () => {
-  noOperation(true); busy = true; busyType = 'login'; controller = new AbortController();
-  try {
-    await account.signIn(controller.signal, value => {
-      notify('auth-code', value);
-      shell.openExternal(value.url).catch(() => notify('auth-code', { ...value, openManually: true }));
-    });
-    const next = { ...config, loginMode: 'microsoft' };await saveConfig(next);config = next;
-    await log('Login Microsoft concluído.');
-  } finally { busy = false; busyType = ''; controller = null; notify('auth-code', { finished: true }); }
-  return state();
-});
-register('logout', async () => { noOperation(true); await account.signOut(); return state(); });
+register('nickname', async value => { noOperation(true); const name = offline.nickname(value); await saveConfig({ ...config, offlineNickname: name }); config.offlineNickname = name; return state(); });
 register('launch', async () => {
   noOperation(true); if (process.platform !== 'win32') throw new Error('A inicialização desta versão é para Windows x64.');
   busy = true; busyType = 'launch'; controller = new AbortController();
   try {
-    let session = await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal });
+    let session = await offline.resolveSession(config.offlineNickname);
     if (!(await state()).installed) {
       await prepareInstallation();
       // Large first-time downloads can outlast the session freshness window.
-      session = await sessions.resolveSession({ microsoftAccount: account, signal: controller.signal });
+      session = await offline.resolveSession(config.offlineNickname);
     }
     await edition.validateInstance(config.instanceDir, payload);
     const ready = await game.readReady(root, config.instanceDir, config.minecraftRoot);
@@ -185,24 +182,40 @@ register('external', async kind => {
 });
 if (lock) app.whenReady().then(async () => {
   await fs.mkdir(root, { recursive: true }); config = defaults();
+  if (!await core.exists(path.join(root, 'config.json'))) {
+    for (const name of ['ZyonClientPreview', 'ZyonTesteLocal']) {
+      const sourceRoot = path.join(app.getPath('appData'), name);
+      const old = await core.readJson(path.join(sourceRoot, 'config.json'), null).catch(() => null);
+      if (!old) continue;
+      if (typeof old.instanceDir === 'string' && path.isAbsolute(old.instanceDir) && await core.exists(old.instanceDir)) config.instanceDir = old.instanceDir;
+      if (typeof old.minecraftRoot === 'string' && path.isAbsolute(old.minecraftRoot) && await core.exists(path.join(old.minecraftRoot, 'versions', '1.8.9', '1.8.9.json'))) config.minecraftRoot = old.minecraftRoot;
+      try { config.offlineNickname = offline.nickname(old.offlineNickname); } catch {}
+      if (Number.isInteger(old.memoryGB) && old.memoryGB >= 1 && old.memoryGB <= 16) config.memoryGB = old.memoryGB;
+      const java = await core.readJson(path.join(sourceRoot, 'java.json'), null).catch(() => null);
+      if (java && typeof java.executable === 'string' && core.inside(path.join(sourceRoot, 'runtime'), java.executable) && await core.exists(java.executable)) await core.atomicWrite(path.join(root, 'java.json'), JSON.stringify(java));
+      await saveConfig(); break;
+    }
+  }
   try {
     const previous = await core.readJson(path.join(root, 'config.json'), {});
     Object.assign(config, edition.migrate(previous, root, publisher));
-    if (typeof previous.minecraftRoot === 'string' && core.inside(root, previous.minecraftRoot)) config.minecraftRoot = previous.minecraftRoot;
+    config.loginMode = 'nickname-offline';
+    try { config.offlineNickname = offline.nickname(previous.offlineNickname); } catch { config.offlineNickname = ''; }
+    if (typeof previous.minecraftRoot === 'string' && path.isAbsolute(previous.minecraftRoot)) config.minecraftRoot = previous.minecraftRoot;
     if (Number.isInteger(previous.memoryGB) && previous.memoryGB >= 1 && previous.memoryGB <= 16) config.memoryGB = previous.memoryGB;
   } catch { await log('Configuração inválida; valores padrão aplicados.'); }
   config.memoryGB = Math.min(config.memoryGB, Math.max(1, Math.min(16, Math.floor(os.totalmem() / 1024 ** 3) - 2)));
   await saveConfig();
-  account = new MicrosoftAccount({ root, getClientId: () => config.microsoftClientId, secureStore: safeStorage });
   window = new BrowserWindow({ width: 1240, height: 900, minWidth: 1020, minHeight: 740, show: false,
-    title: 'Zyon Launcher', backgroundColor: '#060f1b', icon: path.join(__dirname, 'assets/icon.png'),
+    title: 'Zyon Client', backgroundColor: '#060f1b', icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true } });
   window.removeMenu(); window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault()); window.once('ready-to-show', () => window.show());
   window.on('close', event => { if (gameChild) { event.preventDefault(); window.hide(); } });
   await window.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-  setTimeout(() => checkUpdates(true), 2500).unref();
-  updateTimer = setInterval(() => checkUpdates(true), (6 * 60 + Math.floor(Math.random() * 30)) * 60000); updateTimer.unref();
+  setTimeout(() => checkUpdates(true), 5000);
+  updateTimer = setInterval(() => checkUpdates(true), 30 * 60 * 1000);
+
 }).catch(error => { dialog.showErrorBox('Zyon Launcher', String(error.message)); app.quit(); });
 app.on('window-all-closed', () => { if (!gameChild) app.quit(); });
 app.on('before-quit', () => { controller?.abort(); if (updateTimer) clearInterval(updateTimer); });

@@ -8,6 +8,25 @@ public final class Catalog {
  private static void widget(Feature f,int x,int y){f.settings.add(number("x","Posicao X (%)",x,0,100,.1));f.settings.add(number("y","Posicao Y (%)",y,0,100,.1));f.settings.add(number("scale","Tamanho",1,.5,2,.1));f.settings.add(choice("alignX","Alinhamento horizontal",0,"Automatico","Esquerda","Centro","Direita"));f.settings.add(choice("alignY","Alinhamento vertical",0,"Automatico","Topo","Centro","Base"));}
  public static boolean widget(Feature f){return Arrays.asList("keystrokes","fps","mainhand","helmet","chestplate","leggings","boots").contains(f.id);}
  public static void register(List<Feature> fs){
+  add(fs,"killaura","KillAura","Ataca um alvo no alcance e campo de visao. Configure tipos de alvo, prioridade e ataques por segundo.",CHEAT,
+   number("range","Alcance",3,1,6,.1),number("cps","Ataques / segundo",8,1,20,1),number("fov","Campo de visao",120,10,360,5),
+   bool("players","Jogadores",true),bool("mobs","Monstros",false),bool("animals","Animais",false),bool("invisible","Invisiveis",false),
+   bool("walls","Atraves de paredes",false),bool("rotate","Virar para o alvo",true),bool("weapon","Exigir espada ou machado",true),choice("sort","Prioridade",0,"Distancia","Vida"));
+  add(fs,"triggerbot","TriggerBot","Ataca a entidade na mira. Usa os filtros do KillAura.",CHEAT,number("cps","Ataques / segundo",8,1,20,1),number("range","Alcance",3,1,6,.1),bool("weapon","Exigir arma",true));
+  add(fs,"autoclicker","AutoClicker","Repete ataques ao segurar o botao esquerdo, sem minerar. Usa os filtros de alvo do KillAura.",CHEAT,number("cps","Cliques / segundo",10,1,20,1),bool("weapon","Exigir arma",true));
+  add(fs,"aimassist","AimAssist","Ajusta a mira ao segurar o botao esquerdo. Usa os filtros de alvo do KillAura.",CHEAT,number("range","Alcance",4,1,6,.1),number("fov","Campo de visao",60,5,180,5),number("turn","Graus / tick",4,.5,20,.5),bool("weapon","Exigir arma",true));
+  add(fs,"autosprint","AutoSprint","Mantem a corrida ao andar.",CHEAT,bool("omni","Todas as direcoes",false));
+  add(fs,"fly","Fly","Espaco sobe, agachar desce.",CHEAT,number("speed","Velocidade horizontal",.5,.1,2,.05),number("vertical","Velocidade vertical",.35,.1,1.5,.05));
+  add(fs,"speed","Speed","Velocidade horizontal e bunny hop opcional.",CHEAT,number("speed","Blocos / tick",.35,.1,1.2,.01),bool("bhop","Bunny hop",false));
+  add(fs,"step","Step","Altura de subida; restaura ao desligar.",CHEAT,number("height","Altura em blocos",1,.6,2.5,.1));
+  add(fs,"autojump","AutoJump","Pula automaticamente ao andar no chao.",CHEAT);
+  add(fs,"safewalk","SafeWalk","Agacha perto de bordas sem apoio.",CHEAT,number("lookahead","Distancia da borda",.3,.1,.8,.05));
+  add(fs,"esp","ESP","Caixas em entidades carregadas no mundo.",CHEAT,bool("players","Jogadores",true),bool("mobs","Monstros",false),bool("animals","Animais",false),bool("walls","Atraves de paredes",true),number("distance","Distancia maxima",64,8,160,1),number("width","Espessura",1.5,1,4,.5));
+  add(fs,"tracers","Tracers","Linhas da camera ate entidades carregadas.",CHEAT,bool("players","Jogadores",true),bool("mobs","Monstros",false),bool("animals","Animais",false),bool("walls","Atraves de paredes",true),number("distance","Distancia maxima",64,8,160,1));
+  add(fs,"autotool","AutoTool","Seleciona a ferramenta mais rapida da hotbar.",CHEAT,bool("restore","Restaurar slot ao soltar",true));
+  add(fs,"autoeat","AutoEat","Come alimentos da hotbar abaixo do limite de fome.",CHEAT,number("hunger","Limite de fome",14,1,19,1));
+  add(fs,"fastplace","FastPlace","Reduz o intervalo local de colocacao de blocos.",CHEAT,number("delay","Intervalo em ticks",0,0,4,1));
+  add(fs,"optifinecape","Capa OptiFine","Carrega a capa publica associada ao nick, quando existir. Nao requer instalar OptiFine.",RENDER,bool("others","Mostrar capas dos outros jogadores",true)).setEnabled(true);
   add(fs,"theme","Aparencia","Temas, cores, fundo e comportamento dos menus do Zyon.",INTERFACE,
    bool("menu","Menu inicial Zyon",true),choice("style","Tema",0,"Zyon","Glass","Vanilla"),bool("pixel","Estilo pixelado",false),
    choice("accent","Paleta de destaque",0,"Azul neon","Azul","Ciano","Verde","Rosa","Laranja"),bool("customAccent","Usar cor personalizada",false),color("highlight","Cor de destaque",0x249BFF),

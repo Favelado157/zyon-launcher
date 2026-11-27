@@ -1,0 +1,1 @@
+package dev.zyon.platform.event; public class TickEvent extends Event {public enum Phase {START,END} public final Phase phase; public TickEvent(Phase p){phase=p;} public static final class ClientTickEvent extends TickEvent {public ClientTickEvent(Phase p){super(p);}} public static final class RenderTickEvent extends TickEvent {public RenderTickEvent(Phase p){super(p);}}}

@@ -1,49 +1,33 @@
-# Zyon Visual — Zyon Launcher
+# Zyon Launcher / Zyon Client 2.0
 
-Cliente independente para **Minecraft Java 1.8.9 / Forge**, com tema azul neon, catálogo de mods e **20 recursos visuais locais**, incluindo widgets arrastáveis, ajustes de cores e animações. Requer conta Microsoft com acesso ao Minecraft Java, verificado nos serviços oficiais antes de preparar e a cada abertura.
+Launcher Windows x64 para Minecraft Java 1.8.9, com inicialização independente, entrada por nick offline, HUD editável, aba Xit e suporte a capas públicas OptiFine.
 
-**Autorização pendente:** o pedido anterior de acesso às APIs foi recusado. Esta edição foi preparada para uma nova análise; não foi aprovada pela Microsoft/Mojang. Até os serviços autorizarem o aplicativo e validarem a conta, preparar e jogar ficam bloqueados. Incluir um Client ID ou publicar um instalador não concede autorização. O login real ainda precisa ser validado após essa autorização.
+## Uso
 
-[Baixar instalador Windows](https://github.com/Favelado157/zyon-launcher/releases/latest) · [Compilações](https://github.com/Favelado157/zyon-launcher/actions) · [Guia](LEIA-ME.md) · [Informações para revisão](docs/API-review.md)
+Instale o EXE de [Releases](https://github.com/Favelado157/zyon-launcher/releases/latest), abra **Zyon Launcher**, salve o nick em **Perfil offline** e pressione **Jogar offline**. A primeira preparação baixa Java e componentes oficiais verificados. O client não carrega Forge, FML ou Launchwrapper. Servidores que exigem autenticação online continuam exigindo uma conta válida.
 
-## Recursos desta edição
+**Shift direito** abre o painel; **Recursos** mantém o HUD atual; **Xit** agrupa as 15 funções da primeira edição. Os módulos Xit começam desligados e podem ser configurados, favoritados e vinculados a uma tecla. O botão **?** explica cada função. **Ctrl direito** abre o editor de widgets, **C** controla o zoom e **End** desliga os recursos.
 
-| Recurso | Comportamento |
-| --- | --- |
-| HUD | Marca própria, FPS, coordenadas do jogador e recursos visuais ativos. |
-| Keystrokes | Teclas, cliques físicos e CPS; tamanho, cores, opacidade e posição editáveis. |
-| Mira | Tamanho, espaço central e ponto sobre a mira padrão. |
-| Zoom | Segure **C** para ampliar a imagem; fator configurável. |
-| Tema | Menu azul neon, cores, opacidade, perfis e cenário noturno com cerejeiras. |
+**Capa OptiFine** vem ativada em Recursos → Visual: consulta a imagem pública do nick em `https://s.optifine.net/capes/<nick>.png`, carrega em segundo plano e guarda cache local. Não inclui OptiFine nem compra/concede capas. Na ausência de uma capa pública, preserva a capa padrão. A aparência é exibida por clientes com suporte a esse serviço.
 
-**Shift direito** abre o painel; **Ctrl direito** abre o editor dos keystrokes. Passe o mouse sobre **?** para ler a ajuda de cada recurso. **End** oculta os extras.
+## Atualização e arquivos
 
-## Acesso e atualização
+O app usa `%APPDATA%/ZyonLauncher`. A atualização preserva a pasta de jogo configurada, mundos, texturas e configurações; bibliotecas na pasta `mods` deixam de ser carregadas. Os arquivos preparados da edição Forge não são aceitos como runtime independente. O instalador preserva AppData na desinstalação. Sem credenciais, tokens ou login Microsoft nesta edição.
 
-O navegador abre o login oficial Microsoft por código de dispositivo. O Zyon consulta os serviços Xbox/Minecraft e verifica a propriedade e o perfil antes de preparar ou iniciar. Não há entrada só por nick, fallback sem autenticação ou importação de contas de outros launchers. O cache de autenticação usa o armazenamento criptografado do Windows.
+## Compilar
 
-A versão 1.5 adiciona Fullbright, Item Physics, Nametag, PvP Clássico, FPS, Vida, Mão principal, Peitoral, Botas e Contorno de blocos aos sete recursos anteriores. Consulte o [guia do novo HUD](docs/hud-studio.md) para controles e limitações. O motor antigo de combate, movimento automatizado e visualização de entidades foi removido. Não há importação de OptiFine, capas de terceiros, automação de jogo ou carregamento de mods externos nesta edição.
+Requer Node.js 24 e um **JDK 8** (`JAVA_HOME` ou `ZYON_JAVA8`).
 
-Atualizações são oferecidas ao abrir e periodicamente pelo canal público `Favelado157/zyon-launcher`. A pessoa escolhe quando instalar; o instalador é conferido pelo SHA-256 publicado.
+```sh
+npm ci
+npm run test:java
+npm test
+npm run dist:win
+node build/prepare-release.cjs --checksums
+```
 
-## Migração
+`build/client.cjs` baixa dependências com hashes verificados, cria o runtime vanilla derivado apenas em `client-src/build`, compila os hooks próprios e gera o SDK em `payload`. **Não distribua** `client-src/build/vanilla-client.jar` nem o arquivo original Minecraft. O SDK contém somente código Zyon, ASM, mapeamentos simbólicos e recursos próprios.
 
-A nova instância fica em `%APPDATA%\ZyonLauncher\instances\zyon-visual-1.8.9`. A instalação anterior, seus mundos e arquivos ficam na pasta original. O botão **Abrir pasta da instalação anterior** permite localizá-la. Somente campos de perfis visuais compatíveis são copiados, sem copiar os mods antigos. Pastas com mods externos são recusadas sem apagar esses arquivos.
+Ao publicar `main`, o workflow Windows compila e testa tudo, gera a versão `2.0.<número da execução>`, constrói o instalador e publica uma release com SHA-256. O launcher consulta esse canal e pede ao usuário para instalar as atualizações.
 
-Versões antigas no histórico Git/Releases pertencem à edição anterior e **não representam esta edição visual**. Para avaliação, use a fonte e o instalador da série 1.5. As demais branches guardam ferramentas separadas da comunidade; não acompanham o instalador.
-
-## Desenvolvimento e publicação
-
-Use Node.js 24, JDK 21 para o Gradle e JDK 8 para o cliente. Execute `npm ci`, compile em `client-src` com `gradlew build`, copie o JAR sem sufixos para `payload` e execute `npm run prepare:release`, `npm test` e `npm run dist:win`.
-
-Cada envio à `main` dispara a compilação Windows, os testes e a publicação do instalador com `SHA256SUMS.txt`. Veja [CONFIGURAR-PUBLICACAO.md](CONFIGURAR-PUBLICACAO.md). Nunca use IDs emprestados, senhas ou tokens de jogadores na configuração de publicação.
-
-Aplicativo independente de terceiros. **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**
-
-## Insígnia e nick em terceira pessoa
-
-Em Shift direito → HUD, use **Insígnia Zyon** e **Meu nick no F5**. O emblema aparece antes do próprio nick no TAB e no nome acima da própria cabeça, nas duas câmeras de terceira pessoa. Ajuste o tamanho do nick no painel. F1, agachar, invisibilidade, dormir e espectador ocultam o nome. O desenho respeita a profundidade dos blocos. O nome e as cores enviados pelo servidor são preservados.
-
-Esta identificação é local: outros clientes não recebem o emblema, e o mod não marca desconhecidos como usuários Zyon. A descoberta e o compartilhamento público de usuários ainda não estão disponíveis. O instalador aceita os hashes conhecidos do cliente oficial anterior e guarda o JAR antigo em zyon-backups, sem trocar a pasta de mundos.
-
-A atualização 1.5.1 adiciona Capacete, Calça e um painel de autotexto acionado pelo usuário. Vida passa a aparecer sobre os jogadores, sem widget arrastável. Consulte o guia HUD Studio para os dados disponíveis em servidores e os controles.
+Aplicativo independente de terceiros, sem afiliação à Mojang/Microsoft. Consulte `build/release-notes.md` para as mudanças e limitações.

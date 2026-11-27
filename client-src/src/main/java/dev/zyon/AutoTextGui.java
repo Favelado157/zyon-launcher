@@ -22,8 +22,8 @@ public final class AutoTextGui extends GuiScreen {
   if(button.id==2||button.id==3){if(!save())return;page=Math.max(0,Math.min((AutoTextStore.SLOTS-1)/pageSize,page+(button.id==2?-1:1)));initGui();return;}
   if(button.id>=10){capture();String message=client.autoText.message(firstSlot+button.id-10);if(message.trim().isEmpty()){status="Escreva a mensagem antes de enviar.";return;}if(mc.thePlayer==null)return;if(save()){sendChatMessage(message);mc.displayGuiScreen(null);}}
  }
- protected void mouseClicked(int x,int y,int b)throws IOException{for(GuiTextField field:texts)field.mouseClicked(x,y,b);super.mouseClicked(x,y,b);}
- protected void keyTyped(char c,int key)throws IOException{
+ protected void mouseClicked(int x,int y,int b){for(GuiTextField field:texts)field.mouseClicked(x,y,b);super.mouseClicked(x,y,b);}
+ protected void keyTyped(char c,int key){
   if(listening>=0){if(key==Keyboard.KEY_ESCAPE){listening=-1;return;}if(Keyboard.isRepeatEvent()||key==0)return;int code=key==Keyboard.KEY_DELETE||key==Keyboard.KEY_BACK?0:key;if(code!=0&&AutoTextHotkeys.reserved(client,code)){status="Essa tecla ja esta em uso nos controles do jogo ou Zyon.";return;}try{client.autoText.setKey(listening,code);listening=-1;save();}catch(IllegalArgumentException e){status=e.getMessage();}return;}
   if(key==Keyboard.KEY_ESCAPE){if(save())mc.displayGuiScreen(parent);return;}if(key==Keyboard.KEY_RETURN||key==Keyboard.KEY_NUMPADENTER){save();return;}if(key==Keyboard.KEY_TAB){int next=0;for(int i=0;i<texts.size();i++)if(texts.get(i).isFocused()){next=(i+1)%texts.size();break;}for(int i=0;i<texts.size();i++)texts.get(i).setFocused(i==next);return;}for(GuiTextField field:texts)field.textboxKeyTyped(c,key);
  }

@@ -6,10 +6,10 @@ const { spawn } = require('node:child_process');
 const AdmZip = require('adm-zip');
 const extractZip = require('extract-zip');
 
-const FORGE_URL = 'https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar';
-const FORGE_SHA256 = 'f9fdf4945ca02d73ec6cc46300942f4e199e4add068877d517157b3677563656';
-const VERSION = 'zyon-1.8.9-forge';
-const MOD = 'zyon-1.8.9-1.5.3.jar';
+const VERSION = 'zyon-client-1.8.9';
+const CLIENT = 'zyon-client-1.8.9-2.0.0.jar';
+const METADATA_SHA256 = '341af5f47a6b5bc137bfe681f4f3533e081041290aabbf9d7ebeae9881de768f';
+const CLIENT_SHA1 = '3870888a6c3d349d3771a3e9d16c9bf5e076b908';
 const digest = (data, algorithm = 'sha256') => crypto.createHash(algorithm).update(data).digest('hex');
 const exists = async file => { try { await fs.access(file); return true; } catch { return false; } };
 function checkAbort(signal) { if (signal?.aborted) throw new Error('Operação cancelada. Você pode retomar a instalação.'); }
@@ -65,50 +65,26 @@ async function downloadVerified(url, file, hash, algorithm, options = {}) {
   const data = await fetchBuffer(url, { ...options, hash, algorithm });
   checkAbort(options.signal); await atomicWrite(file, data);
 }
-async function installMod(payload, instanceDir) {
+function clientFile(instanceDir) { return path.join(instanceDir, 'client', CLIENT); }
+async function installClient(payload, instanceDir) {
   const manifest = await readJson(path.join(payload, 'manifest.json'));
-  if (manifest.file !== MOD || !/^[a-f0-9]{64}$/.test(manifest.sha256)) throw new Error('Manifesto do cliente inválido.');
-  const data = await fs.readFile(path.join(payload, MOD));
-  if (digest(data) !== manifest.sha256 || data.readUInt32LE(0) !== 0x04034b50) throw new Error('O cliente incluído não passou na verificação.');
-  const mods = path.join(instanceDir, 'mods');
-  if (await exists(mods) && (await fs.lstat(mods)).isSymbolicLink()) throw new Error('A pasta mods não pode ser um link simbólico.');
-  await fs.mkdir(mods, { recursive: true });
-  const target = path.join(mods, MOD);
-  let needsWrite = true;
-  if (await exists(target)) {
-    if ((await fs.lstat(target)).isSymbolicLink()) throw new Error('O arquivo do mod não pode ser um link simbólico.');
-    if (digest(await fs.readFile(target)) === manifest.sha256) needsWrite = false;
-    else await backup(target);
+  if (manifest.file !== CLIENT || manifest.engine !== 'zyon-vanilla-1' || !/^[a-f0-9]{64}$/.test(manifest.sha256)) throw new Error('Manifesto do Zyon Client inválido.');
+  const bytes = await fs.readFile(path.join(payload, CLIENT));
+  if (digest(bytes) !== manifest.sha256 || bytes.readUInt32LE(0) !== 0x04034b50) throw new Error('O cliente incluído falhou na verificação.');
+  const folder = path.join(instanceDir, 'client');
+  if (await exists(folder) && (await fs.lstat(folder)).isSymbolicLink()) throw new Error('A pasta do cliente não pode ser um link.');
+  const file = clientFile(instanceDir);
+  if (await exists(file)) {
+    if ((await fs.lstat(file)).isSymbolicLink()) throw new Error('O arquivo do cliente não pode ser um link.');
+    if (digest(await fs.readFile(file)) === manifest.sha256) return;
+    await backup(file);
   }
-  if (needsWrite) await atomicWrite(target, data);
-  // Move only previous Zyon binaries out of Forge's scan, keeping configurations and a reversible backup.
-  for (const previous of manifest.previousFiles || []) {
-    if (!/^zyon-1\.8\.9-[0-9.]+\.jar$/.test(previous) || previous === MOD) continue;
-    const old = path.join(mods, previous);
-    if (!await exists(old)) continue;
-    if ((await fs.lstat(old)).isSymbolicLink()) throw new Error('Uma versão anterior do Zyon é um link simbólico. Ela foi preservada.');
-    const zip = new AdmZip(await fs.readFile(old));
-    const info = JSON.parse(zip.readAsText('mcmod.info'));
-    if (!Array.isArray(info) || !info.some(mod => mod.modid === 'zyon')) throw new Error('Existe um JAR anterior inesperado. Ele foi preservado.');
-    const backups = path.join(instanceDir, 'zyon-backups'); await fs.mkdir(backups, { recursive: true });
-    await fs.rename(old, path.join(backups, previous + '.' + Date.now() + '.bak'));
-  }
-}
-function parseForge(data) {
-  if (digest(data) !== FORGE_SHA256) throw new Error('Instalador Forge inválido.');
-  const zip = new AdmZip(data);
-  const profile = JSON.parse(zip.readAsText('install_profile.json'));
-  if (profile.install.minecraft !== '1.8.9' || profile.versionInfo.inheritsFrom !== '1.8.9') throw new Error('Versão Forge inesperada.');
-  const jar = zip.readFile(profile.install.filePath);
-  if (!jar || jar.length < 1000) throw new Error('Biblioteca Forge ausente.');
-  const version = { ...profile.versionInfo, id: VERSION };
-  version.libraries = version.libraries.map(lib => ({ ...lib, ...(lib.url ? { url: lib.url.replace(/^http:/, 'https:') } : {}) }));
-  return { version, jar, relativeJar: coordinatePath(profile.install.path) };
+  await atomicWrite(file, bytes);
 }
 async function ensureJava(root, options = {}) {
   const stateFile = path.join(root, 'java.json');
   const current = await readJson(stateFile, {});
-  if (typeof current.executable === 'string' && inside(path.join(root, 'runtime'), current.executable) && path.basename(current.executable).toLowerCase() === 'javaw.exe' && await exists(current.executable)) return current.executable;
+  if (typeof current.executable === 'string' && [path.join(root, 'runtime'), path.join(path.dirname(root), 'ZyonTesteLocal', 'runtime'), path.join(path.dirname(root), 'ZyonLauncher', 'runtime')].some(folder => inside(folder, current.executable)) && path.basename(current.executable).toLowerCase() === 'javaw.exe' && await exists(current.executable)) return current.executable;
   const metadataUrl = 'https://api.adoptium.net/v3/assets/latest/8/hotspot?architecture=x64&image_type=jre&os=windows';
   const metadata = JSON.parse((await fetchBuffer(metadataUrl, { ...options, maxBytes: 2 * 1024 * 1024 })).toString('utf8'));
   const pkg = metadata[0]?.binary?.package;
@@ -137,48 +113,27 @@ async function ensureJava(root, options = {}) {
   } catch (error) { await fs.rm(folder, { recursive: true, force: true }); throw error; }
 }
 async function prepare({ root, instanceDir, minecraftRoot, payload, memoryGB = 2, signal, emit = () => {} }) {
-  if (inside(minecraftRoot, instanceDir) || inside(instanceDir, minecraftRoot)) throw new Error('A instância e a pasta base devem ficar separadas.');
-  const stage = (step, percent, message) => { checkAbort(signal); emit({ step, percent, message }); };
-  const options = { signal };
+  if (inside(minecraftRoot, instanceDir) || inside(instanceDir, minecraftRoot)) throw new Error('A instância e o cache devem ficar separados.');
   await fs.mkdir(instanceDir, { recursive: true }); await fs.mkdir(minecraftRoot, { recursive: true });
-  stage('minecraft', 5, 'Buscando Minecraft 1.8.9 nos servidores da Mojang…');
-  const manifest = JSON.parse((await fetchBuffer('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json', { ...options, maxBytes: 5 * 1024 * 1024 })).toString());
-  const entry = manifest.versions.find(v => v.id === '1.8.9');
-  if (!entry?.url || !/^[a-f0-9]{40}$/i.test(entry.sha1)) throw new Error('Minecraft 1.8.9 não encontrado.');
-  const metadata = await fetchBuffer(entry.url, { ...options, hash: entry.sha1, algorithm: 'sha1', maxBytes: 5 * 1024 * 1024 });
-  const vanilla = JSON.parse(metadata.toString());
-  if (vanilla.id !== '1.8.9' || !vanilla.downloads?.client?.sha1) throw new Error('Metadados Minecraft inválidos.');
-  const vanillaDir = path.join(minecraftRoot, 'versions', '1.8.9');
-  const metadataFile = path.join(vanillaDir, '1.8.9.json');
-  let keepMetadata = false;
-  if (await exists(metadataFile)) {
-    const previous = await readJson(metadataFile);
-    if (previous.id !== '1.8.9' || previous.downloads?.client?.sha1 !== vanilla.downloads.client.sha1) throw new Error('Existe um manifesto 1.8.9 diferente. Ele foi preservado; confira essa versão no launcher oficial.');
-    keepMetadata = true;
+  const options = { signal }, metadataFile = path.join(minecraftRoot, 'versions', '1.8.9', '1.8.9.json');
+  emit({ step: 'minecraft', percent: 5, message: 'Conferindo os arquivos oficiais do Minecraft 1.8.9…' });
+  let bytes = await fs.readFile(metadataFile).catch(() => null);
+  if (!bytes || digest(bytes) !== METADATA_SHA256) {
+    const manifest = JSON.parse((await fetchBuffer('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json', { ...options, maxBytes: 5 * 1024 * 1024 })).toString());
+    const entry = manifest.versions.find(v => v.id === '1.8.9');
+    if (!entry || !/^[a-f0-9]{40}$/i.test(entry.sha1)) throw new Error('Metadados Minecraft indisponíveis.');
+    bytes = await fetchBuffer(entry.url, { ...options, hash: entry.sha1, algorithm: 'sha1', maxBytes: 5 * 1024 * 1024 });
+    await atomicWrite(metadataFile, bytes);
   }
-  await downloadVerified(vanilla.downloads.client.url, path.join(vanillaDir, '1.8.9.jar'), vanilla.downloads.client.sha1, 'sha1', options);
-  if (!keepMetadata) await atomicWrite(metadataFile, metadata);
-  stage('forge', 30, 'Preparando Forge 11.15.1.2318…');
-  const forgeFile = path.join(root, 'downloads', 'forge-installer.jar');
-  await downloadVerified(FORGE_URL, forgeFile, FORGE_SHA256, 'sha256', options);
-  const forge = parseForge(await fs.readFile(forgeFile));
-  const forgeLibrary = path.join(minecraftRoot, 'libraries', ...forge.relativeJar.split('/'));
-  if (await exists(forgeLibrary) && digest(await fs.readFile(forgeLibrary)) !== digest(forge.jar)) throw new Error('Já existe uma biblioteca Forge diferente. Ela foi preservada.');
-  await atomicWrite(forgeLibrary, forge.jar);
-  // game.ensureArtifacts resolves the verified libraries, assets and native components.
-  await atomicWrite(path.join(minecraftRoot, 'versions', VERSION, VERSION + '.json'), JSON.stringify(forge.version, null, 2));
-  stage('java', 50, 'Baixando e verificando o Java 8 para esta instalação…');
-  let lastProgress = 0;
-  const javaExe = await ensureJava(root, { ...options, report(received, total) {
-    if (total < 1024 * 1024 || Date.now() - lastProgress < 700) return;
-    lastProgress = Date.now();
-    emit({ step: 'java', percent: 50 + Math.min(27, Math.floor(27 * received / total)), message: `Baixando Java 8: ${(received / 1024 / 1024).toFixed(1)} de ${(total / 1024 / 1024).toFixed(1)} MB…` });
-  } });
-  stage('client', 82, 'Instalando os cinco recursos visuais na instância separada…');
-  await installMod(payload, instanceDir);
+  const vanilla = JSON.parse(bytes.toString());
+  if (vanilla.id !== '1.8.9' || vanilla.downloads?.client?.sha1 !== CLIENT_SHA1) throw new Error('Versão Minecraft inesperada.');
+  await downloadVerified(vanilla.downloads.client.url, path.join(minecraftRoot, 'versions', '1.8.9', '1.8.9.jar'), CLIENT_SHA1, 'sha1', options);
+  emit({ step: 'engine', percent: 30, message: 'Preparando a base própria do Zyon Client…' });
+  await installClient(payload, instanceDir);
+  emit({ step: 'java', percent: 40, message: 'Conferindo o Java 8…' });
+  const javaExe = await ensureJava(root, options);
   checkAbort(signal);
-  await atomicWrite(path.join(root, 'installation.json'), JSON.stringify({ version: VERSION, instanceDir, minecraftRoot, javaExe, memoryGB, prepared: new Date().toISOString() }, null, 2));
-  stage('done', 100, 'Edição visual preparada. A propriedade será verificada novamente ao iniciar.');
+  await atomicWrite(path.join(root, 'installation.json'), JSON.stringify({ engine: 'zyon-vanilla-1', instanceDir, minecraftRoot, javaExe, memoryGB }));
 }
 function launchExecutable(file) {
   return new Promise((resolve, reject) => {
@@ -186,4 +141,4 @@ function launchExecutable(file) {
     child.once('error', reject); child.once('spawn', () => { child.unref(); resolve(); });
   });
 }
-module.exports = { MOD, VERSION, FORGE_SHA256, FORGE_URL, digest, exists, inside, atomicWrite, readJson, coordinatePath, fetchBuffer, downloadVerified, installMod, parseForge, ensureJava, prepare, launchExecutable };
+module.exports = { CLIENT, VERSION, METADATA_SHA256, CLIENT_SHA1, clientFile, digest, exists, inside, atomicWrite, readJson, coordinatePath, fetchBuffer, downloadVerified, installClient, ensureJava, prepare, launchExecutable };

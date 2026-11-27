@@ -1,19 +1,20 @@
 {
   "name": "zyon-launcher",
-  "version": "1.5.0",
-  "description": "Zyon Visual: cliente independente para Minecraft Java 1.8.9 com conta Microsoft e propriedade verificada",
+  "version": "2.0.0",
+  "description": "Zyon Client 1.8.9 independente, HUD editavel, aba Xit e perfil por nick",
   "author": "Zyon",
   "private": true,
   "main": "main.cjs",
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/*.test.cjs",
+    "test": "node build/test-launcher.cjs",
     "dist:win": "electron-builder --win nsis --x64 --publish never",
     "configure:publisher": "node build/configure-publisher.cjs",
-    "prepare:release": "node build/prepare-release.cjs"
+    "prepare:release": "node build/prepare-release.cjs",
+    "build:client": "node build/client.cjs",
+    "test:java": "node build/client.cjs --test"
   },
   "dependencies": {
-    "@azure/msal-node": "7.2.2",
     "adm-zip": "0.5.17",
     "extract-zip": "2.0.1"
   },
@@ -39,11 +40,11 @@
       "assets/**",
       "package.json",
       "game.cjs",
-      "auth.cjs",
       "sessions.cjs",
       "updates.cjs",
       "release-config.json",
-      "edition.cjs"
+      "edition.cjs",
+      "offline.cjs"
     ],
     "extraResources": [
       {
@@ -51,7 +52,7 @@
         "to": "payload",
         "filter": [
           "manifest.json",
-          "zyon-1.8.9-1.5.3.jar"
+          "zyon-client-1.8.9-2.0.0.jar"
         ]
       }
     ],

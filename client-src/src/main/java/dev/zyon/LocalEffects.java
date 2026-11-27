@@ -12,10 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.*;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import dev.zyon.platform.event.*;
+import dev.zyon.platform.event.SubscribeEvent;
+import dev.zyon.platform.event.TickEvent;
+import dev.zyon.platform.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
 /** These effects only change local rendering. No entity state or network input is modified. */
@@ -34,7 +34,7 @@ public final class LocalEffects {
   private final Zyon c;private final Minecraft mc=Minecraft.getMinecraft();private final BrightnessState state=new BrightnessState();private boolean rendererChecked;
   public Brightness(Zyon c){this.c=c;}
   @SubscribeEvent public void render(TickEvent.RenderTickEvent e){mc.gameSettings.gammaSetting=state.apply(mc.gameSettings.gammaSetting,e.phase==TickEvent.Phase.START&&mc.theWorld!=null&&c.feature("fullbright").enabled());}
-  @SubscribeEvent public void tick(TickEvent.ClientTickEvent e){if(e.phase!=TickEvent.Phase.END)return;mc.gameSettings.gammaSetting=state.apply(mc.gameSettings.gammaSetting,false);if(!rendererChecked&&mc.theWorld!=null){rendererChecked=true;ClassicAnimations.install(c);Render<?> old=mc.getRenderManager().getEntityClassRenderObject(EntityItem.class);if(old!=null&&old.getClass()==RenderEntityItem.class)mc.getRenderManager().entityRenderMap.put(EntityItem.class,new Dropped(c));}}
+  @SubscribeEvent public void tick(TickEvent.ClientTickEvent e){if(e.phase!=TickEvent.Phase.END)return;mc.gameSettings.gammaSetting=state.apply(mc.gameSettings.gammaSetting,false);if(!rendererChecked&&mc.theWorld!=null){rendererChecked=true;ClassicAnimations.install(c);Render<?> old=mc.getRenderManager().getEntityClassRenderObject(EntityItem.class);if(old!=null&&old.getClass()==RenderEntityItem.class)try{((java.util.Map)ReflectionHelper.findField(RenderManager.class,"entityRenderMap").get(mc.getRenderManager())).put(EntityItem.class,new Dropped(c));}catch(Exception failure){org.apache.logging.log4j.LogManager.getLogger("Zyon").warn("Item renderer unavailable",failure);}}}
  }
  private static final class Dropped extends RenderEntityItem {
   private final Zyon c;private final Minecraft mc=Minecraft.getMinecraft();Dropped(Zyon c){super(Minecraft.getMinecraft().getRenderManager(),Minecraft.getMinecraft().getRenderItem());this.c=c;}

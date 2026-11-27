@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL14;
 public final class HudRenderState implements AutoCloseable {
  private final boolean alpha=on(GL11.GL_ALPHA_TEST),depth=on(GL11.GL_DEPTH_TEST),blend=on(GL11.GL_BLEND),lighting=on(GL11.GL_LIGHTING),material=on(GL11.GL_COLOR_MATERIAL),cull=on(GL11.GL_CULL_FACE),normal=on(GL11.GL_NORMALIZE),rescale=on(32826),depthWrite=GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
  private final int alphaFunc=get(GL11.GL_ALPHA_TEST_FUNC),depthFunc=get(GL11.GL_DEPTH_FUNC),src=get(GL14.GL_BLEND_SRC_RGB),dst=get(GL14.GL_BLEND_DST_RGB),srcAlpha=get(GL14.GL_BLEND_SRC_ALPHA),dstAlpha=get(GL14.GL_BLEND_DST_ALPHA),face=get(GL11.GL_COLOR_MATERIAL_FACE),materialMode=get(GL11.GL_COLOR_MATERIAL_PARAMETER),cullMode=get(GL11.GL_CULL_FACE_MODE),shade=get(GL11.GL_SHADE_MODEL),active=get(GL13.GL_ACTIVE_TEXTURE),matrix=get(GL11.GL_MATRIX_MODE);
- private final float alphaRef=GL11.glGetFloat(GL11.GL_ALPHA_TEST_REF),lightX=OpenGlHelper.lastBrightnessX,lightY=OpenGlHelper.lastBrightnessY;
+ private final float alphaRef=GL11.glGetFloat(GL11.GL_ALPHA_TEST_REF),lightX=dev.zyon.platform.Platform.lastBrightnessX,lightY=dev.zyon.platform.Platform.lastBrightnessY;
  private final FloatBuffer color=BufferUtils.createFloatBuffer(16),clear=BufferUtils.createFloatBuffer(16);private final java.nio.ByteBuffer colorMask=BufferUtils.createByteBuffer(16);private final double clearDepth=GL11.glGetDouble(GL11.GL_DEPTH_CLEAR_VALUE);private final boolean[] lights=new boolean[8],textures=new boolean[2];private final int[] bound=new int[2];private boolean closed;
  private static boolean on(int capability){return GL11.glIsEnabled(capability);}private static int get(int name){return GL11.glGetInteger(name);}
  public HudRenderState(){

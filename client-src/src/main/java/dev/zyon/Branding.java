@@ -1,13 +1,12 @@
-// Java / Branding.java / Java 8 / Minecraft Forge 1.8.9
+// Java / Branding.java / Java 8 / Minecraft 1.8.9
 package dev.zyon;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.client.GuiModList;
+import dev.zyon.platform.event.GuiOpenEvent;
+import dev.zyon.platform.event.SubscribeEvent;
 import org.lwjgl.opengl.Display;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,16 +16,17 @@ import java.nio.ByteBuffer;
 
 public final class Branding {
     public static final ResourceLocation LOGO = new ResourceLocation("zyon", "textures/brand.png");
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("zyon", "textures/menu.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("zyon", "textures/menu.jpg");
     private boolean menuReported;
     @SubscribeEvent public void open(GuiOpenEvent event) {
+        if (Display.isCreated()) Display.setTitle("Zyon Client");
         if (event.gui instanceof GuiMainMenu && !menuReported) {
             menuReported = true; System.out.println("ZYON_MENU_READY");
         }
         if (event.gui instanceof GuiMainMenu && Zyon.instance.feature("theme").flag("menu")) event.gui = new MainMenu();
     }
     public static void image(ResourceLocation resource, int x, int y, int width, int height) {
-        // Forge splash rendering can leave the texture-state cache out of sync.
+        // External rendering can leave the texture-state cache out of sync.
         GlStateManager.disableTexture2D();
         GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().getTextureManager().bindTexture(resource);
@@ -36,6 +36,7 @@ public final class Branding {
     }
     public static void applyWindowIcons() {
         if (!Display.isCreated()) return;
+        Display.setTitle("Zyon Client");
         try {
             ByteBuffer[] buffers = new ByteBuffer[2]; int[] sizes = {16, 32};
             for (int i = 0; i < sizes.length; i++) {
@@ -51,36 +52,49 @@ public final class Branding {
         } catch (Exception e) { org.apache.logging.log4j.LogManager.getLogger("Zyon").warn("Icone de janela indisponivel", e); }
     }
     private static final class MainMenu extends GuiScreen {
+        private int menuTop() { return Math.max(92, Math.min(height / 2 - 15, height - 146)); }
         @Override public void initGui() {
-            int w = Math.max(150, Math.min(240, (int)(width * .28))), left = (width - w) / 2;
-            int titleBottom = (int)Math.ceil(215 * Math.max(width / 1672.0, height / 941.0)) + 8;
-            int top = Math.max(64, Math.min(height - 116, Math.max(titleBottom, height / 3))), third = (w - 8) / 3;
+            int left = Math.max(18, width / 12), top = menuTop(), w = Math.min(210, width - left - 20);
             buttonList.clear();
-            buttonList.add(new GuiButton(1, left, top, w, 20, "Um jogador"));
-            buttonList.add(new GuiButton(2, left, top + 24, w, 20, "Multijogador"));
-            buttonList.add(new GuiButton(4, left, top + 48, w, 20, "Menu Zyon"));
-            buttonList.add(new GuiButton(3, left, top + 84, third, 20, "Opcoes"));
-            buttonList.add(new GuiButton(6, left + third + 4, top + 84, third, 20, "Mods"));
-            buttonList.add(new GuiButton(5, left + 2 * (third + 4), top + 84, w - 2 * (third + 4), 20, "Sair"));
+            buttonList.add(new MenuButton(1, left, top, w, "Um jogador"));
+            buttonList.add(new MenuButton(2, left, top + 29, w, "Multijogador"));
+            buttonList.add(new MenuButton(3, left, top + 58, w / 2 - 3, "Opcoes"));
+            buttonList.add(new MenuButton(4, left + w / 2 + 3, top + 58, w / 2 - 3, "Menu Zyon"));
+            buttonList.add(new MenuButton(5, left, top + 87, w, "Sair"));
         }
         @Override public void drawScreen(int mouseX, int mouseY, float partial) {
-            // Cover the viewport without stretching. Anchor the crop to the top to preserve the ZYON title on ultrawide displays.
             double cover = Math.max(width / 1672.0, height / 941.0);
-            int backgroundWidth = (int)Math.ceil(1672 * cover), backgroundHeight = (int)Math.ceil(941 * cover);
-            image(BACKGROUND, (width - backgroundWidth) / 2, 0, backgroundWidth, backgroundHeight);
+            int bw = (int)Math.ceil(1672 * cover), bh = (int)Math.ceil(941 * cover);
+            image(BACKGROUND, (width - bw) / 2, (height - bh) / 2, bw, bh);
+            drawRect(0, 0, width, height, 0x44050D1A);
+            int left = Math.max(18, width / 12), logoY = Math.max(15, menuTop() - 77);
+            image(LOGO, left, logoY, 43, 43);
+            GlStateManager.pushMatrix(); GlStateManager.translate(left + 52, logoY + 8, 0); GlStateManager.scale(2, 2, 1);
+            fontRendererObj.drawStringWithShadow("ZYON CLIENT", 0, 0, 0xFFE7F7FF); GlStateManager.popMatrix();
+            fontRendererObj.drawStringWithShadow("MINECRAFT JAVA 1.8.9", left + 53, logoY + 31, 0xFFA8D8F0);
+            fontRendererObj.drawStringWithShadow("Seu mundo. Seu cliente.", left, logoY + 57, 0xFFBBD6E8);
             super.drawScreen(mouseX, mouseY, partial);
-            fontRendererObj.drawStringWithShadow("Cliente independente de terceiros", 4, height - 24, 0xFFC7DFF4);
-            fontRendererObj.drawStringWithShadow("Zyon Visual 1.5.3 / Minecraft 1.8.9", 4, height - 12, 0xFFC7DFF4);
+            fontRendererObj.drawStringWithShadow("Cliente independente para Minecraft Java", 14, height - 28, 0xFF91A8BC);
+            fontRendererObj.drawStringWithShadow("Zyon Client 1.8.9", 14, height - 16, 0xFFBBD6E8);
         }
-        @Override protected void actionPerformed(GuiButton button) throws IOException {
+        @Override protected void actionPerformed(GuiButton button)  {
             if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));
             if (button.id == 2) mc.displayGuiScreen(new GuiMultiplayer(this));
             if (button.id == 3) mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
             if (button.id == 4) mc.displayGuiScreen(new ClickGui(Zyon.instance));
             if (button.id == 5) mc.shutdown();
-            if (button.id == 6) mc.displayGuiScreen(new GuiModList(this));
         }
         @Override protected void keyTyped(char typed, int key) { }
         @Override public boolean doesGuiPauseGame() { return false; }
+    }
+    private static final class MenuButton extends GuiButton {
+        MenuButton(int id, int x, int y, int width, String name) { super(id, x, y, width, 23, name); }
+        @Override public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+            if (!visible) return;
+            hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+            drawRect(xPosition, yPosition, xPosition + width, yPosition + height, hovered ? 0xED123F60 : 0xDB091A2E);
+            drawRect(xPosition, yPosition, xPosition + 2, yPosition + height, hovered ? 0xFF75DEFF : 0xFF249BFF);
+            drawCenteredString(mc.fontRendererObj, displayString, xPosition + width / 2, yPosition + 8, enabled ? 0xFFE8F7FF : 0xFF627D92);
+        }
     }
 }

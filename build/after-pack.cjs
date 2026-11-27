@@ -22,6 +22,14 @@ module.exports = async context => {
     resource.outputResource(exe); await fs.writeFile(executable, Buffer.from(exe.generate()));
     await fs.copyFile(path.join(context.packager.projectDir, 'assets/icon.ico'), path.join(context.appOutDir, 'resources', 'zyon-icon-' + context.packager.appInfo.version + '.ico'));
   }
+  // Validate transitive production dependencies from the actual packaged app.
+  const check = await fs.mkdtemp(path.join(context.packager.projectDir, 'dist', '.verify-deps-'));
+  try {
+    require('@electron/asar').extractAll(path.join(context.appOutDir, 'resources', 'app.asar'), check);
+    const packaged = require('node:module').createRequire(path.join(check, 'package.json'));
+    for (const module of ['./core.cjs','./game.cjs','./offline.cjs','./updates.cjs']) packaged(module);
+    console.log('Zyon: packaged backend dependencies verified.');
+  } finally { await fs.rm(check, {recursive:true,force:true}); }
   const files = [], dirs = [];
   async function scan(folder) {
     for (const entry of await fs.readdir(folder, { withFileTypes: true })) {

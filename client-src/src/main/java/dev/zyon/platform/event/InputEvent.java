@@ -1,0 +1,1 @@
+package dev.zyon.platform.event; public class InputEvent extends Event { public static final class KeyInputEvent extends InputEvent {} public static final class MouseInputEvent extends InputEvent {} }

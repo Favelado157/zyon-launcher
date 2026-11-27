@@ -6,7 +6,7 @@ import net.minecraft.client.entity.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.item.*;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import dev.zyon.platform.ReflectionHelper;
 /** Uses vanilla item state and transforms. It never changes player input, swing timing or packets. */
 public final class ClassicAnimations extends ItemRenderer {
  private final Zyon c;private final Minecraft mc;private final Map<String,Method> methods=new HashMap<String,Method>();private Field stack,progress,previous;

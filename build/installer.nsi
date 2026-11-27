@@ -13,7 +13,7 @@ ShowUninstDetails show
 BrandingText "Zyon Launcher ${VERSION}"
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEPAGE_TITLE "Bem-vindo ao Zyon Launcher"
-!define MUI_WELCOMEPAGE_TEXT "Este assistente instala o Zyon Visual, cliente independente para Minecraft Java 1.8.9.$\r$\n$\r$\nFeche o Zyon Launcher antes de instalar ou atualizar.$\r$\n$\r$\nRequer conta Microsoft com acesso verificado ao Minecraft Java. O aplicativo depende de autorização para os serviços oficiais."
+!define MUI_WELCOMEPAGE_TEXT "Este assistente instala o Zyon Client, cliente independente para Minecraft Java 1.8.9.$\r$\n$\r$\nFeche o Zyon Launcher antes de instalar ou atualizar.$\r$\n$\r$\nEntre pelo nick. Inclui HUD, aba Xit e suporte a capas publicas OptiFine. A primeira preparacao precisa de internet."
 !define MUI_FINISHPAGE_RUN "$INSTDIR\Zyon Launcher.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Abrir Zyon Launcher"
 !insertmacro MUI_PAGE_WELCOME

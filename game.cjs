@@ -5,6 +5,9 @@ const { spawn } = require('node:child_process');
 const AdmZip = require('adm-zip');
 const core = require('./core.cjs');
 const GAME_VERSION = '1.8.9';
+const ENGINE = 'zyon-vanilla-1';
+const ENTRYPOINT = 'dev.zyon.platform.Main';
+function javaEnvironment(){return Object.fromEntries(Object.entries(process.env).filter(([key])=>!['JAVA_TOOL_OPTIONS','JDK_JAVA_OPTIONS','_JAVA_OPTIONS','CLASSPATH'].includes(key.toUpperCase())));}
 function canceled(signal) { if (signal?.aborted) throw new Error('Preparação cancelada.'); }
 function safePath(root, relative) {
   if (typeof relative !== 'string' || !relative || relative.includes('\\') || relative.split('/').some(p => !p || p === '.' || p === '..') || /^[A-Za-z]:/.test(relative) || relative.startsWith('/')) throw new Error('Caminho de recurso inválido.');
@@ -25,18 +28,18 @@ function allowed(library, platform = { name: 'windows', arch: 'x86_64', version:
   }
   return result;
 }
-function mergeLibraries(vanilla, forge) {
+function mergeLibraries(vanilla) {
   const entries = new Map();
-  for (const library of [...vanilla, ...forge]) {
+  for (const library of vanilla) {
     if (!allowed(library)) continue;
     const [group, artifact, , classifier = ''] = library.name.split(':');
     entries.set(group + ':' + artifact + ':' + classifier, library);
   }
   return [...entries.values()];
 }
-function libraryPlan(vanilla, forge, minecraftRoot) {
+function libraryPlan(vanilla, minecraftRoot) {
   const result = [], seen = new Set();
-  for (const lib of mergeLibraries(vanilla.libraries || [], forge.version.libraries || [])) {
+  for (const lib of mergeLibraries(vanilla.libraries || [])) {
     if (!allowed(lib)) continue;
     const add = (artifact, classifier) => {
       const relative = artifact?.path || core.coordinatePath(lib.name + (classifier ? ':' + classifier : ''));
@@ -45,7 +48,6 @@ function libraryPlan(vanilla, forge, minecraftRoot) {
       let url = artifact?.url || (lib.url || 'https://libraries.minecraft.net/') + relative;
       url = url.replace(/^http:/, 'https:');
       let hashes = artifact?.sha1 ? [artifact.sha1.toLowerCase()] : (lib.checksums || []).filter(hash => /^[a-f0-9]{40}$/i.test(hash)).map(hash => hash.toLowerCase());
-      if (relative === forge.relativeJar) hashes = [core.digest(forge.jar, 'sha1')];
       result.push({ file, relative, url, hashes, native: !!classifier, exclude: lib.extract?.exclude || ['META-INF/'] });
     };
     if (!lib.downloads || lib.downloads.artifact) add(lib.downloads?.artifact, null);
@@ -97,12 +99,7 @@ async function extractNatives(file, destination, exclude) {
 async function ensureArtifacts({ root, instanceDir, minecraftRoot, signal, emit = () => {}, request = fetch }) {
   const options = { signal, request };
   const vanilla = await core.readJson(path.join(minecraftRoot, 'versions', GAME_VERSION, GAME_VERSION + '.json'));
-  const forgeData = await fs.readFile(path.join(root, 'downloads', 'forge-installer.jar'));
-  const forge = core.parseForge(forgeData);
-  const embeddedForge = safePath(path.join(minecraftRoot, 'libraries'), forge.relativeJar);
-  if (!await core.exists(embeddedForge)) await core.atomicWrite(embeddedForge, forge.jar);
-  else if (core.digest(await fs.readFile(embeddedForge)) !== core.digest(forge.jar)) throw new Error('A biblioteca Forge existente é diferente e foi preservada.');
-  const libraries = libraryPlan(vanilla, forge, minecraftRoot);
+  const libraries = libraryPlan(vanilla, minecraftRoot);
   let completed = 0;
   emit({ step: 'client', percent: 48, message: 'Verificando bibliotecas e componentes do jogo…' });
   await pool(libraries, 4, async library => {
@@ -141,26 +138,47 @@ async function ensureArtifacts({ root, instanceDir, minecraftRoot, signal, emit 
     await core.downloadVerified(config.url, file, config.sha1, 'sha1', options);
     logging = { argument: vanilla.logging.client.argument, file };
   }
-  const clientJar = path.join(minecraftRoot, 'versions', GAME_VERSION, GAME_VERSION + '.jar');
-  const ready = {
-    schema: 1, version: GAME_VERSION, clientVersion: '1.3.0', minecraftRoot, instanceDir, mainClass: forge.version.mainClass,
-    arguments: forge.version.minecraftArguments || vanilla.minecraftArguments, classpath: libraries.filter(value => !value.native).map(value => value.file).concat(clientJar),
-    natives, assetsRoot, assetsIndex: index.id, logging,
-    resources: objects.map(value => path.join(assetsRoot, 'objects', value.hash.slice(0, 2), value.hash)), prepared: new Date().toISOString()
-  };
+  const clientJar = core.clientFile(instanceDir);
+  const clientSha256 = core.digest(await fs.readFile(clientJar));
+  const vanillaJar = path.join(minecraftRoot, 'versions', GAME_VERSION, GAME_VERSION + '.jar');
+  if (core.digest(await fs.readFile(vanillaJar), 'sha1') !== core.CLIENT_SHA1) throw new Error('O Minecraft original falhou na verificação.');
+  const patchedJar = path.join(root, 'engine', 'minecraft-1.8.9-zyon.jar');
+  const java = await core.readJson(path.join(root, 'java.json'));
+  emit({ step: 'client', percent: 95, message: 'Integrando o Zyon Client aos arquivos locais…' });
+  const javaConsole = path.join(path.dirname(java.executable), 'java.exe');
+  await runPatcher({ javaExe: await core.exists(javaConsole) ? javaConsole : java.executable, clientJar, vanillaJar, patchedJar, signal });
+  const artifacts = [{ file: clientJar, sha256: clientSha256 }, { file: patchedJar, sha256: core.digest(await fs.readFile(patchedJar)) }];
+  const ready = { schema: 2, engine: ENGINE, version: GAME_VERSION, minecraftRoot, instanceDir, mainClass: ENTRYPOINT,
+    arguments: vanilla.minecraftArguments, classpath: [clientJar, patchedJar, ...libraries.filter(v => !v.native).map(v => v.file)],
+    natives, assetsRoot, assetsIndex: index.id, logging, artifacts,
+    resources: objects.map(v => path.join(assetsRoot, 'objects', v.hash.slice(0, 2), v.hash)), prepared: new Date().toISOString() };
   canceled(signal); await core.atomicWrite(path.join(root, 'game-ready.json'), JSON.stringify(ready, null, 2));
-  emit({ step: 'done', percent: 100, message: 'Minecraft preparado para iniciar diretamente pelo Zyon.' });
+  emit({ step: 'done', percent: 100, message: 'Zyon Client independente preparado para jogar.' });
   return ready;
+}
+async function runPatcher({ javaExe, clientJar, vanillaJar, patchedJar, signal, spawnProcess = spawn }) {
+  canceled(signal);
+  return new Promise((resolve, reject) => {
+    const child = spawnProcess(javaExe, ['-cp', clientJar, 'dev.zyon.bootstrap.PatchMain', vanillaJar, patchedJar], { shell: false, windowsHide: true, env: javaEnvironment(), stdio: ['ignore', 'pipe', 'pipe'] });
+    let tail = '', finished = false;
+    const cancel = () => { child.kill(); done(new Error('Preparação cancelada.')); };
+    const timer = setTimeout(() => { child.kill(); done(new Error('O preparo da base do cliente excedeu o tempo.')); }, 180000);
+    const done = error => { if (finished) return; finished = true; clearTimeout(timer); signal?.removeEventListener('abort', cancel); error ? reject(error) : resolve(); };
+    signal?.addEventListener('abort', cancel, { once: true }); if(signal?.aborted)cancel();
+    for (const stream of [child.stdout, child.stderr]) stream?.on('data', value => { tail = (tail + value.toString()).slice(-5000); });
+    child.once('error', () => done(new Error('O Java não pôde preparar a base do Zyon.')));
+    child.once('close', code => done(code === 0 && tail.includes('ZYON_ENGINE_PREPARED') ? null : new Error('Falha ao preparar a base do Zyon: ' + tail.slice(-1200))));
+  });
 }
 async function readReady(root, instanceDir, minecraftRoot) {
   const ready = await core.readJson(path.join(root, 'game-ready.json'), null).catch(() => null);
-  if (!ready || ready.schema !== 1 || ready.clientVersion !== '1.3.0' || ready.instanceDir !== instanceDir || ready.minecraftRoot !== minecraftRoot) return null;
-  if (!core.inside(root, ready.natives) || !core.inside(minecraftRoot, ready.assetsRoot)) return null;
+  if (!ready || ready.schema !== 2 || ready.engine !== ENGINE || ready.mainClass !== ENTRYPOINT || ready.instanceDir !== instanceDir || ready.minecraftRoot !== minecraftRoot || ready.classpath?.[0] !== core.clientFile(instanceDir) || !core.inside(root, ready.natives) || !core.inside(minecraftRoot, ready.assetsRoot)) return null;
+  if (!Array.isArray(ready.artifacts) || ready.artifacts.length !== 2) return null;
   const files = [...ready.classpath, ...(ready.resources || []), ...(ready.logging ? [ready.logging.file] : [])];
-  if (files.some(file => !core.inside(minecraftRoot, file))) return null;
-  let missing = false;
-  await pool(files, 32, async file => { if (!await core.exists(file)) missing = true; });
+  if (files.some(file => ![root, instanceDir, minecraftRoot].some(folder => core.inside(folder, file)))) return null;
+  let missing = false; await pool(files, 32, async file => { if (!await core.exists(file)) missing = true; });
   if (missing || !await core.exists(path.join(ready.natives, 'lwjgl64.dll'))) return null;
+  for (const item of ready.artifacts) if (!files.includes(item.file) || core.digest(await fs.readFile(item.file)) !== item.sha256) return null;
   return ready;
 }
 function splitArguments(text) {
@@ -168,6 +186,7 @@ function splitArguments(text) {
   for (const match of matches) result.push(match[1] ?? match[2] ?? match[3]); return result;
 }
 function launchArguments(ready, session, memoryGB) {
+  if (ready.engine !== ENGINE || ready.mainClass !== ENTRYPOINT || /--tweakClass|FMLTweaker/.test(ready.arguments || '')) throw new Error('A instalação não corresponde ao Zyon Client independente.');
   const userType = require('./sessions.cjs').validateSession(session);
   if (!Number.isInteger(memoryGB) || memoryGB < 1 || memoryGB > 16) throw new Error('Memória inválida.');
   const variables = {
@@ -176,7 +195,7 @@ function launchArguments(ready, session, memoryGB) {
     auth_uuid: session.uuid, auth_access_token: session.accessToken, auth_session: 'token:' + session.accessToken + ':' + session.uuid,
     user_properties: '{}', user_type: userType, version_type: 'release'
   };
-  const args = [`-Xmx${memoryGB}G`, '-XX:+UseG1GC', '-Djava.library.path=' + ready.natives, '-Dminecraft.launcher.brand=Zyon', '-Dminecraft.launcher.version=1.3.0'];
+  const args = [`-Xmx${memoryGB}G`, '-XX:+UseG1GC', '-Djava.library.path=' + ready.natives, '-Dminecraft.launcher.brand=Zyon', '-Dminecraft.launcher.version=' + require('./package.json').version];
   if (ready.logging) args.push(ready.logging.argument.replace('${path}', ready.logging.file));
   args.push('-cp', ready.classpath.join(';'), ready.mainClass);
   for (const token of splitArguments(ready.arguments)) {
@@ -188,14 +207,14 @@ function launchArguments(ready, session, memoryGB) {
 }
 function redactGameLog(value, session) {
   let text = String(value);
-  if (session?.accessToken) text = text.split(session.accessToken).join('[sessão omitida]');
+  if (session?.accessToken && session.accessToken !== '0') text = text.split(session.accessToken).join('[sessão omitida]');
   return text.replace(/(access[_-]?token[=: ]+)[^\s,;}]+/gi, '$1[omitido]');
 }
 function launch({ javaExe, ready, session, memoryGB, onOutput = () => {}, onReady = () => {}, onExit = () => {}, spawnProcess = spawn }) {
   const args = launchArguments(ready, session, memoryGB);
   return new Promise((resolve, reject) => {
     // javaw.exe has no console. Hiding its GUI can also hide LWJGL's first window.
-    const child = spawnProcess(javaExe, args, { cwd: ready.instanceDir, shell: false, windowsHide: false, env: Object.fromEntries(Object.entries(process.env).filter(([key]) => !['JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS', '_JAVA_OPTIONS', 'CLASSPATH'].includes(key.toUpperCase()))), stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawnProcess(javaExe, args, { cwd: ready.instanceDir, shell: false, windowsHide: false, env: javaEnvironment(), stdio: ['ignore', 'pipe', 'pipe'] });
     let menuReady = false, tail = '';
     const output = value => {
       const text = redactGameLog(value, session);
@@ -222,4 +241,4 @@ function launch({ javaExe, ready, session, memoryGB, onOutput = () => {}, onRead
     });
   });
 }
-module.exports = { safePath, allowed, mergeLibraries, libraryPlan, ensureLibrary, pool, extractNatives, ensureArtifacts, readReady, splitArguments, launchArguments, redactGameLog, launch };
+module.exports = { ENGINE, ENTRYPOINT, runPatcher, safePath, allowed, mergeLibraries, libraryPlan, ensureLibrary, pool, extractNatives, ensureArtifacts, readReady, splitArguments, launchArguments, redactGameLog, launch };
