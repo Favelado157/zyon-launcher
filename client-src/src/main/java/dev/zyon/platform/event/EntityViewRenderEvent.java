@@ -1,0 +1,1 @@
+package dev.zyon.platform.event; public class EntityViewRenderEvent extends Event {public static final class FOVModifier extends EntityViewRenderEvent {private float value;public FOVModifier(float v){value=v;}public float getFOV(){return value;}public void setFOV(float v){value=v;}}}

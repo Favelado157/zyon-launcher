@@ -1,0 +1,1 @@
+package dev.zyon.platform.event; import net.minecraft.client.gui.GuiScreen; public final class GuiOpenEvent extends Event {public GuiScreen gui; public GuiOpenEvent(GuiScreen g){gui=g;}}

@@ -1,4 +1,4 @@
-// Java / Setting.java / Java 8 / Forge 1.8.9
+// Java / Setting.java / Java 8 / Minecraft 1.8.9
 package dev.zyon;
 import java.util.Locale;
 public final class Setting {

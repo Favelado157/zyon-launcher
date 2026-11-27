@@ -1,4 +1,4 @@
-// Java / ZyonCommand.java / Java 8 / Forge 1.8.9
+// Java / ZyonCommand.java / Java 8 / Minecraft 1.8.9
 package dev.zyon;
 import net.minecraft.command.*;
 import net.minecraft.util.BlockPos;

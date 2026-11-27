@@ -4,7 +4,7 @@ const call = (name, ...args) => ipcRenderer.invoke('zyon:' + name, ...args);
 contextBridge.exposeInMainWorld('zyon', Object.freeze({
   state: () => call('state'), pick: kind => call('pick', kind), settings: value => call('settings', value),
   prepare: () => call('prepare'), cancel: () => call('cancel'), launch: () => call('launch'),
-  login: () => call('login'), logout: () => call('logout'),
+  nickname: value => call('nickname', value),
   checkUpdates: () => call('check-updates'), installUpdate: () => call('install-update'),
   folder: kind => call('folder', kind), external: kind => call('external', kind),
   onProgress(callback) {

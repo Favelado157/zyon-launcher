@@ -1,9 +1,9 @@
 package dev.zyon;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import dev.zyon.platform.event.EntityViewRenderEvent;
+import dev.zyon.platform.event.RenderGameOverlayEvent;
+import dev.zyon.platform.event.SubscribeEvent;
+import dev.zyon.platform.event.TickEvent;
 import org.lwjgl.opengl.Display;
 
 /** Local rendering only: no entity targeting, movement or input automation. */

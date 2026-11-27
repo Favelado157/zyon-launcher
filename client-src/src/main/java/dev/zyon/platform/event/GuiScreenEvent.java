@@ -1,0 +1,8 @@
+package dev.zyon.platform.event;
+import net.minecraft.client.gui.*;import java.util.List;
+public class GuiScreenEvent extends Event{public final GuiScreen gui;public GuiScreenEvent(GuiScreen g){gui=g;}
+ public static class DrawScreenEvent extends GuiScreenEvent{public final int mouseX,mouseY;public final float renderPartialTicks;public DrawScreenEvent(GuiScreen g,int x,int y,float p){super(g);mouseX=x;mouseY=y;renderPartialTicks=p;}public static final class Pre extends DrawScreenEvent{public Pre(GuiScreen g,int x,int y,float p){super(g,x,y,p);}}public static final class Post extends DrawScreenEvent{public Post(GuiScreen g,int x,int y,float p){super(g,x,y,p);}}}
+ public static class MouseInputEvent extends GuiScreenEvent{public MouseInputEvent(GuiScreen g){super(g);}public static final class Pre extends MouseInputEvent{public Pre(GuiScreen g){super(g);}}}
+ public static class ActionPerformedEvent extends GuiScreenEvent{public final GuiButton button;public ActionPerformedEvent(GuiScreen g,GuiButton b){super(g);button=b;}public static final class Pre extends ActionPerformedEvent{public Pre(GuiScreen g,GuiButton b){super(g,b);}}}
+ public static class InitGuiEvent extends GuiScreenEvent{public final List<GuiButton> buttonList;public InitGuiEvent(GuiScreen g,List<GuiButton> b){super(g);buttonList=b;}public static final class Post extends InitGuiEvent{public Post(GuiScreen g,List<GuiButton> b){super(g,b);}}}
+}

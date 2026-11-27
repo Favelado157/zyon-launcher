@@ -1,0 +1,8 @@
+package dev.zyon.platform;
+import dev.zyon.platform.event.*;import java.lang.reflect.*;import java.util.*;import net.minecraft.client.Minecraft;import net.minecraft.client.settings.KeyBinding;import net.minecraft.command.CommandBase;
+public final class Platform {
+ public static float lastBrightnessX,lastBrightnessY;
+ public static final Bus EVENTS=new Bus();public static CommandBase command;
+ public static void key(KeyBinding binding){Minecraft mc=Minecraft.getMinecraft();KeyBinding[] old=mc.gameSettings.keyBindings;for(KeyBinding b:old)if(b==binding)return;KeyBinding[] next=Arrays.copyOf(old,old.length+1);next[old.length]=binding;mc.gameSettings.keyBindings=next;}
+ public static final class Bus{private final Set<Object> owners=Collections.newSetFromMap(new IdentityHashMap<Object,Boolean>());private final List<Object[]> handlers=new ArrayList<Object[]>();public void register(Object owner){if(!owners.add(owner))return;for(Method m:owner.getClass().getMethods())if(m.isAnnotationPresent(SubscribeEvent.class)&&m.getParameterTypes().length==1)handlers.add(new Object[]{owner,m,m.getParameterTypes()[0]});}public <T extends Event>T post(T event){for(Object[] h:handlers)if(((Class<?>)h[2]).isInstance(event))try{((Method)h[1]).invoke(h[0],event);}catch(InvocationTargetException e){throw new RuntimeException("Zyon event: "+h[1],e.getCause());}catch(Exception e){throw new RuntimeException(e);}return event;}}
+}

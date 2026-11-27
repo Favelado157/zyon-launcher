@@ -1,0 +1,3 @@
+package dev.zyon.platform;
+/** Standalone entrypoint: the classpath must contain only the client and vanilla libraries. */
+public final class Main {public static void main(String[] args){ClassLoader loader=Main.class.getClassLoader();if(loader.getResource("net/minecraftforge/common/MinecraftForge.class")!=null||loader.getResource("net/minecraft/launchwrapper/Launch.class")!=null)throw new IllegalStateException("Unexpected legacy loader on the client classpath");System.out.println("ZYON_RUNTIME_VERIFY forgeAbsent=true launchwrapperAbsent=true");System.out.println("Zyon Client 2.0 / vanilla Minecraft 1.8.9");net.minecraft.client.main.Main.main(args);}}

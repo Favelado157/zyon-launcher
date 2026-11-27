@@ -3,3 +3,12 @@ dist/
 .vscode/
 build/installer-files.nsh
 *.log
+build/asm-classpath.txt
+build/vanilla-classpath.txt
+build/local-bundle/
+build/local-installer/
+
+node_modules
+payload/*.jar
+build/asm-classpath.txt
+build/vanilla-classpath.txt

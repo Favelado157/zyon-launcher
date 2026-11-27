@@ -1,0 +1,1 @@
+package dev.zyon.platform.event; public class Event {private boolean canceled; public void setCanceled(boolean value){canceled=value;} public boolean isCanceled(){return canceled;}}

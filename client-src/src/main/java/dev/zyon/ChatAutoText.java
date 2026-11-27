@@ -1,9 +1,9 @@
 package dev.zyon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import dev.zyon.platform.event.GuiScreenEvent;
+import dev.zyon.platform.event.SubscribeEvent;
+import dev.zyon.platform.ReflectionHelper;
 import org.lwjgl.input.Mouse;
 
 public final class ChatAutoText {

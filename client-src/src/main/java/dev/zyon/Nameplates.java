@@ -12,10 +12,10 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import dev.zyon.platform.event.RenderPlayerEvent;
+import dev.zyon.platform.event.RenderGameOverlayEvent;
+import dev.zyon.platform.event.SubscribeEvent;
+import dev.zyon.platform.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 

@@ -1,4 +1,4 @@
-// Java / Profiles.java / Java 8 / Forge 1.8.9
+// Java / Profiles.java / Java 8 / Minecraft 1.8.9
 package dev.zyon;
 import com.google.gson.*;
 import java.io.*;

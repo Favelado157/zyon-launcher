@@ -5,8 +5,8 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Team;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import dev.zyon.platform.event.RenderPlayerEvent;
+import dev.zyon.platform.event.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 

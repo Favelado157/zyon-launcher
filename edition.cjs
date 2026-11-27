@@ -1,33 +1,9 @@
-'use strict';
-const path = require('node:path');
-const fs = require('node:fs/promises');
-const core = require('./core.cjs');
-const EDITION = 'visual-1.3';
-function migrate(previous, root, publisher) {
-  const defaultDir = path.join(root, 'instances', 'zyon-visual-1.8.9');
-  const sameEdition = previous.edition === EDITION;
-  return {
-    edition: EDITION, loginMode: 'microsoft',
-    instanceDir: sameEdition && typeof previous.instanceDir === 'string' && path.isAbsolute(previous.instanceDir) ? previous.instanceDir : defaultDir,
-    previousInstanceDir: typeof (sameEdition ? previous.previousInstanceDir : previous.instanceDir) === 'string' && path.isAbsolute(sameEdition ? previous.previousInstanceDir : previous.instanceDir) ? (sameEdition ? previous.previousInstanceDir : previous.instanceDir) : '',
-    microsoftClientId: publisher.microsoftClientId || '', githubRepository: publisher.githubRepository || ''
-  };
-}
-async function validateInstance(instanceDir, payload) {
-  const mods = path.join(instanceDir, 'mods');
-  if (!await core.exists(mods)) return;
-  if ((await fs.lstat(mods)).isSymbolicLink()) throw new Error('Escolha uma pasta nova para a edição visual. A pasta mods não pode ser um link.');
-  const manifest = await core.readJson(path.join(payload, 'manifest.json'));
-  for (const entry of await fs.readdir(mods, { withFileTypes: true })) {
-    if (!entry.isFile() || entry.isSymbolicLink()) throw new Error('Esta pasta contém mods externos à edição visual. Escolha uma pasta nova; os arquivos anteriores serão preservados.');
-    const expected = entry.name === core.MOD ? [manifest.sha256] : manifest.previousVisuals?.[entry.name];
-    if (!Array.isArray(expected) || !expected.length) throw new Error('Esta pasta contém mods externos à edição visual. Escolha uma pasta nova; os arquivos anteriores serão preservados.');
-    const bytes = await fs.readFile(path.join(mods, entry.name));
-    if (manifest.file !== core.MOD || !expected.includes(core.digest(bytes))) throw new Error('O cliente visual existente tem conteúdo diferente. Escolha uma pasta nova para preservar esse arquivo.');
-  }
-}
-module.exports = { EDITION, migrate, validateInstance };
-
+"use strict";
+const path=require('node:path'),fs=require('node:fs/promises'),core=require('./core.cjs');
+const EDITION='standalone-2';
+function migrate(previous,root,publisher){return {edition:EDITION,loginMode:'nickname-offline',instanceDir:typeof previous.instanceDir==='string'&&path.isAbsolute(previous.instanceDir)?previous.instanceDir:path.join(root,'instances','zyon-client-1.8.9'),previousInstanceDir:typeof previous.previousInstanceDir==='string'?previous.previousInstanceDir:'',githubRepository:publisher.githubRepository||''};}
+async function validateInstance(instanceDir,payload){if(typeof instanceDir!=='string'||!path.isAbsolute(instanceDir))throw Error('Pasta de jogo inválida.');const folder=path.join(instanceDir,'client');if(await core.exists(folder)&&(await fs.lstat(folder)).isSymbolicLink())throw Error('A pasta do cliente não pode ser um link.');}
+module.exports={EDITION,migrate,validateInstance};
 async function migrateProfiles(previousDir, instanceDir) {
   if (!previousDir || previousDir === instanceDir) return;
   const source = path.join(previousDir, 'config', 'zyon'), destination = path.join(instanceDir, 'config', 'zyon');
