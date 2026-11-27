@@ -47,7 +47,7 @@ async function main(){
  await fs.writeFile(path.join(build,'classpath.json'),JSON.stringify({cp,libraries,asm:deps.slice(0,3),junit:deps.slice(3),metadata,vanilla,java:exe('java')},null,2));
  require('./prepare-release.cjs');
  if(process.argv.includes('--test')){
-  const testCp=[classes,cp,...deps.slice(3)].join(path.delimiter),sources=(await files(path.join(root,'client-src/src/test/java'))).filter(f=>f.endsWith('.java'));
+  const testCp=[classes,cp,...deps].join(path.delimiter),sources=(await files(path.join(root,'client-src/src/test/java'))).filter(f=>f.endsWith('.java'));
   run('javac',['-encoding','UTF-8','-cp',testCp,'-d',tests,...sources]);const names=[];for(const source of sources)if((await fs.readFile(source,'utf8')).includes('@Test'))names.push('dev.zyon.'+path.basename(source,'.java'));
   run('java',['-Djava.awt.headless=true','-cp',[tests,resources,testCp].join(path.delimiter),'org.junit.runner.JUnitCore',...names]);
  }
