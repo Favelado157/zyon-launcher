@@ -2,7 +2,7 @@ Zyon Client {{VERSION}} inicia Minecraft Java 1.8.9 pela integração própria d
 
 - Entrada por nick offline, sem login Microsoft no aplicativo.
 - HUD e menu atuais preservados, com aba **Xit** separada: KillAura, TriggerBot, AutoClicker, AimAssist, AutoSprint, Fly, Speed, Step, AutoJump, SafeWalk, ESP, Tracers, AutoTool, AutoEat e FastPlace. Começam desligados; ajustes e teclas ficam salvos nos perfis.
-- Capas públicas OptiFine pelo nick, quando existentes. Não inclui o OptiFine ou uma capa paga, nem modifica o perfil oficial Minecraft.
+- Capas públicas OptiFine pelo nick, quando existentes. Inclui fallback para a rota pública de compatibilidade do serviço. Não inclui o OptiFine ou uma capa paga, nem modifica o perfil oficial Minecraft.
 - Preserva a pasta configurada do jogo, mundos e preferências. Arquivos antigos da pasta mods não são carregados por este client.
 - Avisos de atualização pelo canal oficial, com verificação de integridade do instalador.
 

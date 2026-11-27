@@ -8,7 +8,7 @@ Instale o EXE de [Releases](https://github.com/Favelado157/zyon-launcher/release
 
 **Shift direito** abre o painel; **Recursos** mantém o HUD atual; **Xit** agrupa as 15 funções da primeira edição. Os módulos Xit começam desligados e podem ser configurados, favoritados e vinculados a uma tecla. O botão **?** explica cada função. **Ctrl direito** abre o editor de widgets, **C** controla o zoom e **End** desliga os recursos.
 
-**Capa OptiFine** vem ativada em Recursos → Visual: consulta a imagem pública do nick em `https://s.optifine.net/capes/<nick>.png`, carrega em segundo plano e guarda cache local. Não inclui OptiFine nem compra/concede capas. Na ausência de uma capa pública, preserva a capa padrão. A aparência é exibida por clientes com suporte a esse serviço.
+**Capa OptiFine** vem ativada em Recursos → Visual: consulta a imagem pública do nick em `https://s.optifine.net/capes/<nick>.png`, carrega em segundo plano e guarda cache local. Se HTTPS estiver indisponível, usa a rota HTTP pública de compatibilidade do OptiFine, sem enviar credenciais. Não inclui OptiFine nem compra/concede capas. Na ausência de uma capa pública, preserva a capa padrão. A aparência é exibida por clientes com suporte a esse serviço.
 
 ## Atualização e arquivos
 
