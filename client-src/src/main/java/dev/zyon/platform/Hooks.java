@@ -13,6 +13,11 @@ public final class Hooks {
  public static void renderStart(){if(initialized)Platform.EVENTS.post(new TickEvent.RenderTickEvent(TickEvent.Phase.START));}
  public static void worldLast(float partial){if(initialized)Platform.EVENTS.post(new RenderWorldLastEvent(partial));}
  public static net.minecraft.util.ResourceLocation cape(net.minecraft.util.ResourceLocation original,net.minecraft.client.entity.AbstractClientPlayer player){return initialized?CapeSupport.location(original,player):original;}
+ public static void citAtlas(net.minecraft.client.renderer.texture.TextureMap atlas,net.minecraft.client.resources.IResourceManager manager){ArmorCit.prepare(atlas,manager);}
+ public static net.minecraft.util.ResourceLocation citResource(net.minecraft.util.ResourceLocation vanilla,net.minecraft.util.ResourceLocation sprite,int level){return ArmorCit.atlasResource(vanilla,sprite,level);}
+ public static net.minecraft.util.ResourceLocation citArmor(net.minecraft.util.ResourceLocation vanilla,net.minecraft.item.ItemStack item,int slot){return ArmorCit.armorTexture(vanilla,item,slot);}
+ public static net.minecraft.client.resources.model.IBakedModel citItem(net.minecraft.client.resources.model.IBakedModel vanilla,net.minecraft.item.ItemStack item){return ArmorCit.itemModel(vanilla,item);}
+ public static void connectionFault(final Throwable failure){org.apache.logging.log4j.LogManager.getLogger("Zyon").error("Connection integration failed",failure);mc().addScheduledTask(new Runnable(){public void run(){mc().displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()),"connect.failed",new ChatComponentText("Falha interna ao iniciar a conexao. Atualize o Zyon e tente novamente. Detalhes em logs/latest.log.")));}});}
  public static void renderEnd(){if(initialized)Platform.EVENTS.post(new TickEvent.RenderTickEvent(TickEvent.Phase.END));}
  public static boolean keyboardNext(){if(keyboardPending&&initialized){keyboardPending=false;Platform.EVENTS.post(new InputEvent.KeyInputEvent());}boolean next=Keyboard.next();keyboardPending=next;return next;}
  public static boolean mouseNext(){if(mousePending&&initialized){mousePending=false;Platform.EVENTS.post(new InputEvent.MouseInputEvent());}boolean next=Mouse.next();mousePending=next;return next;}
